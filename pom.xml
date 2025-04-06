@@ -23,8 +23,6 @@
 
     <modules>
         <module>nurse-track-backend</module>
-        <module>nurse-track-backend</module>
-
     </modules>
 
     <dependencyManagement>
