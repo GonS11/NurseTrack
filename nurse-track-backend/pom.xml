@@ -48,6 +48,12 @@
             <version>${mysql.connector.version}</version>
         </dependency>
 
+        <!-- CORS Config -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Utilidades -->
         <dependency>
             <groupId>org.projectlombok</groupId>
