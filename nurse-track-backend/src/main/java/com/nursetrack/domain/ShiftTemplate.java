@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shift_templates",
-        indexes = @Index(name = "idx_shift_templates_creator", columnList = "created_by_user_id"))
+        indexes = @Index(name = "idx_shift_templates_creator", columnList = "created_by_user_id"),
+        uniqueConstraints = @UniqueConstraint(name = "unq_shift_name_department", columnNames = {"department_id","name"}))
 @Getter
 @Setter
 @NoArgsConstructor

@@ -87,8 +87,6 @@ CREATE TABLE nurses_departments (
     FOREIGN KEY (nurse_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE CASCADE,
 
-    UNIQUE (nurse_user_id, department_id),
-
     INDEX idx_nurses_departments (department_id, nurse_user_id)
 ) ENGINE=InnoDB;
 
@@ -154,7 +152,7 @@ CREATE TABLE vacation_requests (
     UNIQUE (requester_user_id, start_date, end_date),
 
     INDEX idx_vacation_dates (start_date, end_date),
-     INDEX idx_vacation_requester_status (requester_user_id, status),
+    INDEX idx_vacation_requester_status (requester_user_id, status),
 
     CHECK (end_date >= start_date)
 ) ENGINE=InnoDB;

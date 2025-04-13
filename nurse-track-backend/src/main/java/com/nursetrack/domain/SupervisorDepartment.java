@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "supervisors_departments",
-        indexes = @Index(name = "idx_supervisors_departments",columnList = "department_id, supervisor_user_id"))
+        indexes = @Index(name = "idx_supervisors_departments",columnList = "department_id, supervisor_user_id"),
+        uniqueConstraints = @UniqueConstraint(name = "unq_supervisor_department",columnNames = {"supervisor_user_id","department_id"}))
 @Getter
 @Setter
 @NoArgsConstructor

@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
         indexes = {
                 @Index(name = "idx_vacation_dates", columnList = "start_date, end_date"),
                 @Index(name = "idx_vacation_requester_status", columnList = "requester_user_id, status")
-        })
+        },
+        uniqueConstraints = @UniqueConstraint(name = "unq_vacation_user",columnNames = {"requester_user_id","start_date","end_date"}))
 @Getter
 @Setter
 @NoArgsConstructor
