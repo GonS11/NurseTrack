@@ -1,6 +1,5 @@
 package com.nursetrack.domain;
 
-import com.nursetrack.constants.AppEnums;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,6 @@ public class Department
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "department_id")
     private Long departmentId;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -28,14 +26,13 @@ public class Department
     @Column(nullable = false, length = 100)
     private String location;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(nullable = false)
     private Boolean isActive = true;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 }

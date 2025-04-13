@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS `nurse-track`;
+USE `nurse-track`;
+
 CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(50) NOT NULL,
@@ -49,8 +52,11 @@ CREATE TABLE shift_templates (
     FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by_user_id) REFERENCES users(user_id) ON DELETE RESTRICT,
 
-    INDEX idx_shift_templates_department (department_id),
-    INDEX idx_shift_templates_creator (created_by_user_id)
+    UNIQUE (department_id, name),
+
+    INDEX idx_shift_templates_creator (created_by_user_id),
+
+    CONSTRAINT chk_shift_time CHECK (shift_end_time > shift_start_time)
 ) ENGINE=InnoDB;
 
 INSERT INTO shift_templates(department_id, name, shift_start_time, shift_end_time, shift_type, display_color, created_by_user_id)
@@ -88,15 +94,15 @@ CREATE TABLE nurses_departments (
 
 CREATE TABLE shifts (
     shift_id INT PRIMARY KEY AUTO_INCREMENT,
-    nurse_user_id INT NOT NULL,
-    department_id INT NOT NULL,
+    nurse_user_id INT,
+    department_id INT,
     shift_template_id INT,
     shift_date DATE NOT NULL,
     shift_start_datetime DATETIME NOT NULL,
     shift_end_datetime DATETIME NOT NULL,
-    status ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED') DEFAULT 'SCHEDULED',  
+    status ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED', 'PENDING', 'APPROVED', 'REJECTED') DEFAULT 'SCHEDULED',
     notes TEXT,
-    created_by_user_id INT NOT NULL,
+    created_by_user_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -105,11 +111,10 @@ CREATE TABLE shifts (
     FOREIGN KEY (shift_template_id) REFERENCES shift_templates(shift_template_id) ON DELETE SET NULL,
     FOREIGN KEY (created_by_user_id) REFERENCES users(user_id) ON DELETE RESTRICT,
 
-    UNIQUE (nurse_user_id, shift_start_datetime),
-
-    INDEX idx_shifts_date_time (shift_date, shift_start_datetime),
+    INDEX idx_shifts_coverage (department_id, shift_date, status),
     INDEX idx_shifts_nurse_date (nurse_user_id, shift_date),
-    INDEX idx_shifts_status (status)
+
+    CONSTRAINT chk_shift_duration CHECK (shift_end_datetime > shift_start_datetime)
 ) ENGINE=InnoDB;
 
 CREATE TABLE shift_change_requests (
@@ -118,36 +123,38 @@ CREATE TABLE shift_change_requests (
     requested_shift_id INT NOT NULL,
     offered_shift_id INT,
     reason TEXT,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED') DEFAULT 'PENDING',  
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM("SCHEDULED", "COMPLETED", "CANCELLED", "PENDING", "APPROVED", "REJECTED") DEFAULT 'PENDING',
     reviewed_by_user_id INT,
     reviewed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (requester_user_id) REFERENCES users(user_id) ON DELETE RESTRICT,
     FOREIGN KEY (requested_shift_id) REFERENCES shifts(shift_id) ON DELETE CASCADE,
     FOREIGN KEY (offered_shift_id) REFERENCES shifts(shift_id) ON DELETE SET NULL,
     FOREIGN KEY (reviewed_by_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
 
-    INDEX idx_shift_change_status (status),
+    INDEX idx_shift_change_requester (requester_user_id, status),
     INDEX idx_shift_change_timestamps (created_at, reviewed_at)
 ) ENGINE=InnoDB;
 
 CREATE TABLE vacation_requests (
     vacation_request_id INT PRIMARY KEY AUTO_INCREMENT,
-    nurse_user_id INT NOT NULL,
+    requester_user_id INT,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     reason TEXT,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED') DEFAULT 'PENDING',  
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED', 'PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
     reviewed_by_user_id INT,
     reviewed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (nurse_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (requester_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (reviewed_by_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
 
+    UNIQUE (requester_user_id, start_date, end_date),
+
     INDEX idx_vacation_dates (start_date, end_date),
-    INDEX idx_vacation_status (status),
+     INDEX idx_vacation_requester_status (requester_user_id, status),
 
     CHECK (end_date >= start_date)
 ) ENGINE=InnoDB;
@@ -155,10 +162,9 @@ CREATE TABLE vacation_requests (
 CREATE TABLE notifications (
     notification_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    notification_type ENUM('SHIFT_CHANGE', 'VACATION_REQUEST', 'GENERAL', 'SYSTEM') NOT NULL,  
+    notification_type ENUM('SHIFT_CHANGE', 'VACATION_REQUEST', 'GENERAL', 'SYSTEM') DEFAULT 'GENERAL',
     title VARCHAR(100) NOT NULL,
     message TEXT NOT NULL,
-    related_id INT,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -167,6 +173,3 @@ CREATE TABLE notifications (
     INDEX idx_notifications_user (user_id, is_read),
     INDEX idx_notifications_type (notification_type)
 ) ENGINE=InnoDB;
-
-CREATE INDEX idx_shifts_date_status ON shifts(shift_date, status);
-CREATE INDEX idx_vacation_nurse_status ON vacation_requests(nurse_user_id, status);

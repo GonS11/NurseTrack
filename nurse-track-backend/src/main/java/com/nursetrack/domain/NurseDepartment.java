@@ -9,7 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "nurses_departments")
+@Table(name = "nurses_departments",
+        indexes = @Index(name = "idx_nurses_departments",columnList = "department_id, nurse_user_id"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,8 +18,7 @@ public class NurseDepartment
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "nurse_department_id")
-    private Long id;
+    private Long nurseDepartmentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nurse_user_id", nullable = false)
@@ -29,6 +29,6 @@ public class NurseDepartment
     private Department department;
 
     @CreationTimestamp
-    @Column(name = "assigned_at", updatable = false)
+    @Column(updatable = false)
     private LocalDateTime assignedAt;
 }

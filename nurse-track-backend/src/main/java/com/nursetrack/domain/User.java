@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users",
-        indexes = @Index(name = "idx_users_role_active", columnList = "role, isActive"))
+        indexes = @Index(name = "idx_users_role_active", columnList = "role, is_active"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,13 +20,12 @@ public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String lastName;
 
     @Column(unique = true, nullable = false, length = 100)
@@ -39,17 +38,16 @@ public class User
     @Column(nullable = false, length = 20)
     private AppEnums.UserRole role = AppEnums.UserRole.NURSE;
 
-    @Column(name = "license_number", length = 50)
+    @Column(length = 50)
     private String licenseNumber = null;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(nullable = false)
     private Boolean isActive = true;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 }
