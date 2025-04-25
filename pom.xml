@@ -2,30 +2,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- ==================== -->
+    <!-- CONFIGURACIÓN BÁSICA -->
+    <!-- ==================== -->
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Identificadores del proyecto (GAV - Group, Artifact, Version) -->
     <groupId>com.nursetrack</groupId>
     <artifactId>NurseTrack</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <!-- Packaging como 'pom' indica que es un proyecto padre multi-módulo -->
     <packaging>pom</packaging>
 
     <name>NurseTrack</name>
-    <description>Aplicación web de gestión de planillas para personal de enfermería</description>
+    <description>Web-based spreadsheet management application for nurses</description>
 
+    <!-- ================= -->
+    <!-- PROPIEDADES GLOBALES -->
+    <!-- ================= -->
     <properties>
+        <!-- Configuración básica del proyecto -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <!-- Versiones de dependencias principales (centralizadas para fácil mantenimiento) -->
         <spring-boot.version>3.2.0</spring-boot.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.30</lombok.version>
+        <lombok.mapstruct.version>0.2.0</lombok.mapstruct.version>
         <mysql.connector.version>8.0.33</mysql.connector.version>
+        <jjwt-api.version>0.11.5</jjwt-api.version>
+        <jjwt-impl.version>0.11.5</jjwt-impl.version>
+        <jjwt-jackson.version>0.11.5</jjwt-jackson.version>
     </properties>
 
+    <!-- ============= -->
+    <!-- MÓDULOS HIJO -->
+    <!-- ============= -->
     <modules>
         <module>nurse-track-backend</module>
     </modules>
 
+    <!-- ========================== -->
+    <!-- GESTIÓN DE DEPENDENCIAS -->
+    <!-- ========================== -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -35,9 +57,51 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql.connector.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!-- Dependencias JJWT para JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt-impl.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt-jackson.version}</version>
+                <scope>runtime</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
+    <!-- ====================== -->
+    <!-- CONFIGURACIÓN DE BUILD -->
+    <!-- ====================== -->
     <build>
         <pluginManagement>
             <plugins>
@@ -53,6 +117,16 @@
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
                                 <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>${lombok.mapstruct.version}</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
