@@ -37,7 +37,7 @@ public class JwtUtil
                 .compact();
     }
 
-    public boolean validateToken(String token)
+    public Boolean validateToken(String token)
     {
         try
         {

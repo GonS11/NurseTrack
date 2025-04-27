@@ -23,16 +23,16 @@ public interface UserRepository extends JpaRepository<User, Long>
     Optional<User> findByUsernameOrEmail(@Param("username") String username);
 
     List<User> findByRole(UserRole role);
-    List<User> findByIsActive(boolean isActive);
-    List<User> findByRoleAndIsActive(UserRole role, boolean isActive);
+    List<User> findByIsActive(Boolean isActive);
+    List<User> findByRoleAndIsActive(UserRole role, Boolean isActive);
 
     Page<User> findByRole(UserRole role, Pageable pageable);
-    Page<User> findByIsActive(boolean isActive, Pageable pageable);
-    Page<User> findByRoleAndIsActive(UserRole role, boolean isActive, Pageable pageable);
+    Page<User> findByIsActive(Boolean isActive, Pageable pageable);
+    Page<User> findByRoleAndIsActive(UserRole role, Boolean isActive, Pageable pageable);
 
-    boolean existsByEmail(String email);
-    boolean existsByUsername(String username);
-    boolean existsByLicenseNumber(String licenseNumber);
+    Boolean existsByEmail(String email);
+    Boolean existsByUsername(String username);
+    Boolean existsByLicenseNumber(String licenseNumber);
 
     Optional<User> findByIdAndRole(Long id, UserRole role);
 }

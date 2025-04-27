@@ -58,7 +58,7 @@ public class UserService
         return userMapper.toDto(userRepository.save(user));
     }
 
-    public void toggleUserStatus(Long id, boolean active)
+    public void toggleUserStatus(Long id, Boolean active)
     {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

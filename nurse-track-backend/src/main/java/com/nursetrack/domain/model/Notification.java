@@ -47,7 +47,7 @@ public class Notification
     private LocalDateTime createdAt;
 
     @Transient
-    public boolean isEmergency()
+    public Boolean isEmergency()
     {
         return type == NotificationType.EMERGENCY;
     }
