@@ -1,10 +1,10 @@
 package com.nursetrack.web.mappers;
 
 import com.nursetrack.domain.model.Notification;
+import com.nursetrack.repository.UserRepository;
 import com.nursetrack.web.dto.request.notification.CreateNotificationRequest;
 import com.nursetrack.web.dto.response.NotificationResponse;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +21,13 @@ public interface NotificationMapper
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "isRead", constant = "false")
     Notification toEntity(CreateNotificationRequest dto);
+
+    @AfterMapping
+    default void resolveCreateRelations(CreateNotificationRequest request, @MappingTarget Notification notification,
+                                        @Context UserRepository userRepository)
+    {
+        notification.setUser(userRepository.getReferenceById(request.getUserId()));
+    }
 
     List<NotificationResponse> toDtoList(List<Notification> entities);
 

@@ -10,9 +10,14 @@ import java.util.Optional;
 @Repository
 public interface NurseDepartmentRepository extends JpaRepository<NurseDepartment, Long>
 {
-    List<NurseDepartment> findByDepartmentId(Long departmentId);
+    Optional<NurseDepartment> findByDepartmentId(Long departmentId);
     Optional<NurseDepartment> findByNurseIdAndDepartmentId(Long nurseId, Long departmentId);
-    List<NurseDepartment> findByNurseId(Long nurseId);
-    Boolean existsByNurseIdAndDepartmentId(Long nurseId, Long departmentId);
+    Optional<NurseDepartment> findByNurseId(Long nurseId);
+
+    List<NurseDepartment> findByNurseIdList(Long nurseId);
+    List<NurseDepartment> findByDepartmentIdList(Long departmentId);
+
+    boolean existsByNurseIdAndDepartmentId(Long nurseId, Long departmentId);
+
     void deleteByNurseIdAndDepartmentId(Long nurseId, Long departmentId);
 }

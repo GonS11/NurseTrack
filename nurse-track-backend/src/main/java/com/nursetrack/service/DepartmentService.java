@@ -56,7 +56,7 @@ public class DepartmentService
     {
         validateName(request.getName());
 
-        Department department = departmentMapper.toModel(request);
+        Department department = departmentMapper.toEntity(request);
         department.setIsActive(true);
 
         Department savedDepartment = departmentRepository.save(department);

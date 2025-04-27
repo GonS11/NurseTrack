@@ -1,7 +1,6 @@
 package com.nursetrack.service;
 
 import com.nursetrack.domain.model.Notification;
-import com.nursetrack.domain.model.User;
 import com.nursetrack.exception.NotificationNotFoundException;
 import com.nursetrack.repository.NotificationRepository;
 import com.nursetrack.repository.UserRepository;
@@ -42,16 +41,9 @@ public class NotificationService
     @Transactional
     public NotificationResponse createNotification(CreateNotificationRequest request)
     {
-        //No guarda el User completo, solo un proxy con el ID,
-        // la validation de existencia de este user ya se ha hecho en el CreateDTO @Valid
-        User user = userRepository.getReferenceById(request.getUserId());
-
         Notification notification = notificationMapper.toEntity(request);
-        notification.setUser(user); //Solo guarda user_id
 
-        return notificationMapper.toDto(
-                notificationRepository.save(notification)
-        );
+        return notificationMapper.toDto(notificationRepository.save(notification));
     }
 
     @Transactional

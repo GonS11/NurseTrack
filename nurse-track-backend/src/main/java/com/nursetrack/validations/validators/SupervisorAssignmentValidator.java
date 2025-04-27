@@ -1,6 +1,7 @@
 package com.nursetrack.validations.validators;
 
 import com.nursetrack.repository.SupervisorDepartmentRepository;
+import com.nursetrack.utils.ValidationUtils;
 import com.nursetrack.validations.annotations.ValidSupervisorAssignment;
 import com.nursetrack.web.dto.request.supervisorDepartment.AssignSupervisorRequest;
 import jakarta.validation.ConstraintValidator;
@@ -21,22 +22,17 @@ public class SupervisorAssignmentValidator implements ConstraintValidator<ValidS
         supervisorDepartmentRepository.findBySupervisorId(request.getSupervisorId())
                 .filter(assignment -> !assignment.getDepartment().getId().equals(request.getDepartmentId()))
                 .ifPresent(assignment -> {
-                    context.disableDefaultConstraintViolation();
-                    context.buildConstraintViolationWithTemplate("Supervisor already assign to " + assignment.getDepartment().getName() + " department")
-                            .addPropertyNode("supervisorId")
-                            .addConstraintViolation();
+                    ValidationUtils.addValidationError(context, "supervisorId","Supervisor already assign to "
+                                                        + assignment.getDepartment().getName() + " department");
                 });
 
         // Verificar si departamento tiene un supervisor
         supervisorDepartmentRepository.findByDepartmentId(request.getDepartmentId())
                 .filter(assignment -> !assignment.getSupervisor().getId().equals(request.getSupervisorId()))
                 .ifPresent(assignment -> {
-                    context.disableDefaultConstraintViolation();
-                    context.buildConstraintViolationWithTemplate("Department already has assigned supervisor with name: "
-                                                                         + assignment.getSupervisor().getFirstName() + " "
-                                                                         + assignment.getSupervisor().getLastName())
-                            .addPropertyNode("departmentId")
-                            .addConstraintViolation();
+                    ValidationUtils.addValidationError(context, "departmentId","Department already has assigned supervisor with name: "
+                            + assignment.getSupervisor().getFirstName() + " "
+                            + assignment.getSupervisor().getLastName());
                 });
 
         return valid;

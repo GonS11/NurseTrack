@@ -21,7 +21,7 @@ public interface DepartmentMapper
     @Mapping(target = "isActive", constant = "true") // Fuerza valor por defecto
     @Mapping(target = "createdAt", ignore = true) // Se gestiona con @CreationTimestamp
     @Mapping(target = "updatedAt", ignore = true) // Se gestiona con @UpdateTimestamp
-    Department toModel(CreateDepartmentRequest request);
+    Department toEntity(CreateDepartmentRequest request);
 
     // 3. UpdateRequest → Entity existente
     @Mapping(target = "id", ignore = true)

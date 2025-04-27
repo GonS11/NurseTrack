@@ -1,10 +1,11 @@
 package com.nursetrack.web.mappers;
 
 import com.nursetrack.domain.model.NurseDepartment;
+import com.nursetrack.repository.DepartmentRepository;
+import com.nursetrack.repository.UserRepository;
 import com.nursetrack.web.dto.request.nurseDepartment.AssignNurseRequest;
 import com.nursetrack.web.dto.response.NurseDepartmentResponse;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -19,9 +20,16 @@ public interface NurseDepartmentMapper
     // Request → Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "assignedAt", ignore = true)
-    @Mapping(target = "nurse",ignore = true)
-    @Mapping(target = "department",ignore = true)
-    NurseDepartment toModel(AssignNurseRequest request);
+    NurseDepartment toEntity(AssignNurseRequest request);
+
+    @AfterMapping
+    default void resolveAssignRelations (AssignNurseRequest request, @MappingTarget NurseDepartment nurseDepartment,
+                                         @Context UserRepository userRepository,
+                                         @Context DepartmentRepository departmentRepository)
+    {
+        nurseDepartment.setNurse(userRepository.getReferenceById(request.getNurseId()));
+        nurseDepartment.setDepartment(departmentRepository.getReferenceById(request.getDepartmentId()));
+    }
 
     // 3. Lista de Entities → Lista de Responses
     List<NurseDepartmentResponse> toDtoList(List<NurseDepartment> nurseDepartmentList);

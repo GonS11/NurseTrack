@@ -18,12 +18,12 @@ public enum ShiftType
     private final LocalTime defaultEndTime;
 
     @Getter
-    private final boolean fixedTime;
+    private final Boolean fixedTime;
     @Getter
-    private final boolean overnight;
+    private final Boolean overnight;
 
     ShiftType(String displayName, LocalTime defaultStartTime,
-              LocalTime defaultEndTime, boolean fixedTime, boolean overnight)
+              LocalTime defaultEndTime, Boolean fixedTime, Boolean overnight)
     {
         this.displayName = displayName;
         this.defaultStartTime = defaultStartTime;

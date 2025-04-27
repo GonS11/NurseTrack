@@ -38,7 +38,7 @@ public class SupervisorDepartmentService
 
     public SupervisorDepartmentResponse assignSupervisor(AssignSupervisorRequest request)
     {
-        SupervisorDepartment assignment = supervisorDepartmentMapper.toModel(request);
+        SupervisorDepartment assignment = supervisorDepartmentMapper.toEntity(request);
 
         return supervisorDepartmentMapper.toDto(supervisorDepartmentRepository.save(assignment));
     }
@@ -53,7 +53,7 @@ public class SupervisorDepartmentService
         supervisorDepartmentRepository.deleteByDepartmentId(departmentId);
     }
 
-    public void validateSupervisorAccess(Integer supervisorId, Integer departmentId)
+    public void validateSupervisorAccess(Long supervisorId, Long departmentId)
             throws AccessDeniedException
     {
         if(!supervisorDepartmentRepository.existsBySupervisorIdAndDepartmentId(supervisorId, departmentId))

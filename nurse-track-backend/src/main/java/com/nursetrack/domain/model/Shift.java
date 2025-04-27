@@ -69,6 +69,4 @@ public class Shift
 
     @OneToOne(mappedBy = "offeredShift", fetch = FetchType.LAZY)
     private ShiftChangeRequest offeredInShiftChange;
-
-
 }

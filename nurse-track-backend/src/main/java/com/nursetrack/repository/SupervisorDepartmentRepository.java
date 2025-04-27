@@ -16,7 +16,7 @@ public interface SupervisorDepartmentRepository extends JpaRepository<Supervisor
     // Verificar si existe una asignación para un departamento
     Boolean existsByDepartmentId(Long departmentId);
     Boolean existsBySupervisorId(Long supervisorId);
-    Boolean existsBySupervisorIdAndDepartmentId(Integer supervisorId, Integer departmentId);
+    Boolean existsBySupervisorIdAndDepartmentId(Long supervisorId, Long departmentId);
 
     // Eliminar asignación por departamento
     void deleteByDepartmentId(Long departmentId);
