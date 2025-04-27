@@ -11,15 +11,13 @@ public interface SupervisorDepartmentRepository extends JpaRepository<Supervisor
 {
     // Encontrar el supervisor asignado a un departamento
     Optional<SupervisorDepartment> findByDepartmentId(Long departmentId);
+    Optional<SupervisorDepartment> findBySupervisorId(Long supervisorId);
 
     // Verificar si existe una asignación para un departamento
     Boolean existsByDepartmentId(Long departmentId);
+    Boolean existsBySupervisorId(Long supervisorId);
+    Boolean existsBySupervisorIdAndDepartmentId(Integer supervisorId, Integer departmentId);
 
     // Eliminar asignación por departamento
     void deleteByDepartmentId(Long departmentId);
-
-    // Verificar si un usuario es supervisor de algún departamento
-    Boolean existsBySupervisorId(Long supervisorId);
-
-    Boolean existsBySupervisorIdAndDepartmentId(Integer supervisorId, Integer departmentId);
 }

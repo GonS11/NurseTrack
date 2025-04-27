@@ -1,5 +1,6 @@
 package com.nursetrack.web.dto.response;
 
+import com.nursetrack.validations.annotations.ValidSupervisorAssignment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ValidSupervisorAssignment
 public class SupervisorDepartmentResponse
 {
     private Long id;

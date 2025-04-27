@@ -23,5 +23,5 @@ public class AssignSupervisorRequest
     @NotNull
     @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR})
     @ValidUserId
-    private Long supervisorUserId;
+    private Long supervisorId;
 }
