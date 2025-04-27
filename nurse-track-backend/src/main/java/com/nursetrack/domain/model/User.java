@@ -91,9 +91,4 @@ public class User
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Notification> notifications = new ArrayList<>();
-
-    @Transient
-    public String getFullName() {
-        return this.firstName + " " + this.lastName;
-    }
 }

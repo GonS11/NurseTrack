@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// Para el usuario autenticado (incluye datos sensibles)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CurrentUserResponse extends UserResponse
+public class UserSimpleResponse
 {
-    private String email;
-    private String licenseNumber;
+    private Long id;
+    private String fullName;  // Calculado en el mapper
+    private String username;
 }

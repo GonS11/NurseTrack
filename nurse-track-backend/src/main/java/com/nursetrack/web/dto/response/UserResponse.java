@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// Para datos públicos del usuario (listados, perfiles)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,21 +16,13 @@ public class UserResponse
     private String firstName;
     private String lastName;
     private String username;
-    private String email;
     private UserRole role;
-    private String licenseNumber;
     private Boolean isActive;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    //FirstName + LastName
-    private String fullName;
-
-    //De UserRole
-    private String roleDisplayName;
-    private String roleDescription;
-
-    //Calculado
-    private Integer totalAssignedShifts;
-    private Integer unreadNotifications;
+    // Elimina @Mapping del mapper para fullName y déjalo solo en el getter
+    public String getFullName()
+    {
+        return firstName + " " + lastName;
+    }
 }
