@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SupervisorDepartmentResponse
+public class NurseDepartmentResponse
 {
     private Long id;
-    private UserResponse supervisor;
+    private UserResponse nurse;
     private DepartmentResponse department;
     private LocalDateTime assignedAt;
 }

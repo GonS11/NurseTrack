@@ -48,7 +48,7 @@ public class DepartmentService
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new DepartmentNotFoundException(id));
 
-        return departmentMapper.toDTO(department);
+        return departmentMapper.toDto(department);
     }
 
 
@@ -60,7 +60,7 @@ public class DepartmentService
         department.setIsActive(true);
 
         Department savedDepartment = departmentRepository.save(department);
-        return departmentMapper.toDTO(savedDepartment);
+        return departmentMapper.toDto(savedDepartment);
     }
 
 
@@ -78,7 +78,7 @@ public class DepartmentService
 
        Department updateDepartment = departmentRepository.save(department);
 
-       return departmentMapper.toDTO(updateDepartment);
+       return departmentMapper.toDto(updateDepartment);
     }
 
 

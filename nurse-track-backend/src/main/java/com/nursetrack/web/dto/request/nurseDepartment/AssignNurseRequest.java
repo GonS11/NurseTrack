@@ -1,8 +1,8 @@
-package com.nursetrack.web.dto.request.supervisorDepartment;
+package com.nursetrack.web.dto.request.nurseDepartment;
 
 import com.nursetrack.domain.enums.UserRole;
 import com.nursetrack.validations.annotations.ValidDepartmentId;
-import com.nursetrack.validations.annotations.ValidSupervisorAssignment;
+import com.nursetrack.validations.annotations.ValidNurseAssignment;
 import com.nursetrack.validations.annotations.ValidUserId;
 import com.nursetrack.validations.annotations.ValidUserRole;
 import jakarta.validation.constraints.NotNull;
@@ -15,15 +15,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ValidSupervisorAssignment
-public class AssignSupervisorRequest
+@ValidNurseAssignment
+public class AssignNurseRequest
 {
     @NotNull
     @ValidDepartmentId
     private Long departmentId;
 
     @NotNull
-    @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR})
+    @ValidUserRole(allowedRoles = {UserRole.NURSE})
     @ValidUserId
-    private Long supervisorId;
+    private Long nurseId;
 }

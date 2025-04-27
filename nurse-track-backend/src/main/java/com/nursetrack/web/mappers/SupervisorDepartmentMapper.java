@@ -24,5 +24,5 @@ public interface SupervisorDepartmentMapper
     SupervisorDepartment toModel(AssignSupervisorRequest request);
 
     // 3. Lista de Entities → Lista de Responses
-    List<SupervisorDepartmentResponse> toDtoList(List<SupervisorDepartment> entities);
+    List<SupervisorDepartmentResponse> toDtoList(List<SupervisorDepartment> supervisorDepartmentList);
 }

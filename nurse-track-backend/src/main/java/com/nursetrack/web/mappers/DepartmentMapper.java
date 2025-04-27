@@ -14,7 +14,7 @@ import java.util.List;
 public interface DepartmentMapper
 {
     // 1. Entity → Response
-    DepartmentResponse toDTO(Department department); // Todos los demás campos se mapean automáticamente
+    DepartmentResponse toDto(Department department); // Todos los demás campos se mapean automáticamente
 
     // 2. CreateRequest → Entity
     @Mapping(target = "id", ignore = true) // ID es autogenerado
