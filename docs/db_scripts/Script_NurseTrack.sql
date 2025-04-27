@@ -51,6 +51,14 @@ CREATE TABLE shift_templates (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+INSERT INTO shift_templates (name, start_time, end_time, type)
+VALUES
+    ('Morning Shift', '08:00:00', '15:00:00', 'MORNING'),
+    ('Afternoon Shift', '15:00:00', '22:00:00', 'AFTERNOON'),
+    ('Night Shift', '22:00:00', '08:00:00', 'NIGHT'),
+    ('12h Morning', '08:00:00', '20:00:00', 'HALF_MORNING'),
+    ('12h Night', '20:00:00', '08:00:00', 'HALF_NIGHT');
+
 
 CREATE TABLE supervisors_departments (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
