@@ -6,7 +6,7 @@ public class ValidationUtils
 {
     public static void addValidationError(ConstraintValidatorContext context, String field, String message)
     {
-        context.disableDefaultConstraintViolation();
+        context.disableDefaultConstraintViolation(); //Asegura que no hay duplicados y asi no ponerlo en el validator de cada uno
         context.buildConstraintViolationWithTemplate(message)
                 .addPropertyNode(field)
                 .addConstraintViolation();

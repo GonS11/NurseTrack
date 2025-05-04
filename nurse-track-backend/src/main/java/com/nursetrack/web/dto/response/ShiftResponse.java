@@ -1,7 +1,10 @@
 package com.nursetrack.web.dto.response;
 
-import com.nursetrack.domain.enums.Status;
-import lombok.*;
+import com.nursetrack.domain.enums.ShiftStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,7 +20,7 @@ public class ShiftResponse
     private DepartmentResponse department;
     private ShiftTemplateResponse shiftTemplate;
     private LocalDate shiftDate;
-    private Status status;
+    private ShiftStatus status;
     private String notes;
     private UserSimpleResponse createdBy;
     private LocalDateTime createdAt;

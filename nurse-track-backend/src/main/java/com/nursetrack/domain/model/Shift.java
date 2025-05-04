@@ -1,6 +1,6 @@
 package com.nursetrack.domain.model;
 
-import com.nursetrack.domain.enums.Status;
+import com.nursetrack.domain.enums.ShiftStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,8 +44,8 @@ public class Shift
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false,
-            columnDefinition = "ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED', 'PENDING', 'APPROVED', 'REJECTED')")
-    private Status status = Status.SCHEDULED;
+            columnDefinition = "ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED', 'SWAPPED')")
+    private ShiftStatus status = ShiftStatus.SCHEDULED;
 
     @Lob
     @Column(columnDefinition = "TEXT")

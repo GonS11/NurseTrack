@@ -1,6 +1,6 @@
 package com.nursetrack.utils;
 
-import com.nursetrack.domain.enums.Status;
+import com.nursetrack.domain.enums.ShiftStatus;
 import com.nursetrack.domain.model.NurseDepartment;
 import com.nursetrack.domain.model.Shift;
 import com.nursetrack.exception.AssignmentException;
@@ -17,13 +17,13 @@ public class ShiftValidation
                                            ShiftRepository shiftRepository)
     {
         //Validar status
-        if (shift.getStatus() == Status.COMPLETED)
+        if (shift.getStatus() == ShiftStatus.COMPLETED)
         {
             throw new InvalidStatusException("Completed shifts cannot be modified");
         }
 
-        if (shift.getStatus() == Status.CANCELLED
-                && (request.getStatus() == null || request.getStatus() != Status.SCHEDULED))
+        if (shift.getStatus() == ShiftStatus.CANCELLED
+                && (request.getStatus() == null || request.getStatus() != ShiftStatus.SCHEDULED))
         {
             throw new InvalidStatusException("Cancelled shifts can only be rescheduled to SCHEDULED status");
         }

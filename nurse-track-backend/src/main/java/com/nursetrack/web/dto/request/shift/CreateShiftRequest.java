@@ -1,6 +1,6 @@
 package com.nursetrack.web.dto.request.shift;
 
-import com.nursetrack.domain.enums.Status;
+import com.nursetrack.domain.enums.ShiftStatus;
 import com.nursetrack.domain.enums.UserRole;
 import com.nursetrack.validations.annotations.*;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -38,7 +38,7 @@ public class CreateShiftRequest
     @FutureOrPresent
     private LocalDate shiftDate;
 
-    private Status status = Status.SCHEDULED;
+    private ShiftStatus status = ShiftStatus.SCHEDULED;
 
     @Size(max = 500)
     private String notes;

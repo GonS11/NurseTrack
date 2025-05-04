@@ -1,6 +1,6 @@
 package com.nursetrack.validations.validators;
 
-import com.nursetrack.domain.enums.Status;
+import com.nursetrack.domain.enums.ShiftStatus;
 import com.nursetrack.repository.DepartmentRepository;
 import com.nursetrack.repository.ShiftRepository;
 import com.nursetrack.repository.ShiftTemplateRepository;
@@ -35,10 +35,10 @@ public class ShiftUpdateValidator implements ConstraintValidator<ValidShiftUpdat
         // Validar nurseId y status
         if (request.getNurseId() != null
                 && request.getStatus() != null
-                && !List.of(Status.SCHEDULED, Status.APPROVED).contains(request.getStatus()))
+                && !List.of(ShiftStatus.SCHEDULED, ShiftStatus.SWAPPED).contains(request.getStatus()))
         {
             ValidationUtils.addValidationError(context, "status",
-                                               "Shifts with assigned nurses must be SCHEDULED or APPROVED");
+                                               "Shifts with assigned nurses must be SCHEDULED or SWAPPED");
             isValid = false;
         }
 

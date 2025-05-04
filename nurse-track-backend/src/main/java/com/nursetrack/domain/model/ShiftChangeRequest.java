@@ -23,25 +23,36 @@ public class ShiftChangeRequest
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requester_id")
-    private User requester;
+    @JoinColumn(name = "requester_id", nullable = false)
+    private User requestingNurse;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requested_shift_id")
-    private Shift requestedShift;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "offered_shift_id")
+    @JoinColumn(name = "offered_shift_id", nullable = false)
     private Shift offeredShift;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private User receivingNurse;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requested_shift_id", nullable = false)
+    private Shift desiredShift;
 
     @Lob
     @Column(columnDefinition = "TEXT")
     private String reason;
 
+    @Lob
+    @Column(name = "reviewed_notes", columnDefinition = "TEXT")
+    private String reviewedNotes;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false,
             columnDefinition = "ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED')")
     private Status status = Status.PENDING;
+
+    @Column(name = "is_interchange", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isInterchange = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by_id")
@@ -53,27 +64,4 @@ public class ShiftChangeRequest
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    //Mandar al servicio?
-    @PrePersist
-    @PreUpdate
-    private void validateRequest()
-    {
-        if (requester == null || requestedShift == null)
-        {
-            throw new IllegalStateException("Requester and requested shift are mandatory");
-        }
-
-        if (offeredShift != null)
-        {
-            if (offeredShift.equals(requestedShift))
-            {
-                throw new IllegalStateException("Requested and offered shifts cannot be the same");
-            }
-            if (!offeredShift.getNurse().equals(requester))
-            {
-                throw new IllegalStateException("Offered shift must belong to the requester");
-            }
-        }
-    }
 }

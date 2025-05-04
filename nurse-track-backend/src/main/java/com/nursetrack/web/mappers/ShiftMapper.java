@@ -11,7 +11,8 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, DepartmentMapper.class, ShiftTemplateMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {UserMapper.class, DepartmentMapper.class, ShiftTemplateMapper.class})
 public interface ShiftMapper
 {
     ShiftResponse toDTO(Shift shift);
