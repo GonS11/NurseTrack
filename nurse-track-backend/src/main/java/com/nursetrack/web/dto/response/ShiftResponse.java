@@ -1,5 +1,6 @@
 package com.nursetrack.web.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nursetrack.domain.enums.ShiftStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,11 +27,13 @@ public class ShiftResponse
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public LocalDateTime getShiftStart()
     {
         return LocalDateTime.of(shiftDate, shiftTemplate.getShiftStartTime());
     }
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public LocalDateTime getShiftEnd()
     {
         return shiftTemplate.getShiftEndTime().isBefore(shiftTemplate.getShiftStartTime()) ?

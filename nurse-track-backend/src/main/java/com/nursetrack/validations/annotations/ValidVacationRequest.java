@@ -1,6 +1,6 @@
 package com.nursetrack.validations.annotations;
 
-import com.nursetrack.validations.validators.ShiftUpdateValidator;
+import com.nursetrack.validations.validators.VacationRequestValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ShiftUpdateValidator.class)
-public @interface ValidShiftUpdate
+@Constraint(validatedBy = VacationRequestValidator.class)
+public @interface ValidVacationRequest
 {
-    String message() default "Invalid shift update data";
+    String message() default "Invalid vacation request";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

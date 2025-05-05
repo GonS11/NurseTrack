@@ -2,8 +2,10 @@ package com.nursetrack.domain.model;
 
 import com.nursetrack.domain.enums.Status;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.AssertTrue;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -30,7 +32,7 @@ public class VacationRequest
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
-    private User requester;
+    private User requestingNurse;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -41,6 +43,10 @@ public class VacationRequest
     @Lob
     @Column(columnDefinition = "TEXT")
     private String reason;
+
+    @Lob
+    @Column(name = "reviewed_notes", columnDefinition = "TEXT")
+    private String reviewedNotes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED')")
@@ -56,26 +62,4 @@ public class VacationRequest
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @AssertTrue(message = "End date must be after or equal to start date")
-    public boolean isDateRangeValid() {
-        return endDate == null || startDate == null || !endDate.isBefore(startDate);
-    }
-
-    @PrePersist
-    @PreUpdate
-    private void validateRequest()
-    {
-        // Validar que si está aprobado/rechazado, tenga revisor
-        if ((status == Status.APPROVED || status == Status.REJECTED) && reviewedBy == null)
-        {
-            throw new IllegalStateException("Reviewed by must be set when status is APPROVED or REJECTED");
-        }
-
-        // Validar rango de fechas
-        if (endDate.isBefore(startDate))
-        {
-            throw new IllegalStateException("End date cannot be before start date");
-        }
-    }
 }

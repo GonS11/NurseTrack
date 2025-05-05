@@ -24,7 +24,7 @@ public interface ShiftChangeRequestMapper
     @Mapping(target = "status", expression = "java(Status.PENDING)")
     @Mapping(target = "reviewedBy", ignore = true)
     @Mapping(target = "reviewedAt", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "createdAt", ignore = true)
     ShiftChangeRequest toEntity(CreateShiftChangeRequest dto);
 
     @AfterMapping
@@ -46,16 +46,10 @@ public interface ShiftChangeRequestMapper
     @Mapping(target = "receivingNurse", ignore = true)
     @Mapping(target = "desiredShift", ignore = true)
     @Mapping(target = "reason", ignore = true)
+    @Mapping(target = "reviewedBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateModel(UpdateShiftChangeRequest request, @MappingTarget ShiftChangeRequest shiftChangeRequest);
 
-    @AfterMapping
-    default void resolveUpdateRelations(UpdateShiftChangeRequest request,
-                                        @MappingTarget ShiftChangeRequest shiftChangeRequest,
-                                        @Context UserRepository userRepository)
-    {
-        shiftChangeRequest.setReviewedBy(userRepository.getReferenceById(request.getReviewerId()));
-    }
 
     List<ShiftChangeResponse> toDTOList(List<ShiftChangeRequest> requests);
 }

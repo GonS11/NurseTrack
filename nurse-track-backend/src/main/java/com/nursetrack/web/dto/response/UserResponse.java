@@ -1,5 +1,6 @@
 package com.nursetrack.web.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nursetrack.domain.enums.UserRole;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class UserResponse
     private LocalDateTime createdAt;
 
     // Elimina @Mapping del mapper para fullName y déjalo solo en el getter
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getFullName()
     {
         return firstName + " " + lastName;

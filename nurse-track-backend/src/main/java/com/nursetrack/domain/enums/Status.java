@@ -5,8 +5,6 @@ import lombok.Getter;
 @Getter
 public enum Status
 {
-    SCHEDULED("Scheduled", "primary"),
-    COMPLETED("Completed", "success"),
     CANCELLED("Cancelled", "danger"),
     PENDING("Pending", "warning"),
     APPROVED("Approved", "info"),

@@ -39,7 +39,7 @@ public class ShiftChangeRequestValidator implements ConstraintValidator<ValidShi
             valid =false;
         }
 
-        //Deben pertenecer ambos turnos al mismo departamento
+        //Deben pertenecer ambos turnos al mismo departamento (Se valida aqui y no en service por sacar supervisor)
         if(!offeredShift.getDepartment().equals(desiredShift.getDepartment()))
         {
             ValidationUtils.addValidationError(context, "offeredShiftId",

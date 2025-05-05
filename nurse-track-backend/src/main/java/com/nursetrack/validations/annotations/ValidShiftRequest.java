@@ -1,6 +1,6 @@
 package com.nursetrack.validations.annotations;
 
-import com.nursetrack.validations.validators.ShiftCreationValidator;
+import com.nursetrack.validations.validators.ShiftRequestValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ShiftCreationValidator.class)
-public @interface ValidShiftCreation
+@Constraint(validatedBy = ShiftRequestValidator.class)
+public @interface ValidShiftRequest
 {
-    String message() default "Invalid shift creation data";
+    String message() default "Invalid shift data";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

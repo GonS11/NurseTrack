@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@ValidShiftCreation
+@ValidShiftRequest
 public class CreateShiftRequest
 {
     @Positive

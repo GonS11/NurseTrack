@@ -1,6 +1,5 @@
 package com.nursetrack.validations.annotations;
 
-import com.nursetrack.validations.validators.ShiftCreationValidator;
 import com.nursetrack.validations.validators.SupervisorAssignmentValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
