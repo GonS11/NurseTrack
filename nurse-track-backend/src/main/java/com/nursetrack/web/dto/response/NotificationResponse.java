@@ -21,5 +21,5 @@ public class NotificationResponse
     private String message;
     private Boolean isRead;
     private LocalDateTime createdAt;
-    private String timeAgo;
+    // private String timeAgo; //CALCULAR EN EL FRONT
 }

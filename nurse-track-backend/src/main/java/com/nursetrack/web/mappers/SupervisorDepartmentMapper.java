@@ -13,10 +13,9 @@ import java.util.List;
 public interface SupervisorDepartmentMapper
 {
     // 1. Entity → Response
-    @Mapping(source = "supervisor", target = "supervisor")
+    @Mapping(source = "supervisor", target = "supervisor", qualifiedByName = "userToSimpleResponse")
     @Mapping(source = "department", target = "department")
     SupervisorDepartmentResponse toDto(SupervisorDepartment entity);
-
     // 2. Versión básica para creación (sin resolución de dependencias)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "assignedAt", ignore = true)

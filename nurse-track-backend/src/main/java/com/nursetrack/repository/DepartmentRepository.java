@@ -13,8 +13,5 @@ public interface DepartmentRepository extends JpaRepository<Department, Long>
     Optional<Department> findByName(String name);
 
     Boolean existsByName(String name);
-
     List<Department> findByIsActiveTrue();
-
-    List<Department> findAllByUserId(Long nurseId);
 }

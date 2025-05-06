@@ -11,6 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "shifts", indexes = {
@@ -64,9 +66,9 @@ public class Shift
     private LocalDateTime updatedAt;
 
     //Relaciones con FK
-    @OneToOne(mappedBy = "requestedShift", fetch = FetchType.LAZY)
-    private ShiftChangeRequest requestedInShiftChange;
+    @OneToMany(mappedBy = "offeredShift")
+    private List<ShiftChangeRequest> offeredInShiftChanges = new ArrayList<>();
 
-    @OneToOne(mappedBy = "offeredShift", fetch = FetchType.LAZY)
-    private ShiftChangeRequest offeredInShiftChange;
+    @OneToMany(mappedBy = "desiredShift")
+    private List<ShiftChangeRequest> desiredInShiftChanges = new ArrayList<>();
 }

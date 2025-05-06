@@ -1,5 +1,6 @@
 package com.nursetrack.web.dto.request.shiftChange;
 
+import com.nursetrack.domain.enums.Status;
 import com.nursetrack.domain.enums.UserRole;
 import com.nursetrack.validations.annotations.ValidShiftChangeRequest;
 import com.nursetrack.validations.annotations.ValidShiftId;
@@ -40,6 +41,8 @@ public class CreateShiftChangeRequest
     @Positive
     @ValidShiftId
     private Long desiredShiftId;
+
+    private Status status = Status.PENDING;
 
     @NotBlank
     @Size(max = 1000)

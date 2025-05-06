@@ -15,6 +15,10 @@ import java.util.List;
         uses = {UserMapper.class, DepartmentMapper.class, ShiftTemplateMapper.class})
 public interface ShiftMapper
 {
+    @Mapping(source = "nurse", target = "nurse", qualifiedByName = "userToSimpleResponse")
+    @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "userToSimpleResponse")
+    @Mapping(source = "department", target = "department")
+    @Mapping(source = "shiftTemplate", target = "shiftTemplate")
     ShiftResponse toDTO(Shift shift);
 
     List<ShiftResponse> toDTOList(List<Shift> allByDepartmentId);

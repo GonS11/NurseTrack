@@ -65,7 +65,7 @@ public class User
     private LocalDateTime updatedAt;
 
     // Relaciones
-    @OneToOne(mappedBy = "supervisor", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "supervisor")
     private SupervisorDepartment supervisorAssign;
 
     @OneToMany(mappedBy = "nurse", fetch = FetchType.LAZY)
@@ -77,13 +77,16 @@ public class User
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
     private List<Shift> createdShifts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "requestingNurse", fetch = FetchType.LAZY)
     private List<ShiftChangeRequest> requestedShiftChanges = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receivingNurse", fetch = FetchType.LAZY)
+    private List<ShiftChangeRequest> receivingShiftChanges = new ArrayList<>();
 
     @OneToMany(mappedBy = "reviewedBy", fetch = FetchType.LAZY)
     private List<ShiftChangeRequest> reviewedShiftChanges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "requestingNurse", fetch = FetchType.LAZY)
     private List<VacationRequest> vacationRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "reviewedBy", fetch = FetchType.LAZY)

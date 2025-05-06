@@ -1,5 +1,6 @@
 package com.nursetrack.web.dto.request.vacationRequest;
 
+import com.nursetrack.domain.enums.Status;
 import com.nursetrack.domain.enums.UserRole;
 import com.nursetrack.validations.annotations.ValidUserId;
 import com.nursetrack.validations.annotations.ValidUserRole;
@@ -34,6 +35,8 @@ public class CreateVacationRequest
     @NotBlank
     @Size(max = 2000)
     private String reason;
+
+    private Status status = Status.PENDING;
 
     @NotNull
     @Positive

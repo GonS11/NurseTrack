@@ -13,7 +13,7 @@ import java.util.List;
 public interface NurseDepartmentMapper
 {
     // Entity → Response
-    @Mapping(source = "nurse", target = "nurse") // Mapeo automático a NurseInfo
+    @Mapping(source = "nurse", target = "nurse", qualifiedByName = "userToSimpleResponse")
     @Mapping(source = "department", target = "department")
     NurseDepartmentResponse toDTO(NurseDepartment entity);
 

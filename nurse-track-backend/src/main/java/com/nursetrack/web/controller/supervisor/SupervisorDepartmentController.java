@@ -98,11 +98,10 @@ public class SupervisorDepartmentController
     {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
-        request.setCreatedByUserId(supervisor.getId());
+        request.setCreatedById(supervisor.getId());
         request.setDepartmentId(departmentId);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(shiftService.createShift(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(shiftService.createShift(request));
     }
 
     @PutMapping("/shifts/{shiftId}")

@@ -8,11 +8,13 @@ import com.nursetrack.repository.ShiftRepository;
 import com.nursetrack.web.dto.request.shiftChange.CreateShiftChangeRequest;
 import com.nursetrack.web.dto.request.shiftChange.UpdateShiftChangeRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@Component
 public class ShiftChangeRequestValidation
 {
     @Autowired

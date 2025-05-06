@@ -18,9 +18,9 @@ public interface ShiftRepository extends JpaRepository<Shift, Long>
     Optional<Shift> findByDepartmentId(Long departmentId);
 
     List<Shift> findAllByDepartmentId(Long id);
-    List<Shift> findAllByUserId(Long nurseId);
-    List<Shift> findByUserIdAndDepartmentId(Long nurseId, Long departmentId);
-    List<Shift> findAllByUserIdAndDate(Long nurseId, LocalDate startDate, LocalDate endDate);
+    List<Shift> findAllByNurseId(Long nurseId);
+    List<Shift> findAllByNurseIdAndDepartmentId(Long nurseId, Long departmentId);
+    List<Shift> findAllByNurseIdAndShiftDateBetween(Long nurseId, LocalDate startDate, LocalDate endDate);
 
     @Query("""
             SELECT EXISTS (
@@ -34,7 +34,9 @@ public interface ShiftRepository extends JpaRepository<Shift, Long>
     boolean hasNurseShiftConflict(@Param("nurseId") Long nurseId, @Param("departmentId") Long departmentId,
                                   @Param("date") LocalDate date, @Param("excludeShiftId") Long excludeShiftId);
 
-    List<Shift> findByNurseAndDateRange(User requester, LocalDate startDate, LocalDate endDate);
+    @Query("SELECT s FROM Shift s WHERE s.nurse = :nurse AND s.shiftDate BETWEEN :startDate AND :endDate")
+    List<Shift> findByNurseAndShiftDateBetween(@Param("nurse") User nurse, @Param("startDate") LocalDate startDate,
+                                               @Param("endDate") LocalDate endDate);
 
 
 }

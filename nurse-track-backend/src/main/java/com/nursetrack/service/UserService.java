@@ -1,5 +1,6 @@
 package com.nursetrack.service;
 
+import com.nursetrack.domain.enums.UserRole;
 import com.nursetrack.domain.model.User;
 import com.nursetrack.exception.UserNotFoundException;
 import com.nursetrack.exception.UserStatusConflictException;
@@ -10,11 +11,13 @@ import com.nursetrack.web.dto.response.UserResponse;
 import com.nursetrack.web.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -27,9 +30,35 @@ public class UserService
     private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers()
+    public Page<UserResponse> searchUsers(String query,
+                                          UserRole role,
+                                          Boolean active,
+                                          int page,
+                                          int size,
+                                          String sort)
     {
-        return userMapper.toDtoList(userRepository.findAll());
+        Pageable pageable = PageRequest.of(page, size, parseSort(sort));
+
+        // Si no hay filtros, usa findAll
+        if (query == null && role == null && active == null)
+        {
+            return userRepository.findAll(pageable).map(userMapper::toDto);
+        }
+
+        // Si hay filtros, usa la búsqueda filtrada
+        return userRepository.searchUsers(
+                query != null ? query.toLowerCase() : null,
+                role,
+                active,
+                pageable
+        ).map(userMapper::toDto);
+    }
+
+    private Sort parseSort(String sort)
+    {
+        String[] parts = sort.split(",");
+
+        return Sort.by(Sort.Direction.fromString(parts.length > 1 ? parts[1] : "asc"),parts[0]);
     }
 
     @Transactional(readOnly = true)
@@ -38,6 +67,18 @@ public class UserService
         return userRepository.findById(id)
                 .map(userMapper::toDto)
                 .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getUsersByRole(UserRole role, Pageable pageable)
+    {
+        return userRepository.findByRole(role, pageable).map(userMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getActiveUsers(Pageable pageable)
+    {
+        return userRepository.findByIsActive(true, pageable).map(userMapper::toDto);
     }
 
     public UserResponse createUser(CreateUserRequest request)

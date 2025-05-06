@@ -1,6 +1,5 @@
 package com.nursetrack.web.controller.nurse;
 
-import com.nursetrack.domain.model.User;
 import com.nursetrack.service.DepartmentService;
 import com.nursetrack.service.NurseDepartmentService;
 import com.nursetrack.service.ShiftService;
@@ -9,7 +8,6 @@ import com.nursetrack.web.dto.response.ShiftResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,42 +17,33 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/nurses")
+@RequestMapping("/api/nurses/{nurseId}")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('NURSE')")
+@PreAuthorize("hasRole('NURSE') and #nurseId == principal.id")
 public class NurseShiftController
 {
     private final NurseDepartmentService nurseDepartmentService;
     private final ShiftService shiftService;
     private final DepartmentService departmentService;
     
-    @GetMapping("/{nurseId}/departments")
-    public ResponseEntity<List<DepartmentResponse>> getNurseDepartments(@PathVariable("nurseId") Long nurseId,
-                                                                        @AuthenticationPrincipal User currentUser)
-            throws AccessDeniedException
+    @GetMapping("/departments")
+    public ResponseEntity<List<DepartmentResponse>> getNurseDepartments(@PathVariable("nurseId") Long nurseId)
     {
-        nurseDepartmentService.validateNurseIdentity(currentUser, nurseId);
-        return ResponseEntity.ok(departmentService.getAllDepartmentsByUserId(nurseId));
+        return ResponseEntity.ok(departmentService.getDepartmentsForNurse(nurseId));
     }
 
-    @GetMapping("/{nurseId}/shifts")
-    public ResponseEntity<List<ShiftResponse>> getNurseShifts(@PathVariable("nurseId") Long nurseId,
-                                                              @AuthenticationPrincipal User currentUser)
-            throws AccessDeniedException
+    @GetMapping("/shifts")
+    public ResponseEntity<List<ShiftResponse>> getNurseShifts(@PathVariable("nurseId") Long nurseId)
     {
-        nurseDepartmentService.validateNurseIdentity(currentUser, nurseId);
         return ResponseEntity.ok(shiftService.getAllShiftByUserId(nurseId));
     }
 
-    @GetMapping("/{nurseId}/departments/{departmentId}/shifts")
+    @GetMapping("/departments/{departmentId}/shifts")
     public ResponseEntity<List<ShiftResponse>> getDepartmentShiftsForNurse(@PathVariable("nurseId") Long nurseId,
-                                                                           @PathVariable("departmentId") Long departmentId,
-                                                                           @AuthenticationPrincipal User currentUser)
+                                                                           @PathVariable("departmentId") Long departmentId)
             throws AccessDeniedException
     {
-        nurseDepartmentService.validateNurseIdentity(currentUser, nurseId);
-        List<ShiftResponse> shifts = shiftService.getShiftsByUserIdAndDepartmentId(nurseId, departmentId);
-
-        return ResponseEntity.ok(shifts);
+        nurseDepartmentService.validateNurseDepartmentAssociation(nurseId, departmentId);
+        return ResponseEntity.ok(shiftService.getShiftsByNurseAndDepartment(nurseId, departmentId));
     }
 }

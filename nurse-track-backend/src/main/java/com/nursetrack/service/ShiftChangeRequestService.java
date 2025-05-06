@@ -19,23 +19,26 @@ import com.nursetrack.web.dto.request.shiftChange.UpdateShiftChangeRequest;
 import com.nursetrack.web.dto.response.ShiftChangeResponse;
 import com.nursetrack.web.mappers.ShiftChangeRequestMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ShiftChangeRequestService
 {
-    private final ShiftChangeRequestRepository requestRepository;
+    private final ShiftChangeRequestRepository shiftChangeRequestRepository;
     private final ShiftChangeRequestMapper shiftChangeRequestMapper;
     private final ShiftChangeRequestValidation validator;
     private final ShiftRepository shiftRepository;
     private final SupervisorDepartmentRepository supervisorDepartmentRepository;
     private final SendNotification sendNotification;
 
+    // ========== CRUD Operations ==========
     public ShiftChangeResponse createShiftChangeRequest(CreateShiftChangeRequest request)
     {
         ShiftChangeRequest shiftChangeRequest = shiftChangeRequestMapper.toEntity(request);
@@ -44,22 +47,19 @@ public class ShiftChangeRequestService
 
         validator.validateShiftChangeCreation(request);
 
-        ShiftChangeRequest savedRequest = requestRepository.save(shiftChangeRequest);
+        ShiftChangeRequest savedRequest = shiftChangeRequestRepository.save(shiftChangeRequest);
 
-        //Notificacion
-        sendNotification.notifyCreation(
-                savedRequest.getRequestingNurse().getId(),
-                savedRequest.getReceivingNurse().getId(),
-                savedRequest.getReviewedBy().getId(),
-                NotificationType.SHIFT_CHANGE
-        );
+        sendNotification.notifyCreation(savedRequest.getRequestingNurse().getId(),
+                                        savedRequest.getReceivingNurse().getId(),
+                                        savedRequest.getReviewedBy().getId(),
+                                        NotificationType.SHIFT_CHANGE);
 
         return shiftChangeRequestMapper.toDTO(savedRequest);
     }
 
     public ShiftChangeResponse updateShiftChangeRequestStatus(Long requestId, UpdateShiftChangeRequest request)
     {
-        ShiftChangeRequest shiftChangeRequest = requestRepository.findById(requestId)
+        ShiftChangeRequest shiftChangeRequest = shiftChangeRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ShiftChangeRequestNotFoundException(requestId));
 
         validator.validateShiftChangeUpdate(shiftChangeRequest, request);
@@ -70,18 +70,62 @@ public class ShiftChangeRequestService
             executeShiftChangeSwap(shiftChangeRequest);
         }
 
-        sendNotification.notifyStatusChange(
-                shiftChangeRequest.getRequestingNurse().getId(),
-                shiftChangeRequest.getReceivingNurse().getId(),
-                request.getStatus(),
-                request.getReviewedNotes(),
-                NotificationType.SHIFT_CHANGE
-        );
+        sendNotification.notifyStatusChange(shiftChangeRequest.getRequestingNurse().getId(),
+                                            shiftChangeRequest.getReceivingNurse().getId(),
+                                            request.getStatus(),
+                                            request.getReviewedNotes(),
+                                            NotificationType.SHIFT_CHANGE);
 
-        return shiftChangeRequestMapper.toDTO(requestRepository.save(shiftChangeRequest));
+        return shiftChangeRequestMapper.toDTO(shiftChangeRequestRepository.save(shiftChangeRequest));
     }
 
+    // ========== Query Operations ==========
+    public ShiftChangeResponse getShiftChangeRequestById(Long requestId, Long currentUserId)
+    {
+        ShiftChangeRequest shiftChangeRequest = shiftChangeRequestRepository.findById(requestId)
+                .orElseThrow(() -> new ShiftChangeRequestNotFoundException(requestId));
 
+        if (!shiftChangeRequest.getRequestingNurse().getId().equals(currentUserId))
+        {
+            throw new AccessDeniedException("You can only access your own requests");
+        }
+
+        return shiftChangeRequestMapper.toDTO(shiftChangeRequest);
+    }
+
+    public List<ShiftChangeResponse> getShiftChangeRequestsByNurse(Long nurseId)
+    {
+        return shiftChangeRequestRepository.findByRequestingNurseId(nurseId)
+                .stream()
+                .map(shiftChangeRequestMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ShiftChangeResponse> getReceivedShiftChangeRequests(Long nurseId)
+    {
+        return shiftChangeRequestRepository.findByReceivingNurseId(nurseId)
+                .stream()
+                .map(shiftChangeRequestMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ShiftChangeResponse> getPendingShiftChangeRequestsByDepartment(Long departmentId)
+    {
+        return shiftChangeRequestRepository.findByDepartmentAndStatus(departmentId, Status.PENDING)
+                .stream()
+                .map(shiftChangeRequestMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ShiftChangeResponse> getShiftChangeRequestsByDepartment(Long departmentId)
+    {
+        return shiftChangeRequestRepository.findByDepartment(departmentId)
+                .stream()
+                .map(shiftChangeRequestMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ========== Business Logic ==========
     private User getSupervisor(CreateShiftChangeRequest request)
     {
         Shift offeredShift = shiftRepository.findById(request.getOfferedShiftId()).orElseThrow();
@@ -96,12 +140,10 @@ public class ShiftChangeRequestService
         Shift offeredShift = request.getOfferedShift();
         Shift desiredShift = request.getDesiredShift();
 
-        // Swap nurses
         User tempNurse = offeredShift.getNurse();
         offeredShift.setNurse(desiredShift.getNurse());
         desiredShift.setNurse(tempNurse);
 
-        // Mark as swapped
         offeredShift.setStatus(ShiftStatus.SWAPPED);
         desiredShift.setStatus(ShiftStatus.SWAPPED);
 

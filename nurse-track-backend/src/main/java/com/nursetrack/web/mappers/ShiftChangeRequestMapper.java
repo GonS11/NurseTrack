@@ -14,14 +14,13 @@ import java.util.List;
         uses = {UserMapper.class, ShiftMapper.class})
 public interface ShiftChangeRequestMapper
 {
-    @Mapping(target = "requestingNurse", source = "requestingNurse")
-    @Mapping(target = "receivingNurse", source = "receivingNurse")
+    @Mapping(target = "requestingNurse", source = "requestingNurse", qualifiedByName = "userToSimpleResponse")
+    @Mapping(target = "receivingNurse", source = "receivingNurse", qualifiedByName = "userToSimpleResponse")
     @Mapping(target = "offeredShiftId", source = "offeredShift.id")
     @Mapping(target = "desiredShiftId", source = "desiredShift.id")
     ShiftChangeResponse toDTO(ShiftChangeRequest entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", expression = "java(Status.PENDING)")
     @Mapping(target = "reviewedBy", ignore = true)
     @Mapping(target = "reviewedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

@@ -31,13 +31,13 @@ public class NurseDepartmentService
     @Transactional(readOnly = true)
     public List<NurseDepartmentResponse> getByDepartmentId(Long departmentId)
     {
-        return nurseDepartmentMapper.toDtoList(nurseDepartmentRepository.findByDepartmentIdList(departmentId));
+        return nurseDepartmentMapper.toDtoList(nurseDepartmentRepository.findAllByDepartmentId(departmentId));
     }
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getDepartmentsByNurseId(Long nurseId)
     {
-        return nurseDepartmentRepository.findByNurseIdList(nurseId)
+        return nurseDepartmentRepository.findAllByNurseId(nurseId)
                 .stream()
                 .map(NurseDepartment::getDepartment)
                 .map(departmentMapper::toDto)
@@ -85,6 +85,15 @@ public class NurseDepartmentService
         if (!currentUser.getId().equals(nurseId))
         {
             throw new AccessDeniedException("Cannot access other nurse's data");
+        }
+    }
+
+    public void validateNurseDepartmentAssociation(Long nurseId, Long departmentId)
+            throws AccessDeniedException
+    {
+        if (!nurseDepartmentRepository.existsByNurseIdAndDepartmentId(nurseId, departmentId))
+        {
+            throw new AccessDeniedException("La enfermera no está asignada a este departamento");
         }
     }
 }

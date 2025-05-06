@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class NurseDepartmentResponse
 {
     private Long id;
-    private UserResponse nurse;
+    private UserSimpleResponse nurse;
     private DepartmentResponse department;
     private LocalDateTime assignedAt;
 }

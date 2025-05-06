@@ -31,6 +31,7 @@ public class AuthService
 
     public LoginResponse login(LoginRequest request)
     {
+        // Autenticación con Spring Security
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -38,11 +39,16 @@ public class AuthService
                 )
         );
 
+        // Buscar usuario por username (no por email)
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (!user.getIsActive()) throw new DisabledException("User account is inactive");
+        if (!user.getIsActive())
+        {
+            throw new DisabledException("User account is inactive");
+        }
 
+        // Generar token JWT
         String token = jwtUtil.generateToken(
                 new org.springframework.security.core.userdetails.User(
                         user.getUsername(),
@@ -51,12 +57,12 @@ public class AuthService
                 )
         );
 
-        user.setJwtToken(token);
-        user.setTokenExpiry(LocalDateTime.now().plusDays(1));
-        userRepository.save(user);
+        // Actualizar token en el usuario
+        updateUserToken(user, token);
 
         return authMapper.toLoginResponse(user, token);
     }
+
 
     @Transactional(readOnly = true)
     public CurrentUserResponse getCurrentUser(String username)
@@ -75,6 +81,12 @@ public class AuthService
         user.setJwtToken(null);
         user.setTokenExpiry(null);
 
+        userRepository.save(user);
+    }
+
+    private void updateUserToken(User user, String token) {
+        user.setJwtToken(token);
+        user.setTokenExpiry(LocalDateTime.now().plusDays(1));
         userRepository.save(user);
     }
 }

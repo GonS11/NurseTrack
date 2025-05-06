@@ -36,21 +36,22 @@ public class ShiftService
     @Transactional(readOnly = true)
     public List<ShiftResponse> getAllShiftByUserId(Long nurseId)
     {
-        return shiftMapper.toDTOList(shiftRepository.findAllByUserId(nurseId));
+        return shiftMapper.toDTOList(shiftRepository.findAllByNurseId(nurseId));
     }
 
     @Transactional(readOnly = true)
     public List<ShiftResponse> getAllShiftByUserIdAndDate(Long nurseId, LocalDate startDate, LocalDate endDate)
     {
-        return shiftMapper.toDTOList(shiftRepository.findAllByUserIdAndDate(nurseId,startDate,endDate));
+        return shiftMapper.toDTOList(shiftRepository.findAllByNurseIdAndShiftDateBetween(nurseId, startDate, endDate));
     }
 
     @Transactional(readOnly = true)
-    public List<ShiftResponse> getShiftsByUserIdAndDepartmentId(Long nurseId, Long departmentId)
+    public List<ShiftResponse> getShiftsByNurseAndDepartment(Long nurseId, Long departmentId)
             throws AccessDeniedException
     {
         nurseDepartmentService.validateNurseAccess(nurseId, departmentId);
-        return shiftMapper.toDTOList(shiftRepository.findByUserIdAndDepartmentId(nurseId,departmentId));
+        return shiftMapper.toDTOList(shiftRepository.findAllByNurseIdAndDepartmentId(nurseId, departmentId));
+
     }
 
     @Transactional(readOnly = true)
@@ -92,4 +93,6 @@ public class ShiftService
         }
         shiftRepository.deleteById(shiftId);
     }
+
+
 }

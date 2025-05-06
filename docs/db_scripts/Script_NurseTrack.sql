@@ -1,7 +1,6 @@
 CREATE DATABASE IF NOT EXISTS nurse_track;
 USE nurse_track;
 
-
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(50) NOT NULL,

@@ -39,7 +39,7 @@ public class Department
     private LocalDateTime updatedAt;
 
     //FK
-    @OneToOne(mappedBy = "department", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "department")
     private SupervisorDepartment supervisorAssignment;
 
     @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)

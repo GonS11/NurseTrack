@@ -8,9 +8,11 @@ import com.nursetrack.repository.VacationRequestRepository;
 import com.nursetrack.web.dto.request.vacationRequest.CreateVacationRequest;
 import com.nursetrack.web.dto.request.vacationRequest.UpdateVacationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
 public class VacationRequestValidation
 {
     @Autowired

@@ -1,11 +1,10 @@
 package com.nursetrack.service;
 
 import com.nursetrack.domain.model.Department;
-import com.nursetrack.exception.DepartmentAlreadyExistsException;
-import com.nursetrack.exception.DepartmentIsAlreadyActiveException;
-import com.nursetrack.exception.DepartmentIsAlreadyInactiveException;
-import com.nursetrack.exception.DepartmentNotFoundException;
+import com.nursetrack.domain.model.NurseDepartment;
+import com.nursetrack.exception.*;
 import com.nursetrack.repository.DepartmentRepository;
+import com.nursetrack.repository.NurseDepartmentRepository;
 import com.nursetrack.web.dto.request.department.CreateDepartmentRequest;
 import com.nursetrack.web.dto.request.department.UpdateDepartmentRequest;
 import com.nursetrack.web.dto.response.DepartmentResponse;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,6 +23,7 @@ public class DepartmentService
 {
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
+    private final NurseDepartmentRepository nurseDepartmentRepository;
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getAllDepartments()
@@ -31,9 +32,19 @@ public class DepartmentService
     }
 
     @Transactional(readOnly = true)
-    public List<DepartmentResponse> getAllDepartmentsByUserId(Long nurseId)
-    {
-        return departmentMapper.toDTOList(departmentRepository.findAllByUserId(nurseId));
+    public List<DepartmentResponse> getDepartmentsForNurse(Long nurseId) {
+        // Obtener todas las asignaciones de la enfermera
+        List<NurseDepartment> assignments = nurseDepartmentRepository.findAllByNurseId(nurseId);
+
+        if (assignments.isEmpty()) {
+            throw new AssignmentException("No departments assigned to nurse with ID: " + nurseId);
+        }
+
+        // Mapear a DepartmentResponse
+        return assignments.stream()
+                .map(NurseDepartment::getDepartment)
+                .map(departmentMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

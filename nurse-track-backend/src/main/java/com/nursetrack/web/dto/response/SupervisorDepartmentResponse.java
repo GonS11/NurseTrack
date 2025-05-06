@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class SupervisorDepartmentResponse
 {
     private Long id;
-    private UserResponse supervisor;
+    private UserSimpleResponse supervisor;
     private DepartmentResponse department;
     private LocalDateTime assignedAt;
 }

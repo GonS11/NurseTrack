@@ -9,6 +9,7 @@ import com.nursetrack.web.dto.response.UserSimpleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -21,17 +22,14 @@ public interface UserMapper
     @Mapping(target = "isActive", ignore = true)
     User toEntity(CreateUserRequest dto);
 
-    // UserResponse (fullName se calcula automáticamente vía getter)
-    @Mapping(target = "roleDisplayName", source = "role.displayName")
-    @Mapping(target = "roleDescription", source = "role.description")
+    @Named("userToDto")
     UserResponse toDto(User user);  // Cambiado de toUserResponse a toDto para coincidir con el servicio
 
+    @Named("userToSimpleResponse")
     @Mapping(target = "fullName", expression = "java(user.getFirstName() + \" \" + user.getLastName())")
     UserSimpleResponse toUserSimpleResponse(User user);
 
-    // CurrentUserResponse (hereda campos de UserResponse)
-    @Mapping(target = "roleDisplayName", source = "role.displayName")
-    @Mapping(target = "roleDescription", source = "role.description")
+    @Named("userToCurrentResponse")
     CurrentUserResponse toCurrentUserResponse(User user);
 
     // Update/ignore fields

@@ -8,10 +8,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
-public interface VacationRequestRepository extends JpaRepository<VacationRequest, Long> {
-
+public interface VacationRequestRepository extends JpaRepository<VacationRequest, Long>
+{
     @Query("""
         SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END
         FROM VacationRequest v
@@ -27,4 +28,22 @@ public interface VacationRequestRepository extends JpaRepository<VacationRequest
                                                           @Param("status") Status status,
                                                           @Param("startDate") LocalDate startDate,
                                                           @Param("endDate") LocalDate endDate);
+
+    List<VacationRequest> findByRequestingNurseId(Long nurseId);
+
+    @Query("""
+        SELECT DISTINCT vr FROM VacationRequest vr
+        JOIN NurseDepartment nd ON nd.nurse.id = vr.requestingNurse.id
+        WHERE nd.department.id = :departmentId
+        AND vr.status = :status
+    """)
+    List<VacationRequest> findByDepartmentAndStatus(@Param("departmentId") Long departmentId,
+                                                    @Param("status") Status status);
+
+    @Query("""
+        SELECT DISTINCT vr FROM VacationRequest vr
+        JOIN NurseDepartment nd ON nd.nurse.id = vr.requestingNurse.id
+        WHERE nd.department.id = :departmentId
+    """)
+    List<VacationRequest> findByDepartment(@Param("departmentId") Long departmentId);
 }

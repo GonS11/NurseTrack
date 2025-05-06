@@ -67,7 +67,7 @@ public class VacationRequestValidator implements ConstraintValidator<ValidVacati
                                    ConstraintValidatorContext context)
     {
         if (request.getStatus() == Status.REJECTED &&
-                StringUtils.isBlank(request.getReviewNotes()))
+                StringUtils.isBlank(request.getReviewedNotes()))
         {
             ValidationUtils.addValidationError(context, "reviewNotes",
                                                "Review notes are required when rejecting");

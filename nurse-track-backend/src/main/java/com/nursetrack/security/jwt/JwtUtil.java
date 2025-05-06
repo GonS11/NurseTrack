@@ -26,8 +26,7 @@ public class JwtUtil
         this.expirationMs = expirationMs;
     }
 
-    public String generateToken(UserDetails userDetails)
-    {
+    public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("role", userDetails.getAuthorities())

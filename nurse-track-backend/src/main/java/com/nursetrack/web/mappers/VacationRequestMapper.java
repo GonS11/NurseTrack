@@ -10,10 +10,12 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface VacationRequestMapper
 {
+    @Mapping(source = "requestingNurse", target = "requester", qualifiedByName = "userToSimpleResponse")
+    @Mapping(source = "reviewedBy", target = "reviewedBy", qualifiedByName = "userToSimpleResponse")
+    @Mapping(source = "reviewedNotes", target = "reviewedNotes")
     VacationRequestResponse toDTO(VacationRequest entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", expression = "java(Status.PENDING)") // Valor por defecto
     @Mapping(target = "reviewedBy", ignore = true)
     @Mapping(target = "reviewedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -27,7 +29,7 @@ public interface VacationRequestMapper
         vacationRequest.setRequestingNurse(userRepository.getReferenceById(request.getRequestingNurseId()));
     }
 
-    @Mapping(target = "requester", ignore = true)
+    @Mapping(target = "requestingNurse", ignore = true)
     @Mapping(target = "startDate", ignore = true)
     @Mapping(target = "endDate", ignore = true)
     @Mapping(target = "reason", ignore = true)

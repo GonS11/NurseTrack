@@ -41,7 +41,7 @@ public class NotificationController
         return ResponseEntity.status(HttpStatus.CREATED).body(notificationService.createNotification(request));
     }
 
-    @PatchMapping("/{notificationId}/read")
+    @PutMapping("/{notificationId}/read")
     @PreAuthorize("#userId == principal.id")
     public ResponseEntity<Void> markAsRead(@PathVariable("userId") Long userId,
                                            @PathVariable("notificationId") Long notificationId)

@@ -9,7 +9,9 @@ import com.nursetrack.exception.UserNotFoundException;
 import com.nursetrack.repository.NurseDepartmentRepository;
 import com.nursetrack.repository.ShiftRepository;
 import com.nursetrack.web.dto.request.shift.UpdateShiftRequest;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ShiftValidation
 {
     public static void validateShiftUpdate(Shift shift, UpdateShiftRequest request,
@@ -29,7 +31,7 @@ public class ShiftValidation
         }
 
         //Validar enfermera - departamento
-        NurseDepartment nurse = nurseDepartmentRepository.findByNurseId(request.getNurseId())
+        NurseDepartment nurse = nurseDepartmentRepository.findFirstByNurseId(request.getNurseId())
                 .orElseThrow(() -> new UserNotFoundException(request.getNurseId()));
 
         if (!nurse.getDepartment().getId().equals(request.getDepartmentId()))
