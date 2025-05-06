@@ -15,7 +15,7 @@ import lombok.*;
 public class CreateNotificationRequest
 {
     @NotNull @ValidUserId
-    private Long id;
+    private Long userId;
 
     @NotNull
     private NotificationType type;
