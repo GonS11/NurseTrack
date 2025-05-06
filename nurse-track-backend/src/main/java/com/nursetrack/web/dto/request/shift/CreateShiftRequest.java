@@ -19,6 +19,7 @@ import java.time.LocalDate;
 @ValidShiftRequest
 public class CreateShiftRequest
 {
+    @NotNull
     @Positive
     @ValidUserRole(allowedRoles = {UserRole.NURSE})
     @ValidUserId
