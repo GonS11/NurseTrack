@@ -18,13 +18,13 @@ import java.time.temporal.ChronoUnit;
 public class VacationRequestResponse
 {
     private Long id;
-    private UserResponse requester;
+    private UserSimpleResponse requester;
     private LocalDate startDate;
     private LocalDate endDate;
     private String reason;
     private String reviewedNotes;
     private Status status;
-    private UserResponse reviewedBy;
+    private UserSimpleResponse reviewedBy;
     private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
 
