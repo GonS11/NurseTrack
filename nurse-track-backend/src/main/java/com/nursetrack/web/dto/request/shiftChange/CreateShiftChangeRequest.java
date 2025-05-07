@@ -18,33 +18,33 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @ValidShiftChangeRequest
-public class CreateShiftChangeRequest
+public class CreateShiftChangeRequest 
 {
-    @NotNull
-    @Positive
+    @NotNull(message = "Requesting nurse ID is required")
+    @Positive(message = "Requesting nurse ID must be a positive number")
     @ValidUserRole(allowedRoles = {UserRole.NURSE})
     @ValidUserId
     private Long requestingNurseId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Offered shift ID is required")
+    @Positive(message = "Offered shift ID must be a positive number")
     @ValidShiftId
     private Long offeredShiftId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Receiving nurse ID is required")
+    @Positive(message = "Receiving nurse ID must be a positive number")
     @ValidUserRole(allowedRoles = {UserRole.NURSE})
     @ValidUserId
     private Long receivingNurseId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Desired shift ID is required")
+    @Positive(message = "Desired shift ID must be a positive number")
     @ValidShiftId
     private Long desiredShiftId;
 
     private Status status = Status.PENDING;
 
-    @NotBlank
-    @Size(max = 1000)
+    @NotBlank(message = "Reason is required")
+    @Size(max = 1000, message = "Reason cannot exceed 1000 characters")
     private String reason;
 }
