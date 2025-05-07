@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VacationRequestResponse
+public class VacationRequestResponse 
 {
     private Long id;
     private UserSimpleResponse requester;
@@ -28,10 +28,8 @@ public class VacationRequestResponse
     private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
 
-    // Campo calculado para duración
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY) // Solo lectura
-    public long getDurationInDays()
-    {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public long getDurationInDays() {
         return ChronoUnit.DAYS.between(startDate, endDate) + 1;
     }
 }
