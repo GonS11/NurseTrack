@@ -12,11 +12,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @ValidVacationRequest
-public class UpdateVacationRequest
+public class UpdateVacationRequest 
 {
-    @NotNull
+    @NotNull(message = "Status is required")
     private Status status;
 
-    @Size(max = 2000)
-    private String reviewedNotes; // Notas obligatorias solo para REJECTED
+    @Size(max = 2000, message = "Reviewed notes cannot exceed 2000 characters")
+    private String reviewedNotes; // Mandatory only for REJECTED status
 }
