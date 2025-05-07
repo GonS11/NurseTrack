@@ -16,31 +16,31 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @ValidVacationRequest
-public class CreateVacationRequest
+public class CreateVacationRequest 
 {
-    @NotNull
-    @Positive
-    @ValidUserRole(allowedRoles = {UserRole.NURSE})
-    @ValidUserId
+    @NotNull(message = "Requesting nurse ID is required")
+    @Positive(message = "Requesting nurse ID must be a positive number")
+    @ValidUserRole(allowedRoles = {UserRole.NURSE}, message = "User must have the role of Nurse")
+    @ValidUserId(message = "Invalid nurse ID")
     private Long requestingNurseId;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "Start date is required")
+    @FutureOrPresent(message = "Start date must be in the future or present")
     private LocalDate startDate;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "End date is required")
+    @FutureOrPresent(message = "End date must be in the future or present")
     private LocalDate endDate;
 
-    @NotBlank
-    @Size(max = 2000)
+    @NotBlank(message = "Reason is required")
+    @Size(max = 2000, message = "Reason cannot exceed 2000 characters")
     private String reason;
 
     private Status status = Status.PENDING;
 
-    @NotNull
-    @Positive
-    @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR})
-    @ValidUserId
+    @NotNull(message = "Reviewed by ID is required")
+    @Positive(message = "Reviewed by ID must be a positive number")
+    @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR}, message = "User must have the role of Supervisor")
+    @ValidUserId(message = "Invalid supervisor ID")
     private Long reviewedById;
 }
