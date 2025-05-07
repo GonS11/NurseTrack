@@ -6,12 +6,11 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// Para datos públicos del usuario (listados, perfiles)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse
+public class UserResponse 
 {
     private Long id;
     private String firstName;
@@ -21,9 +20,8 @@ public class UserResponse
     private Boolean isActive;
     private LocalDateTime createdAt;
 
-    // Elimina @Mapping del mapper para fullName y déjalo solo en el getter
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public String getFullName()
+    public String getFullName() 
     {
         return firstName + " " + lastName;
     }
