@@ -12,17 +12,20 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateNotificationRequest
+public class CreateNotificationRequest 
 {
-    @NotNull @ValidUserId
+    @NotNull(message = "User ID is required")
+    @ValidUserId(message = "Invalid user ID")
     private Long userId;
 
-    @NotNull
+    @NotNull(message = "Notification type is required")
     private NotificationType type;
 
-    @NotBlank @Size(max = 100)
+    @NotBlank(message = "Title is required")
+    @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
 
-    @NotBlank @Size(max = 1000)
+    @NotBlank(message = "Message is required")
+    @Size(max = 1000, message = "Message must not exceed 1000 characters")
     private String message;
 }
