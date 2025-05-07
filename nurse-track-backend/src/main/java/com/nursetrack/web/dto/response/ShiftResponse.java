@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShiftResponse
+public class ShiftResponse 
 {
     private Long id;
     private UserSimpleResponse nurse;
@@ -28,14 +28,12 @@ public class ShiftResponse
     private LocalDateTime updatedAt;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public LocalDateTime getShiftStart()
-    {
+    public LocalDateTime getShiftStart() {
         return LocalDateTime.of(shiftDate, shiftTemplate.getShiftStartTime());
     }
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public LocalDateTime getShiftEnd()
-    {
+    public LocalDateTime getShiftEnd() {
         return shiftTemplate.getShiftEndTime().isBefore(shiftTemplate.getShiftStartTime()) ?
                 LocalDateTime.of(shiftDate.plusDays(1), shiftTemplate.getShiftEndTime()) :
                 LocalDateTime.of(shiftDate, shiftTemplate.getShiftEndTime());
