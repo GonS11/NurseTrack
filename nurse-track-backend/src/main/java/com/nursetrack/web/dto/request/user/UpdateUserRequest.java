@@ -9,15 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateUserRequest
+public class UpdateUserRequest 
 {
-    @Size(max = 50)
+    @Size(max = 50, message = "First name must not exceed 50 characters")
     private String firstName;
 
-    @Size(max = 50)
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
     private String lastName;
 
-    @Size(max = 50) @ValidLicenseNumber
+    @Size(max = 50, message = "License number must not exceed 50 characters")
+    @ValidLicenseNumber
     private String licenseNumber;
 
     private Boolean isActive;
