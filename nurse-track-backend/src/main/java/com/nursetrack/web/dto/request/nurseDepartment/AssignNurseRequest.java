@@ -16,14 +16,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @ValidNurseAssignment
-public class AssignNurseRequest
+public class AssignNurseRequest 
 {
-    @NotNull
-    @ValidDepartmentId
+    @NotNull(message = "Department ID is required")
+    @ValidDepartmentId(message = "Invalid department ID")
     private Long departmentId;
 
-    @NotNull
-    @ValidUserRole(allowedRoles = {UserRole.NURSE})
-    @ValidUserId
+    @NotNull(message = "Nurse ID is required")
+    @ValidUserRole(allowedRoles = {UserRole.NURSE}, message = "User must have the role of Nurse")
+    @ValidUserId(message = "Invalid nurse ID")
     private Long nurseId;
 }
