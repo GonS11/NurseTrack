@@ -16,14 +16,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @ValidSupervisorAssignment
-public class AssignSupervisorRequest
+public class AssignSupervisorRequest 
 {
-    @NotNull
-    @ValidDepartmentId
+    @NotNull(message = "Department ID is required")
+    @ValidDepartmentId(message = "Invalid department ID")
     private Long departmentId;
 
-    @NotNull
-    @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR})
-    @ValidUserId
+    @NotNull(message = "Supervisor ID is required")
+    @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR}, message = "User must have the role of Supervisor")
+    @ValidUserId(message = "Invalid supervisor ID")
     private Long supervisorId;
 }
