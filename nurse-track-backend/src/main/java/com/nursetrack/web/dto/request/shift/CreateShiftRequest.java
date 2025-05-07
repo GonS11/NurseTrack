@@ -23,7 +23,7 @@ public class CreateShiftRequest
     @Positive
     @ValidUserRole(allowedRoles = {UserRole.NURSE})
     @ValidUserId
-    private Long nurseId; //Nullable para turno sin enfermera
+    private Long nurseId;
 
     @NotNull
     @Positive
