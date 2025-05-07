@@ -59,14 +59,14 @@ public class AdminDepartmentController
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{departmentId}/desactivate")
+    @PutMapping("/{departmentId}/desactivate")
     public ResponseEntity<Void> deactivateDepartment(@PathVariable("departmentId") Long departmentId)
     {
         departmentService.deactivateDepartment(departmentId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{departmentId}/activate")
+    @PutMapping("/{departmentId}/activate")
     public ResponseEntity<Void> activateDepartment(@PathVariable("departmentId") Long departmentId)
     {
         departmentService.activateDepartment(departmentId);
