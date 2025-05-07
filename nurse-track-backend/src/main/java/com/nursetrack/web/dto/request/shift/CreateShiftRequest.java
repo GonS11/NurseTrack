@@ -17,36 +17,37 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @ValidShiftRequest
-public class CreateShiftRequest
+public class CreateShiftRequest 
 {
-    @NotNull
-    @Positive
+    @NotNull(message = "Nurse ID is required")
+    @Positive(message = "Nurse ID must be a positive number")
     @ValidUserRole(allowedRoles = {UserRole.NURSE})
     @ValidUserId
     private Long nurseId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Department ID is required")
+    @Positive(message = "Department ID must be a positive number")
     @ValidDepartmentId
     private Long departmentId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Shift template ID is required")
+    @Positive(message = "Shift template ID must be a positive number")
     @ValidShiftTemplateId
     private Long shiftTemplateId;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "Shift date is required")
+    @FutureOrPresent(message = "Shift date must be today or in the future")
     private LocalDate shiftDate;
 
     private ShiftStatus status = ShiftStatus.SCHEDULED;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Notes cannot exceed 500 characters")
     private String notes;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Created by ID is required")
+    @Positive(message = "Created by ID must be a positive number")
     @ValidUserRole(allowedRoles = {UserRole.SUPERVISOR})
     @ValidUserId
     private Long createdById;
 }
+
