@@ -16,28 +16,34 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @ValidUserCreation
-public class CreateUserRequest
+public class CreateUserRequest 
 {
-    @NotBlank @Size(min = 1, max = 50)
+    @NotBlank(message = "First name is required")
+    @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
     private String firstName;
 
-    @NotBlank @Size(min = 1, max = 50)
+    @NotBlank(message = "Last name is required")
+    @Size(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")
     private String lastName;
 
-    @NotBlank @Size(min = 3, max = 50)
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
 
-    @NotBlank @Email @Size(max = 100)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid email address")
+    @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
 
-    @NotBlank @Size(min = 8, max = 255)
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     private String password;
 
-    @NotNull
-    //@ValidUserRole(allowedRoles = {UserRole.ADMIN, UserRole.SUPERVISOR, UserRole.NURSE})
-    //INNECESARIO si quiero permitir todos, con UserRole ya esta
+    @NotNull(message = "Role is required")
     private UserRole role;
 
-    @Size(max = 50) @ValidLicenseNumber
+    @Size(max = 50, message = "License number must not exceed 50 characters")
+    @ValidLicenseNumber
     private String licenseNumber;
 }
+
