@@ -11,17 +11,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateShiftChangeRequest
+public class UpdateShiftChangeRequest 
 {
-    @NotNull
+    @NotNull(message = "Status is required")
     @ValidEnumValue(
             enumClass = Status.class,
             allowedValues = {"APPROVED", "REJECTED", "CANCELLED"},
-            message = "Status must be one of: APPROVED, REJECTED or CANCELLED"
+            message = "Status must be one of: APPROVED, REJECTED, or CANCELLED"
     )
     private Status status;
 
-    @NotNull
-    @Size(max = 1000)
+    @NotNull(message = "Reviewed notes are required")
+    @Size(max = 1000, message = "Reviewed notes cannot exceed 1000 characters")
     private String reviewedNotes;
 }
