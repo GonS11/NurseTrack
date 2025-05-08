@@ -19,8 +19,8 @@ import java.util.List;
 @RequestMapping("/api/admin/assignments/departments/{departmentId}")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminAssignmentController
-{
+public class AdminAssignmentController {
+
     private final SupervisorDepartmentService supervisorDepartmentService;
     private final NurseDepartmentService nurseDepartmentService;
 
@@ -28,21 +28,32 @@ public class AdminAssignmentController
     // ASIGNACIÓN DE SUPERVISORES (1:1 con departamento)
     // ==============================================
 
+    /**
+     * Obtener el supervisor asignado a un departamento.
+     */
     @GetMapping("/supervisor")
-    public ResponseEntity<SupervisorDepartmentResponse> getDepartmentSupervisor(@PathVariable("departmentId") Long departmentId)
-    {
-        return ResponseEntity.ok(supervisorDepartmentService.getByDepartmentId(departmentId));
+    public ResponseEntity<SupervisorDepartmentResponse> getDepartmentSupervisor(
+            @PathVariable("departmentId") Long departmentId) {
+        SupervisorDepartmentResponse response = supervisorDepartmentService.getByDepartmentId(departmentId);
+        return ResponseEntity.ok(response);
     }
 
+    /**
+     * Asignar un supervisor a un departamento.
+     */
     @PostMapping("/supervisor")
-    public ResponseEntity<SupervisorDepartmentResponse> assignSupervisor(@Valid @RequestBody AssignSupervisorRequest request)
-    {
-        return ResponseEntity.status(HttpStatus.CREATED).body(supervisorDepartmentService.assignSupervisor(request));
+    public ResponseEntity<SupervisorDepartmentResponse> assignSupervisor(
+            @Valid @RequestBody AssignSupervisorRequest request) {
+        SupervisorDepartmentResponse response = supervisorDepartmentService.assignSupervisor(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Eliminar el supervisor asignado a un departamento.
+     */
     @DeleteMapping("/supervisor")
-    public ResponseEntity<Void> removeSupervisorFromDepartment(@PathVariable("departmentId") Long departmentId)
-    {
+    public ResponseEntity<Void> removeSupervisorFromDepartment(
+            @PathVariable("departmentId") Long departmentId) {
         supervisorDepartmentService.removeSupervisor(departmentId);
         return ResponseEntity.noContent().build();
     }
@@ -51,22 +62,33 @@ public class AdminAssignmentController
     // ASIGNACIÓN DE ENFERMERAS (N:M con departamentos)
     // ==============================================
 
+    /**
+     * Obtener todas las enfermeras asignadas a un departamento.
+     */
     @GetMapping("/nurses")
-    public ResponseEntity<List<NurseDepartmentResponse>> getNursesByDepartment(@PathVariable("departmentId") Long departmentId)
-    {
-        return ResponseEntity.ok(nurseDepartmentService.getByDepartmentId(departmentId));
+    public ResponseEntity<List<NurseDepartmentResponse>> getNursesByDepartment(
+            @PathVariable("departmentId") Long departmentId) {
+        List<NurseDepartmentResponse> responses = nurseDepartmentService.getByDepartmentId(departmentId);
+        return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Asignar una enfermera a un departamento.
+     */
     @PostMapping("/nurses")
-    public ResponseEntity<NurseDepartmentResponse> assignNurseToDepartment(@Valid @RequestBody AssignNurseRequest request)
-    {
-        return ResponseEntity.status(HttpStatus.CREATED).body(nurseDepartmentService.assignNurseToDepartment(request));
+    public ResponseEntity<NurseDepartmentResponse> assignNurseToDepartment(
+            @Valid @RequestBody AssignNurseRequest request) {
+        NurseDepartmentResponse response = nurseDepartmentService.assignNurseToDepartment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Eliminar una enfermera de un departamento.
+     */
     @DeleteMapping("/nurses/{nurseId}")
-    public ResponseEntity<Void> removeNurseFromDepartment(@PathVariable Long departmentId,
-                                                          @PathVariable Long nurseId)
-    {
+    public ResponseEntity<Void> removeNurseFromDepartment(
+            @PathVariable("departmentId") Long departmentId,
+            @PathVariable("nurseId") Long nurseId) {
         nurseDepartmentService.removeNurseFromDepartment(nurseId, departmentId);
         return ResponseEntity.noContent().build();
     }
