@@ -27,14 +27,6 @@ public class NurseRequestController
     private final ShiftChangeRequestService shiftChangeRequestService;
 
     // ==================== VACATION REQUESTS ====================
-    @PostMapping("/vacations")
-    public ResponseEntity<VacationRequestResponse> createVacationRequest(@Valid @RequestBody CreateVacationRequest request,
-                                                                         @AuthenticationPrincipal User currentUser)
-    {
-        request.setRequestingNurseId(currentUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(vacationRequestService.createVacationRequest(request));
-    }
-
     @GetMapping("/vacations/{requestId}")
     public ResponseEntity<VacationRequestResponse> getVacationRequestById(@PathVariable Long requestId,
                                                                           @AuthenticationPrincipal User currentUser)
@@ -48,15 +40,15 @@ public class NurseRequestController
         return ResponseEntity.ok(vacationRequestService.getVacationRequestsByNurse(currentUser.getId()));
     }
 
-    // ==================== SHIFT CHANGE REQUESTS ====================
-    @PostMapping("/shift-changes")
-    public ResponseEntity<ShiftChangeResponse> createShiftChangeRequest(@Valid @RequestBody CreateShiftChangeRequest request,
-                                                                        @AuthenticationPrincipal User currentUser)
+    @PostMapping("/vacations")
+    public ResponseEntity<VacationRequestResponse> createVacationRequest(@Valid @RequestBody CreateVacationRequest request,
+                                                                         @AuthenticationPrincipal User currentUser)
     {
         request.setRequestingNurseId(currentUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(shiftChangeRequestService.createShiftChangeRequest(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(vacationRequestService.createVacationRequest(request));
     }
 
+    // ==================== SHIFT CHANGE REQUESTS ====================
     @GetMapping("/shift-changes/{requestId}")
     public ResponseEntity<ShiftChangeResponse> getShiftChangeRequestById(@PathVariable Long requestId,
                                                                          @AuthenticationPrincipal User currentUser)
@@ -74,5 +66,13 @@ public class NurseRequestController
     public ResponseEntity<List<ShiftChangeResponse>> getReceivedShiftChangeRequests(@AuthenticationPrincipal User currentUser)
     {
         return ResponseEntity.ok(shiftChangeRequestService.getReceivedShiftChangeRequests(currentUser.getId()));
+    }
+
+    @PostMapping("/shift-changes")
+    public ResponseEntity<ShiftChangeResponse> createShiftChangeRequest(@Valid @RequestBody CreateShiftChangeRequest request,
+                                                                        @AuthenticationPrincipal User currentUser)
+    {
+        request.setRequestingNurseId(currentUser.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(shiftChangeRequestService.createShiftChangeRequest(request));
     }
 }
