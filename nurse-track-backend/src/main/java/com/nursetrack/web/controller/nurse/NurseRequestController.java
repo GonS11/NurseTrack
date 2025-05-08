@@ -27,17 +27,17 @@ public class NurseRequestController
     private final ShiftChangeRequestService shiftChangeRequestService;
 
     // ==================== VACATION REQUESTS ====================
+    @GetMapping("/vacations")
+    public ResponseEntity<List<VacationRequestResponse>> getMyVacationRequests(@AuthenticationPrincipal User currentUser)
+    {
+        return ResponseEntity.ok(vacationRequestService.getVacationRequestsByNurse(currentUser.getId()));
+    }
+
     @GetMapping("/vacations/{requestId}")
     public ResponseEntity<VacationRequestResponse> getVacationRequestById(@PathVariable Long requestId,
                                                                           @AuthenticationPrincipal User currentUser)
     {
         return ResponseEntity.ok(vacationRequestService.getVacationRequestById(requestId, currentUser.getId()));
-    }
-
-    @GetMapping("/vacations")
-    public ResponseEntity<List<VacationRequestResponse>> getMyVacationRequests(@AuthenticationPrincipal User currentUser)
-    {
-        return ResponseEntity.ok(vacationRequestService.getVacationRequestsByNurse(currentUser.getId()));
     }
 
     @PostMapping("/vacations")
@@ -49,17 +49,17 @@ public class NurseRequestController
     }
 
     // ==================== SHIFT CHANGE REQUESTS ====================
+    @GetMapping("/shift-changes")
+    public ResponseEntity<List<ShiftChangeResponse>> getMyShiftChangeRequests(@AuthenticationPrincipal User currentUser)
+    {
+        return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestsByNurse(currentUser.getId()));
+    }
+
     @GetMapping("/shift-changes/{requestId}")
     public ResponseEntity<ShiftChangeResponse> getShiftChangeRequestById(@PathVariable Long requestId,
                                                                          @AuthenticationPrincipal User currentUser)
     {
         return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestById(requestId, currentUser.getId()));
-    }
-
-    @GetMapping("/shift-changes")
-    public ResponseEntity<List<ShiftChangeResponse>> getMyShiftChangeRequests(@AuthenticationPrincipal User currentUser)
-    {
-        return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestsByNurse(currentUser.getId()));
     }
 
     @GetMapping("/shift-changes/received")
