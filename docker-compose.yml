@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.8' # Puedes eliminar esta línea si quieres (es opcional ahora)
 services:
   mysqldb:
     image: mysql:8.0
@@ -27,5 +27,7 @@ services:
     depends_on:
       - mysqldb
 
+# Asegúrate de que esta sección esté al mismo nivel que 'services' (sin indentación)
 volumes:
   db_data:
+    driver: local

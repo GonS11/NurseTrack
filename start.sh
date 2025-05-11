@@ -1,7 +1,15 @@
 #!/bin/bash
 
-# Start Docker services (MySQL and Backend)
+# Start Docker services
+echo "Starting Docker services..."
 docker-compose up -d
+
+# Wait for MySQL to be ready
+echo "Waiting for MySQL to be ready..."
+while ! docker exec mysqldb mysqladmin ping -h localhost --silent; do
+  sleep 5
+done
+echo "MySQL is ready."
 
 # Wait for the backend to be ready
 echo "Waiting for the backend to be ready..."
@@ -14,4 +22,5 @@ echo "The backend is ready."
 echo "Starting the frontend..."
 cd nurse-track-frontend
 npm install
+
 npm run dev

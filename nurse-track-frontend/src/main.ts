@@ -1,5 +1,16 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+// main.ts
+import { createApp } from 'vue';
+import { createPinia } from 'pinia'; // Importa createPinia
+import App from './App.vue';
+import router from './router';
 
-createApp(App).mount('#app')
+const app = createApp(App);
+
+// Crea la instancia de Pinia
+const pinia = createPinia();
+
+// Instala Pinia antes que el router
+app.use(pinia);
+app.use(router);
+
+app.mount('#app');

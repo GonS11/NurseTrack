@@ -71,7 +71,7 @@ import {
   EnvelopeIcon,
   LockClosedIcon,
 } from '@heroicons/vue/24/outline';
-import { useAuthStore } from '../../services';
+import { useAuthStore } from '../../stores/auth.store';
 
 const authStore = useAuthStore();
 const username = ref('');
@@ -84,10 +84,7 @@ const handleSubmit = async () => {
   error.value = null;
 
   try {
-    await authStore.login({
-      username: username.value,
-      password: password.value,
-    });
+    await authStore.login(username.value, password.value);
     window.location.href = '/dashboard'; // Redirect after successful login
   } catch (err: any) {
     error.value =

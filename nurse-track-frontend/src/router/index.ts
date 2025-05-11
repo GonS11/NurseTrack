@@ -1,20 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '../services';
+import { UserRole } from '../types/enums/user-role.enum';
 import AppShell from '../components/layout/AppShell.vue';
-import { useAuthService } from '../services/shared/auth.service';
 
-// Auth pages
+// Import the LoginPage component
 const LoginPage = () => import('../views/auth/LoginPage.vue');
 
-// Dashboard pages
+//Dashboards
 const AdminDashboard = () => import('../views/dashboard/AdminDashboard.vue');
 const SupervisorDashboard = () =>
   import('../views/dashboard/SupervisorDashboard.vue');
 const NurseDashboard = () => import('../views/dashboard/NurseDashboard.vue');
 
-// Protected route logic
-const requireAuth = (allowedRoles?: string[]) => {
+//Protected route logic
+const requiresAuth = (allowedRoles?: string[]) => {
   return (to: any, from: any, next: any) => {
-    const authStore = useAuthService;
+    const authStore = useAuthStore();
 
     if (!authStore.isAuthenticated) {
       return next('/login');
@@ -32,20 +33,20 @@ const requireAuth = (allowedRoles?: string[]) => {
   };
 };
 
-// Dashboard route logic based on user role
+//Route logic on user role
 const DashboardRoute = () => {
-  const authStore = useAuthService();
+  const authStore = useAuthStore();
 
   if (!authStore.user) {
     return { path: '/login' };
   }
 
   switch (authStore.user.role) {
-    case 'ADMIN':
+    case UserRole.ADMIN:
       return { component: AdminDashboard };
-    case 'SUPERVISOR':
+    case UserRole.SUPERVISOR:
       return { component: SupervisorDashboard };
-    case 'NURSE':
+    case UserRole.NURSE:
       return { component: NurseDashboard };
     default:
       return { path: '/login' };
@@ -53,7 +54,7 @@ const DashboardRoute = () => {
 };
 
 const routes = [
-  // Auth routes
+  //Auth routes
   {
     path: '/login',
     name: 'login',
@@ -66,11 +67,11 @@ const routes = [
     path: '/',
     component: AppShell,
     children: [
-      // Dashboard - redirects based on user role
+      // Dashboard - Redirect based on user role
       {
         path: '',
         name: 'dashboard',
-        beforeEnter: requireAuth(),
+        beforeEnter: requiresAuth(),
         component: DashboardRoute,
       },
 
@@ -81,19 +82,19 @@ const routes = [
           {
             path: 'users',
             name: 'admin-users',
-            beforeEnter: requireAuth(['admin']),
+            beforeEnter: requiresAuth([UserRole.ADMIN]),
             component: () => import('../views/admin/UsersManagement.vue'),
           },
           {
             path: 'departments',
             name: 'admin-departments',
-            beforeEnter: requireAuth(['admin']),
+            beforeEnter: requiresAuth([UserRole.ADMIN]),
             component: () => import('../views/admin/DepartmentsManagement.vue'),
           },
           {
             path: 'shift-templates',
             name: 'admin-shift-templates',
-            beforeEnter: requireAuth(['admin']),
+            beforeEnter: requiresAuth([UserRole.ADMIN]),
             component: () => import('../views/admin/ShiftTemplates.vue'),
           },
         ],
@@ -106,26 +107,26 @@ const routes = [
           {
             path: 'department',
             name: 'supervisor-department',
-            beforeEnter: requireAuth(['supervisor']),
+            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
             component: () =>
               import('../views/supervisor/DepartmentManagement.vue'),
           },
           {
             path: 'staff',
             name: 'supervisor-staff',
-            beforeEnter: requireAuth(['supervisor']),
+            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
             component: () => import('../views/supervisor/StaffManagement.vue'),
           },
           {
             path: 'shifts',
             name: 'supervisor-shifts',
-            beforeEnter: requireAuth(['supervisor']),
+            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
             component: () => import('../views/supervisor/ShiftSchedule.vue'),
           },
           {
             path: 'requests',
             name: 'supervisor-requests',
-            beforeEnter: requireAuth(['supervisor']),
+            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
             component: () =>
               import('../views/supervisor/RequestsManagement.vue'),
           },
@@ -139,25 +140,25 @@ const routes = [
           {
             path: 'departments',
             name: 'nurse-departments',
-            beforeEnter: requireAuth(['nurse']),
+            beforeEnter: requiresAuth([UserRole.NURSE]),
             component: () => import('../views/nurse/MyDepartments.vue'),
           },
           {
             path: 'schedule',
             name: 'nurse-schedule',
-            beforeEnter: requireAuth(['nurse']),
+            beforeEnter: requiresAuth([UserRole.NURSE]),
             component: () => import('../views/nurse/MySchedule.vue'),
           },
           {
             path: 'shift-swap',
             name: 'nurse-shift-swap',
-            beforeEnter: requireAuth(['nurse']),
+            beforeEnter: requiresAuth([UserRole.NURSE]),
             component: () => import('../views/nurse/RequestShiftSwap.vue'),
           },
           {
             path: 'vacation',
             name: 'nurse-vacation',
-            beforeEnter: requireAuth(['nurse']),
+            beforeEnter: requiresAuth([UserRole.NURSE]),
             component: () => import('../views/nurse/RequestVacation.vue'),
           },
         ],
@@ -167,19 +168,19 @@ const routes = [
       {
         path: 'profile',
         name: 'profile',
-        beforeEnter: requireAuth(),
+        beforeEnter: requiresAuth(),
         component: () => import('../views/common/UserProfile.vue'),
       },
       {
         path: 'notifications',
         name: 'notifications',
-        beforeEnter: requireAuth(),
+        beforeEnter: requiresAuth(),
         component: () => import('../views/common/Notifications.vue'),
       },
       {
         path: 'settings',
         name: 'settings',
-        beforeEnter: requireAuth(),
+        beforeEnter: requiresAuth(),
         component: () => import('../views/common/Settings.vue'),
       },
     ],
