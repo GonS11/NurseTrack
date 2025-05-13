@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/supervisor/departments/{departmentId}/requests")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPERVISOR')")
+//@PreAuthorize("hasRole('SUPERVISOR')")
 public class SupervisorRequestController
 {
     private final VacationRequestService vacationRequestService;
