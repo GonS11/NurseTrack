@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/nurses/{nurseId}")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('NURSE') and #nurseId == principal.id")
+//@PreAuthorize("hasRole('NURSE') and #nurseId == principal.id")
 public class NurseShiftController
 {
     private final NurseDepartmentService nurseDepartmentService;
