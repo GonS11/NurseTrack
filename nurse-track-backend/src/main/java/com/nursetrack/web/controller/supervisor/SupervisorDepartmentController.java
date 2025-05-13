@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/supervisor/departments/{departmentId}")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPERVISOR')")
+//@PreAuthorize("hasRole('SUPERVISOR')")
 public class SupervisorDepartmentController
 {
     private final DepartmentService departmentService;
