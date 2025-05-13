@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/nurses/{nurseId}/requests")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('NURSE') and #nurseId == principal.id")
+//@PreAuthorize("hasRole('NURSE') and #nurseId == principal.id")
 public class NurseRequestController
 {
     private final VacationRequestService vacationRequestService;
@@ -28,51 +28,51 @@ public class NurseRequestController
 
     // ==================== VACATION REQUESTS ====================
     @GetMapping("/vacations")
-    public ResponseEntity<List<VacationRequestResponse>> getMyVacationRequests(@AuthenticationPrincipal User currentUser)
+    public ResponseEntity<List<VacationRequestResponse>> getMyVacationRequests(@PathVariable Long nurseId)
     {
-        return ResponseEntity.ok(vacationRequestService.getVacationRequestsByNurse(currentUser.getId()));
+        return ResponseEntity.ok(vacationRequestService.getVacationRequestsByNurse(nurseId));
     }
 
     @GetMapping("/vacations/{requestId}")
     public ResponseEntity<VacationRequestResponse> getVacationRequestById(@PathVariable Long requestId,
-                                                                          @AuthenticationPrincipal User currentUser)
+                                                                          @PathVariable Long nurseId)
     {
-        return ResponseEntity.ok(vacationRequestService.getVacationRequestById(requestId, currentUser.getId()));
+        return ResponseEntity.ok(vacationRequestService.getVacationRequestById(requestId, nurseId));
     }
 
     @PostMapping("/vacations")
     public ResponseEntity<VacationRequestResponse> createVacationRequest(@Valid @RequestBody CreateVacationRequest request,
-                                                                         @AuthenticationPrincipal User currentUser)
+                                                                         @PathVariable Long nurseId)
     {
-        request.setRequestingNurseId(currentUser.getId());
+        request.setRequestingNurseId(nurseId);
         return ResponseEntity.status(HttpStatus.CREATED).body(vacationRequestService.createVacationRequest(request));
     }
 
     // ==================== SHIFT CHANGE REQUESTS ====================
     @GetMapping("/shift-changes")
-    public ResponseEntity<List<ShiftChangeResponse>> getMyShiftChangeRequests(@AuthenticationPrincipal User currentUser)
+    public ResponseEntity<List<ShiftChangeResponse>> getMyShiftChangeRequests(@PathVariable Long nurseId)
     {
-        return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestsByNurse(currentUser.getId()));
+        return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestsByNurse(nurseId));
     }
 
     @GetMapping("/shift-changes/{requestId}")
     public ResponseEntity<ShiftChangeResponse> getShiftChangeRequestById(@PathVariable Long requestId,
-                                                                         @AuthenticationPrincipal User currentUser)
+                                                                         @PathVariable Long nurseId)
     {
-        return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestById(requestId, currentUser.getId()));
+        return ResponseEntity.ok(shiftChangeRequestService.getShiftChangeRequestById(requestId, nurseId));
     }
 
     @GetMapping("/shift-changes/received")
-    public ResponseEntity<List<ShiftChangeResponse>> getReceivedShiftChangeRequests(@AuthenticationPrincipal User currentUser)
+    public ResponseEntity<List<ShiftChangeResponse>> getReceivedShiftChangeRequests(@PathVariable Long nurseId)
     {
-        return ResponseEntity.ok(shiftChangeRequestService.getReceivedShiftChangeRequests(currentUser.getId()));
+        return ResponseEntity.ok(shiftChangeRequestService.getReceivedShiftChangeRequests(nurseId));
     }
 
     @PostMapping("/shift-changes")
     public ResponseEntity<ShiftChangeResponse> createShiftChangeRequest(@Valid @RequestBody CreateShiftChangeRequest request,
-                                                                        @AuthenticationPrincipal User currentUser)
+                                                                        @PathVariable Long nurseId)
     {
-        request.setRequestingNurseId(currentUser.getId());
+        request.setRequestingNurseId(nurseId);
         return ResponseEntity.status(HttpStatus.CREATED).body(shiftChangeRequestService.createShiftChangeRequest(request));
     }
 }
