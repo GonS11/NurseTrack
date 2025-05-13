@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/shift-templates")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
+//@PreAuthorize("hasAnyRole('ADMIN', 'SUPERVISOR')")
 public class ShiftTemplatesController
 {
     private final ShiftTemplateService shiftTemplateService;
