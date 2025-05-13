@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/departments")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 public class AdminDepartmentController
 {
     private final DepartmentService departmentService;
