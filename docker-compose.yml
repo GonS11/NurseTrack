@@ -1,4 +1,4 @@
-version: '3.8' # Puedes eliminar esta línea si quieres (es opcional ahora)
+#version: '3.8' # Puedes eliminar esta línea si quieres (es opcional ahora)
 services:
   mysqldb:
     image: mysql:8.0
