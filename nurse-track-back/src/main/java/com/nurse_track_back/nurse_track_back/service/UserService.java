@@ -1,12 +1,11 @@
 package com.nurse_track_back.nurse_track_back.service;
 
-import com.nurse_track_back.nurse_track_back.domain.enums.Role;
 import com.nurse_track_back.nurse_track_back.domain.model.User;
 import com.nurse_track_back.nurse_track_back.dto.request.user.CreateUserRequest;
 import com.nurse_track_back.nurse_track_back.dto.request.user.UpdateUserRequest;
 import com.nurse_track_back.nurse_track_back.dto.response.UserResponse;
-import com.nurse_track_back.nurse_track_back.exception.UserNotFoundException;
-import com.nurse_track_back.nurse_track_back.exception.UserStatusConflictException;
+import com.nurse_track_back.nurse_track_back.exception.InvalidStatusException;
+import com.nurse_track_back.nurse_track_back.exception.ResourceNotFoundException;
 import com.nurse_track_back.nurse_track_back.mapper.UserMapper;
 import com.nurse_track_back.nurse_track_back.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +19,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class UserService
-{
+public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(int page, int size, String sortBy)
-    {
+    public Page<UserResponse> getAllUsers(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         Page<User> userPage = userRepository.findAll(pageable);
 
@@ -42,15 +37,13 @@ public class UserService
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getUserById(Long id)
-    {
+    public UserResponse getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toDTO)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> ResourceNotFoundException.create("User", id));
     }
 
-    public UserResponse createUser(CreateUserRequest request)
-    {
+    public UserResponse createUser(CreateUserRequest request) {
         User user = userMapper.toEntity(request);
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -59,14 +52,12 @@ public class UserService
         return userMapper.toDTO(userRepository.save(user));
     }
 
-    public UserResponse updateUser(Long id, UpdateUserRequest request)
-    {
+    public UserResponse updateUser(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> ResourceNotFoundException.create("User", id));
 
         // Actualizar contraseña si se proporciona
-        if (request.getPassword() != null && !request.getPassword().isBlank())
-        {
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
@@ -74,23 +65,21 @@ public class UserService
         return userMapper.toDTO(userRepository.save(user));
     }
 
-    public void toggleUserStatus(Long id, Boolean active)
-    {
+    public void toggleUserStatus(Long id, Boolean active) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> ResourceNotFoundException.create("User", id));
 
-        if (user.getIsActive() == active)
-        {
-            throw new UserStatusConflictException(id, active);
+        if (user.getIsActive() == active) {
+            throw InvalidStatusException.create("active", user.getId());
         }
 
         user.setIsActive(active);
         userRepository.save(user);
     }
 
-    public void deleteUser(Long id)
-    {
-        if (!userRepository.existsById(id)) throw new UserNotFoundException(id);
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id))
+            throw ResourceNotFoundException.create("User", id);
 
         userRepository.deleteById(id);
     }

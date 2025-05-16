@@ -8,12 +8,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+import com.nurse_track_back.nurse_track_back.validation.validators.SupervisorAssignmentValidator;
+
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = SupervisorAssignmentValidator.class)
-public @interface ValidSupervisorAssignment
-{
+public @interface ValidSupervisorAssignment {
     String message() default "Invalid supervisor assignment data";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
