@@ -1,5 +1,6 @@
 package com.nurse_track_back.nurse_track_back.dto.request.user;
 
+import com.nurse_track_back.nurse_track_back.domain.enums.Role;
 import com.nurse_track_back.nurse_track_back.validation.annotations.ValidLicenseNumber;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -23,6 +24,8 @@ public class UpdateUserRequest
 
     //@ValidPassword
     private String password;
+
+    private Role role;
 
     private Boolean isActive;
 }

@@ -30,7 +30,7 @@ public class AdminUserController
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId)
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("userId") Long userId)
     {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
@@ -42,28 +42,28 @@ public class AdminUserController
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId,
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") Long userId,
                                                    @Valid @RequestBody UpdateUserRequest request)
     {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
     @PutMapping("/{userId}/activate")
-    public ResponseEntity<Void> activateUser(@PathVariable Long userId)
+    public ResponseEntity<Void> activateUser(@PathVariable("userId") Long userId)
     {
         userService.toggleUserStatus(userId, true);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{userId}/desactivate")
-    public ResponseEntity<Void> desactivateUser(@PathVariable Long userId)
+    public ResponseEntity<Void> desactivateUser(@PathVariable("userId") Long userId)
     {
         userService.toggleUserStatus(userId, false);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId)
+    public ResponseEntity<Void> deleteUser(@PathVariable("userId") Long userId)
     {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
