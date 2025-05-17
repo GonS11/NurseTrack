@@ -20,7 +20,7 @@ public interface UserMapper
     UserResponse toDTO(User user);
 
     @Named("userToSimpleResponse")
-    @Mapping(target = "fullName", expression = "java(user.getFirstname() + \" \" + user.getLastname())")
+    @Mapping(target = "fullname", expression = "java(user.getFirstname() + \" \" + user.getLastname())")
     UserSimpleResponse toUserSimpleResponse(User user);
 
     // CreateRequest -> Entity

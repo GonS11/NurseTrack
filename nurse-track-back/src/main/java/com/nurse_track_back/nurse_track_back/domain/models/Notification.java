@@ -8,16 +8,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notifications", indexes = {
-        @Index(name = "idx_notifications_user", columnList = "user_id, is_read"),
-        @Index(name = "idx_notifications_type", columnList = "type")
+@Table(name = "notifications",
+        indexes = {
+            @Index(name = "idx_notifications_user", columnList = "user_id, is_read"),
+            @Index(name = "idx_notifications_type", columnList = "type")
 })
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Notification {
-
+public class Notification
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

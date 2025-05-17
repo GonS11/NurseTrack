@@ -1,7 +1,6 @@
 package com.nurse_track_back.nurse_track_back.handlers;
 
-import com.nurse_track_back.nurse_track_back.exceptions.AssignmentException;
-import com.nurse_track_back.nurse_track_back.exceptions.GeneralException;
+import com.nurse_track_back.nurse_track_back.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.nurse_track_back.nurse_track_back.web.dto.response.ErrorResponse;
-import com.nurse_track_back.nurse_track_back.exceptions.BusinessException;
-import com.nurse_track_back.nurse_track_back.exceptions.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -80,7 +77,32 @@ public class GlobalExceptionHandler
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // 5. Captura cualquier excepción no controlada
+    // 6. Errores de seguridad
+    @ExceptionHandler({ org.springframework.security.access.AccessDeniedException.class })
+    public ResponseEntity<ErrorResponse> handleSpringAccessDenied(
+            org.springframework.security.access.AccessDeniedException ex,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(), status.value(), status.getReasonPhrase(),
+                ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler({ org.springframework.security.core.AuthenticationException.class })
+    public ResponseEntity<ErrorResponse> handleSpringAuthentication(
+            org.springframework.security.core.AuthenticationException ex,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(), status.value(), status.getReasonPhrase(),
+                ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(body);
+    }
+
+    // 7. Captura cualquier excepción no controlada
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request)
     {

@@ -11,11 +11,6 @@ import java.util.Optional;
 public interface SupervisorDepartmentRepository extends JpaRepository<SupervisorDepartment,Long>
 {
     Optional<SupervisorDepartment> findByDepartmentId(Long departmentId);
-    //List<SupervisorDepartment> findAllBySupervisorId(Long supervisorId);
 
     boolean existsBySupervisorIdAndDepartmentId(Long supervisorId, Long departmentId);
-
-    boolean existsByDepartmentId(Long departmentId); // Para validar asignación única
-    List<SupervisorDepartment> findBySupervisorId(Long supervisorId); // Todos los departamentos de un supervisor
-
 }

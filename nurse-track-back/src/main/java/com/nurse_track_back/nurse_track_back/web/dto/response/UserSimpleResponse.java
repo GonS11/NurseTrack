@@ -12,6 +12,6 @@ import lombok.Setter;
 public class UserSimpleResponse
 {
     private Long id;
-    private String fullName;
+    private String fullname;
     private String username;
 }

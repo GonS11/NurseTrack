@@ -18,20 +18,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity  // Activa seguridad web
 @EnableMethodSecurity // Permite @PreAuthorize, @RolesAllowed, etc. :contentReference[oaicite:4]{index=4}
 @RequiredArgsConstructor
-public class SecurityConfiguration {
-
+public class SecurityConfiguration
+{
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
     // Define un entry point que responde 401 en vez de redirigir :contentReference[oaicite:5]{index=5}
     @Bean
-    public AuthenticationEntryPoint restAuthenticationEntryPoint() {
+    public AuthenticationEntryPoint restAuthenticationEntryPoint()
+    {
         return (request, response, authException) ->
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
+    {
         http
                 // 1. Desactiva CSRF y HTTP Basic (por defecto Spring Security habilita HTTP Basic) :contentReference[oaicite:6]{index=6}
                 .csrf(AbstractHttpConfigurer::disable)
