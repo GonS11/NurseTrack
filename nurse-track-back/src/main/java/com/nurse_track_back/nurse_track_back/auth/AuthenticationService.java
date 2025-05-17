@@ -2,8 +2,8 @@ package com.nurse_track_back.nurse_track_back.auth;
 
 import com.nurse_track_back.nurse_track_back.config.JwtService;
 import com.nurse_track_back.nurse_track_back.domain.enums.Role;
-import com.nurse_track_back.nurse_track_back.domain.model.User;
-import com.nurse_track_back.nurse_track_back.repository.UserRepository;
+import com.nurse_track_back.nurse_track_back.domain.models.User;
+import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

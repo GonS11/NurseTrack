@@ -1,21 +1,21 @@
-package com.nurse_track_back.nurse_track_back.auth;
+package com.nurse_track_back.nurse_track_back.web.dto.request.user;
 
+import com.nurse_track_back.nurse_track_back.domain.enums.Role;
 import com.nurse_track_back.nurse_track_back.validations.annotations.ValidLicenseNumber;
 import com.nurse_track_back.nurse_track_back.validations.annotations.ValidUserCreation;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@Builder
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @ValidUserCreation
-public class RegisterRequest
+public class CreateUserRequest
 {
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
@@ -38,8 +38,8 @@ public class RegisterRequest
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     private String password;
 
-    //@NotNull(message = "Role is required") // SOlo nurse o supervisor
-    //private Role role;
+    @NotNull(message = "Role is required")
+    private Role role;
 
     @Size(max = 50, message = "License number must not exceed 50 characters")
     @ValidLicenseNumber

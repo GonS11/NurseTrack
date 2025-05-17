@@ -1,6 +1,6 @@
 package com.nurse_track_back.nurse_track_back.config;
 
-import com.nurse_track_back.nurse_track_back.repository.UserRepository;
+import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
