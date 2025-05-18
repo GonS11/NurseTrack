@@ -43,6 +43,8 @@ public class SecurityConfiguration
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()   // Permite registro/autenticación
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/supervisor/**").hasRole("SUPERVISOR")
+                        .requestMatchers("/api/nurse/**").hasRole("NURSE")
                         .anyRequest().authenticated()                  // Resto de rutas requieren token
                 )
 

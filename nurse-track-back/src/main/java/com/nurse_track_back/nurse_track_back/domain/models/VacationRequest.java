@@ -11,25 +11,26 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vacation_requests",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"requester_id", "start_date", "end_date"}),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"requester_id","start_date","end_date"}),
         indexes = {
                 @Index(name = "idx_vacation_dates", columnList = "start_date, end_date"),
                 @Index(name = "idx_vacation_requester_status", columnList = "requester_id, status")
         })
 @SQLRestriction("end_date >= start_date")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VacationRequest {
-
+public class VacationRequest
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)
-    private User requester;
+    private User requestingNurse;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -45,7 +46,7 @@ public class VacationRequest {
     private String reviewedNotes;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('CANCELLED', 'PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING'")
+    @Column(columnDefinition = "ENUM('CANCELLED','PENDING','APPROVED','REJECTED') DEFAULT 'PENDING'")
     private RequestStatus status = RequestStatus.PENDING;
 
     @ManyToOne

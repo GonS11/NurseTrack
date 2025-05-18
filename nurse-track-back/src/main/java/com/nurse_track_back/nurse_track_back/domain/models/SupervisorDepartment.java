@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "supervisors_departments",
-        uniqueConstraints = @UniqueConstraint(columnNames = "department_id")) // Departamento único
-@Getter @Setter
+        uniqueConstraints = @UniqueConstraint(columnNames = "department_id"))
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,5 +29,6 @@ public class SupervisorDepartment
     private Department department;
 
     @CreationTimestamp
+    @Column(name = "assigned_at", updatable = false)
     private LocalDateTime assignedAt;
 }

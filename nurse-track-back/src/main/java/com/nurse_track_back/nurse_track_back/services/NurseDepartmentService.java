@@ -5,6 +5,7 @@ import com.nurse_track_back.nurse_track_back.domain.models.NurseDepartment;
 import com.nurse_track_back.nurse_track_back.domain.models.SupervisorDepartment;
 import com.nurse_track_back.nurse_track_back.domain.models.User;
 import com.nurse_track_back.nurse_track_back.exceptions.*;
+import com.nurse_track_back.nurse_track_back.exceptions.SecurityException;
 import com.nurse_track_back.nurse_track_back.repositories.DepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.NurseDepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
@@ -73,16 +74,9 @@ public class NurseDepartmentService
 
     public NurseDepartmentResponse assignNurseToDepartment(AssignNurseRequest request)
     {
-        User nurse = userRepository.getReferenceById(request.getNurseId());
-        Department department = departmentRepository.getReferenceById(request.getDepartmentId());
+        NurseDepartment assignment = nurseDepartmentMapper.toEntity(request, userRepository, departmentRepository);
 
-        NurseDepartment assignment = NurseDepartment.builder()
-                .nurse(nurse)
-                .department(department)
-                .build();
-
-        NurseDepartment saved = nurseDepartmentRepository.save(assignment);
-        return nurseDepartmentMapper.toDTO(saved);
+        return nurseDepartmentMapper.toDTO(nurseDepartmentRepository.save(assignment));
     }
 
 
@@ -96,28 +90,27 @@ public class NurseDepartmentService
     }
 
     public void validateNurseAccess(Long nurseId, Long departmentId)
-            throws AccessDeniedException
     {
         if(!nurseDepartmentRepository.existsByNurseIdAndDepartmentId(nurseId, departmentId))
         {
-            throw new AccessDeniedException("Nurse has not access to this department");
+            throw SecurityException.create("validateNurseAccess",
+                                           "Nurse with ID " + nurseId + " does not have access to department ID: " + departmentId);
         }
     }
 
-    public void validateNurseIdentity(User currentUser, Long nurseId) throws AccessDeniedException
+    public void validateNurseIdentity(User currentUser, Long nurseId)
     {
         if (!currentUser.getId().equals(nurseId))
         {
-            throw new AccessDeniedException("Cannot access other nurse's data");
+            throw new SecurityException("Cannot access other nurse's data");
         }
     }
 
     public void validateNurseDepartmentAssociation(Long nurseId, Long departmentId)
-            throws AccessDeniedException
     {
         if (!nurseDepartmentRepository.existsByNurseIdAndDepartmentId(nurseId, departmentId))
         {
-            throw new AccessDeniedException("La enfermera no está asignada a este departamento");
+            throw AssignmentException.create("Nurse", nurseId, departmentId);
         }
     }
 }

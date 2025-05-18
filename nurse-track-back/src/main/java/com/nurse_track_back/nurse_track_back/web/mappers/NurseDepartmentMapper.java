@@ -9,7 +9,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {DepartmentMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {DepartmentMapper.class, UserMapper.class, GenericUtilsMapper.class})
 public interface NurseDepartmentMapper
 {
     // Entity → Response
@@ -17,21 +17,13 @@ public interface NurseDepartmentMapper
     @Mapping(source = "department", target = "department")
     NurseDepartmentResponse toDTO(NurseDepartment entity);
 
-    /*// Request → Entity
+    // Request → Entity
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "nurse", source = "nurseId", qualifiedByName = "userIdToUser")
+    @Mapping(target = "department", source = "departmentId", qualifiedByName = "departmentIdToDepartment")
     @Mapping(target = "assignedAt", ignore = true)
-    @Mapping(target = "nurse", ignore = true)
-    @Mapping(target = "department", ignore = true)
-    NurseDepartment toEntity(AssignNurseRequest request);
-
-    @AfterMapping
-    default void resolveAssignRelations (AssignNurseRequest request, @MappingTarget NurseDepartment nurseDepartment,
-                                         @Context UserRepository userRepository,
-                                         @Context DepartmentRepository departmentRepository)
-    {
-        nurseDepartment.setNurse(userRepository.getReferenceById(request.getNurseId()));
-        nurseDepartment.setDepartment(departmentRepository.getReferenceById(request.getDepartmentId()));
-    }*/
+    NurseDepartment toEntity(AssignNurseRequest request, @Context UserRepository userRepository,
+                             @Context DepartmentRepository departmentRepository);
 
     // 3. Lista de Entities → Lista de Responses
     List<NurseDepartmentResponse> toDtoList(List<NurseDepartment> nurseDepartmentList);

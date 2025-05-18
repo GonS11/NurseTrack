@@ -10,10 +10,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "notifications",
         indexes = {
-            @Index(name = "idx_notifications_user", columnList = "user_id, is_read"),
-            @Index(name = "idx_notifications_type", columnList = "type")
-})
-@Getter @Setter
+                @Index(name = "idx_notifications_user", columnList = "user_id, is_read"),
+                @Index(name = "idx_notifications_type", columnList = "type")
+        })
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,8 +29,8 @@ public class Notification
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('SHIFT_CHANGE', 'VACATION_REQUEST', 'GENERAL', 'SYSTEM', 'EMERGENCY') DEFAULT 'GENERAL'")
-    private NotificationType type;
+    @Column(columnDefinition = "ENUM('SHIFT_CHANGE','VACATION_REQUEST','GENERAL','SYSTEM','EMERGENCY') DEFAULT 'GENERAL'")
+    private NotificationType type = NotificationType.GENERAL;
 
     @Column(nullable = false)
     private String title;

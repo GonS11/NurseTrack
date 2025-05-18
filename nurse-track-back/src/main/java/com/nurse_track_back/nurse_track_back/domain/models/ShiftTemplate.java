@@ -12,7 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "shift_templates")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,7 +33,7 @@ public class ShiftTemplate
     private LocalTime endTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('MORNING', 'AFTERNOON', 'NIGHT', 'HALF_MORNING', 'HALF_NIGHT')")
+    @Column(columnDefinition = "ENUM('MORNING','AFTERNOON','NIGHT','HALF_MORNING','HALF_NIGHT')")
     private ShiftType type;
 
     @CreationTimestamp

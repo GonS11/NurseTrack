@@ -51,13 +51,7 @@ public class NotificationService
     @Transactional
     public NotificationResponse createNotification(CreateNotificationRequest request)
     {
-        Notification notification = notificationMapper.toEntity(request);
-
-        User user = userRepository.findById(request.getUserId())
-                        .orElseThrow(() -> ResourceNotFoundException.create("User", request.getUserId()));
-
-        notification.setUser(user);
-
+        Notification notification = notificationMapper.toEntity(request, userRepository);
         return notificationMapper.toDTO(notificationRepository.save(notification));
     }
 

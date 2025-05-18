@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = {DepartmentMapper.class, UserMapper.class})
+        uses = {DepartmentMapper.class, UserMapper.class, GenericUtilsMapper.class})
 public interface SupervisorDepartmentMapper
 {
     // 1. Entity → Response
@@ -19,22 +19,13 @@ public interface SupervisorDepartmentMapper
     @Mapping(source = "department", target = "department")
     SupervisorDepartmentResponse toDTO(SupervisorDepartment entity);
 
-    /*// 2. Versión básica para creación (sin resolución de dependencias)
+    // 2. Versión básica para creación (sin resolución de dependencias)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "supervisor", source = "supervisorId", qualifiedByName = "userIdToUser")
+    @Mapping(target = "department", source = "departmentId", qualifiedByName = "departmentIdToDepartment")
     @Mapping(target = "assignedAt", ignore = true)
-    @Mapping(target = "supervisor", ignore = true)
-    @Mapping(target = "department", ignore = true)
-    SupervisorDepartment toEntity(AssignSupervisorRequest request);
-
-    /*@AfterMapping
-    default void resolveAssignRelations(AssignSupervisorRequest request,
-                                        @MappingTarget SupervisorDepartment target,
-                                        @Context UserRepository userRepository,
-                                        @Context DepartmentRepository departmentRepository)
-    {
-        target.setSupervisor(userRepository.getReferenceById(request.getSupervisorId()));
-        target.setDepartment(departmentRepository.getReferenceById(request.getDepartmentId()));
-    }*/
+    SupervisorDepartment toEntity(AssignSupervisorRequest request, @Context UserRepository userRepository,
+                                  @Context DepartmentRepository departmentRepository);
 
     // 3. Lista de Entities → Lista de Responses
     List<SupervisorDepartmentResponse> toDtoList(List<SupervisorDepartment> supervisorDepartmentList);

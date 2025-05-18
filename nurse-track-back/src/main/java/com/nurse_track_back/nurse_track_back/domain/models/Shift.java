@@ -12,10 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "shifts", indexes = {
-        @Index(name = "idx_shifts_coverage", columnList = "department_id, shift_date, status"),
-        @Index(name = "idx_shifts_nurse_date", columnList = "nurse_id, shift_date")
-})
+@Table(name = "shifts",
+        indexes = {
+                @Index(name = "idx_shifts_coverage", columnList = "department_id, shift_date, status"),
+                @Index(name = "idx_shifts_nurse_date", columnList = "nurse_id, shift_date")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,7 +44,7 @@ public class Shift
     private LocalDate shiftDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED', 'SWAPPED') DEFAULT 'SCHEDULED'")
+    @Column(columnDefinition = "ENUM('SCHEDULED','COMPLETED','CANCELLED','SWAPPED') DEFAULT 'SCHEDULED'")
     private ShiftStatus status;
 
     @Lob
@@ -61,11 +62,10 @@ public class Shift
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //Relaciones con FK
-    @OneToMany(mappedBy = "offeredShift")
+    // Relaciones
+    @OneToMany(mappedBy = "offeredShift", cascade = CascadeType.ALL)
     private List<ShiftChangeRequest> offeredInShiftChanges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requestedShift")
-    private List<ShiftChangeRequest> requestedInShiftChanges = new ArrayList<>();
-
+    @OneToMany(mappedBy = "desiredShift", cascade = CascadeType.ALL)
+    private List<ShiftChangeRequest> desiredInShiftChanges = new ArrayList<>();
 }

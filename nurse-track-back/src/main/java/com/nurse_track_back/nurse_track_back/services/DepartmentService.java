@@ -1,6 +1,11 @@
 package com.nurse_track_back.nurse_track_back.services;
 
 import com.nurse_track_back.nurse_track_back.domain.models.Department;
+import com.nurse_track_back.nurse_track_back.domain.models.NurseDepartment;
+import com.nurse_track_back.nurse_track_back.exceptions.AssignmentException;
+import com.nurse_track_back.nurse_track_back.repositories.NurseDepartmentRepository;
+import com.nurse_track_back.nurse_track_back.repositories.SupervisorDepartmentRepository;
+import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
 import com.nurse_track_back.nurse_track_back.web.dto.request.department.CreateDepartmentRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.request.department.UpdateDepartmentRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.response.DepartmentResponse;
@@ -18,14 +23,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class DepartmentService {
+public class DepartmentService
+{
+    private final SupervisorDepartmentRepository supervisorDepartmentRepository;
+    private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
+    private final NurseDepartmentRepository nurseDepartmentRepository;
 
     @Transactional(readOnly = true)
     public Page<DepartmentResponse> getAllDepartments(int page, int size, String sortBy) {
@@ -52,6 +62,28 @@ public class DepartmentService {
                 .orElseThrow(() -> ResourceNotFoundException.create("Department", id));
 
         return departmentMapper.toDTO(department);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DepartmentResponse> getAllUserDepartments(Long userId)
+    {
+        return departmentMapper.toDTOList(supervisorDepartmentRepository.findDepartmentsBySupervisorId(userId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<DepartmentResponse> getDepartmentsForNurse(Long nurseId)
+    {
+        List<NurseDepartment> assignments = nurseDepartmentRepository.findAllByNurseId(nurseId);
+
+        if (assignments.isEmpty()) {
+            throw AssignmentException.create("Nurse", nurseId, assignments.getFirst().getDepartment().getId());
+        }
+
+        // Mapear a DepartmentResponse
+        return assignments.stream()
+                .map(NurseDepartment::getDepartment)
+                .map(departmentMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public DepartmentResponse createDepartment(CreateDepartmentRequest request) {
@@ -103,5 +135,4 @@ public class DepartmentService {
         department.setIsActive(true);
         departmentRepository.save(department);
     }
-
 }

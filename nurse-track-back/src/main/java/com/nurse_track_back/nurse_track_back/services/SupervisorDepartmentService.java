@@ -4,6 +4,7 @@ import com.nurse_track_back.nurse_track_back.domain.models.Department;
 import com.nurse_track_back.nurse_track_back.domain.models.SupervisorDepartment;
 import com.nurse_track_back.nurse_track_back.domain.models.User;
 import com.nurse_track_back.nurse_track_back.exceptions.ResourceNotFoundException;
+import com.nurse_track_back.nurse_track_back.exceptions.SecurityException;
 import com.nurse_track_back.nurse_track_back.repositories.DepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.SupervisorDepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
@@ -67,16 +68,9 @@ public class SupervisorDepartmentService
 
     public SupervisorDepartmentResponse assignSupervisor(AssignSupervisorRequest request)
     {
-        User supervisor = userRepository.getReferenceById(request.getSupervisorId());
-        Department department = departmentRepository.getReferenceById(request.getDepartmentId());
+        SupervisorDepartment assignment = supervisorDepartmentMapper.toEntity(request, userRepository, departmentRepository);
 
-        SupervisorDepartment assignment = SupervisorDepartment.builder()
-                .supervisor(supervisor)
-                .department(department)
-                .build();
-
-        SupervisorDepartment saved = supervisorDepartmentRepository.save(assignment);
-        return supervisorDepartmentMapper.toDTO(saved);
+        return supervisorDepartmentMapper.toDTO(supervisorDepartmentRepository.save(assignment));
     }
 
 
@@ -89,10 +83,14 @@ public class SupervisorDepartmentService
     }
 
     public void validateSupervisorAccess(Long supervisorId, Long departmentId)
-            throws AccessDeniedException {
+    {
         boolean hasAccess = supervisorDepartmentRepository.existsBySupervisorIdAndDepartmentId(supervisorId, departmentId);
-        if (!hasAccess) {
-            throw new AccessDeniedException("Supervisor has no access to this department");
+
+        if (!hasAccess)
+        {
+            throw SecurityException.create("validateSupervisorAccess",
+                                           "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
+
         }
     }
 }
