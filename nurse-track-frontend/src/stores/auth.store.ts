@@ -1,65 +1,71 @@
 import { defineStore } from 'pinia';
-import type {
-  CurrentUserResponse,
-  LoginRequest,
-  LoginResponse,
-} from '../types/schemas/auth.schema';
+import { jwtDecode } from 'jwt-decode';
 import { useAuthService } from '../services/shared/auth.service';
 import { UserRole } from '../types/enums/user-role.enum';
+import type {
+  AuthenticationRequest,
+  AuthenticationResponse,
+  DecodedToken,
+  RegisterRequest,
+} from '../types/schemas/auth.schema';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('token') || null,
-    user: null as CurrentUserResponse | null,
+    user: null as DecodedToken | null,
+    token: localStorage.getItem('authToken') || null,
   }),
 
   actions: {
-    async login(username: string, password: string) {
+    async login(
+      username: string,
+      password: string,
+    ): Promise<AuthenticationResponse> {
       try {
-        const data: LoginResponse = await useAuthService.login({
+        const response = await useAuthService.authenticate({
           username,
           password,
-        } as LoginRequest);
+        });
 
-        this.token = data.token;
-        this.user = {
-          username: data.username,
-          fullName: data.fullName,
-          role: data.role,
-          email: data.email,
-          licenseNumber: data.licenseNumber,
-        };
+        this.token = response.token;
+        localStorage.setItem('authToken', response.token);
 
-        localStorage.setItem('token', data.token);
+        this.user = jwtDecode<DecodedToken>(response.token);
+        console.log('Authenticated user: ', this.user);
+
+        return response;
       } catch (error) {
-        console.error('Login failed: ', error);
+        console.error('Login error: ', error);
+        this.logout();
         throw error;
       }
     },
 
-    async loadCurrentUser() {
-      if (this.token) {
-        try {
-          this.user = await useAuthService.getCurrentUser();
-        } catch (error) {
-          console.error('Failed to load current user: ', error);
-          this.logout();
-        }
+    async register(request: RegisterRequest): Promise<AuthenticationResponse> {
+      try {
+        const response = await useAuthService.register(request);
+
+        console.log('Correct register: ', response);
+        return response;
+      } catch (error) {
+        console.error('Register error: ', error);
+        throw error;
       }
     },
 
     logout() {
       this.token = null;
       this.user = null;
-      localStorage.removeItem('token');
-      useAuthService.logout();
+      localStorage.removeItem('authToken'); // Key corregida
+      // Limpiar cualquier otra data relacionada
     },
   },
 
   getters: {
     isAuthenticated: (state) => !!state.token,
-    isAdmin: (state) => state.user?.role === UserRole.ADMIN,
-    isSupervisor: (state) => state.user?.role === UserRole.SUPERVISOR,
-    isNurse: (state) => state.user?.role === UserRole.NURSE,
+    isAdmin: (state) => state.user?.role?.includes(UserRole.ADMIN) || false,
+    isSupervisor: (state) =>
+      state.user?.role?.includes(UserRole.SUPERVISOR) || false,
+    isNurse: (state) => state.user?.role?.includes(UserRole.NURSE) || false,
+    currentUser: (state) => state.user,
   },
 });

@@ -51,11 +51,11 @@
         <div class="demo-accounts">
           <p>Demo accounts</p>
           <div class="buttons">
-            <button @click="setDemoAccount('admin', 'password')">Admin</button>
-            <button @click="setDemoAccount('supervisor', 'password')">
+            <button @click="setDemoAccount('admin1', 'admin1')">Admin</button>
+            <button @click="setDemoAccount('super1', 'super1')">
               Supervisor
             </button>
-            <button @click="setDemoAccount('nurse', 'password')">Nurse</button>
+            <button @click="setDemoAccount('nurse1', 'nurse1')">Nurse</button>
           </div>
         </div>
       </div>

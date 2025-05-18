@@ -8,7 +8,7 @@ import { useAuthStore } from './services';
 
 const authStore = useAuthStore();
 
-onMounted(async () => {
+/*onMounted(async () => {
   try {
     if (authStore.isAuthenticated) {
       await authStore.loadCurrentUser();
@@ -16,5 +16,5 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error loading user:', error);
   }
-});
+});*/
 </script>

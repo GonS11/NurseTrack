@@ -7,8 +7,8 @@ export const UserRoleSchema = z.nativeEnum(UserRole);
 export const UserSchemas = {
   create: z
     .object({
-      firstName: validation.requiredString(1, 50),
-      lastName: validation.requiredString(1, 50),
+      firstname: validation.requiredString(1, 50),
+      lastname: validation.requiredString(1, 50),
       username: validation.username(),
       email: validation.email(),
       password: validation.password(),

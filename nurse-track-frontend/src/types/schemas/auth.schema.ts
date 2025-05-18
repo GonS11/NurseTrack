@@ -1,47 +1,49 @@
 import { z } from 'zod';
 import { validation } from '../validation';
-import { UserRoleSchema } from './user.schema';
-import { UserRole } from '../enums/user-role.enum';
 
 export const AuthSchemas = {
-  loginRequest: z
+  authenticationRequest: z
     .object({
       username: validation.requiredString(5, 50),
       password: validation.requiredString(8, 40),
     })
     .strict(),
 
-  loginResponse: z
+  authenticationResponse: z.object({
+    token: validation.requiredString(),
+  }),
+
+  registerRequest: z
     .object({
-      token: z.string(),
-      tokenType: z.string(),
-      username: z.string(),
-      role: UserRoleSchema,
-      fullName: z.string(),
-      email: z.string().email(),
-      licenseNumber: z.string().optional(),
+      firstname: validation.requiredString(),
+      lastname: validation.requiredString(),
+      username: validation.requiredString(),
+      email: validation.email(),
+      password: validation.password(),
+      licenseNumber: validation.licenseNumber(),
     })
     .strict(),
 
-  currentUserResponse: z
-    .object({
-      id: validation.requiredId(),
-      firstName: validation.requiredString(),
-      lastName: validation.requiredString(),
-      username: validation.requiredString(),
-      role: z.nativeEnum(UserRole),
-      isActive: z.boolean(),
-      createdAt: validation.dateTime(),
-      email: validation.email(),
-      licenseNumber: validation.optionalLicenseNumber(),
-      fullName: validation.requiredString(),
-    })
-    .strict(),
+  decodedToken: z.object({
+    role: validation.requiredString(),
+    username: validation.requiredString(),
+    email: validation.requiredString(),
+    firstname: validation.requiredString(),
+    lastname: validation.requiredString(),
+    licenseNumber: validation.requiredString(),
+    isActive: z.boolean(),
+    exp: z.number(),
+    iat: z.number().optional(),
+  }),
 };
 
 // Tipos inferidos
-export type LoginRequest = z.infer<typeof AuthSchemas.loginRequest>;
-export type LoginResponse = z.infer<typeof AuthSchemas.loginResponse>;
-export type CurrentUserResponse = z.infer<
-  typeof AuthSchemas.currentUserResponse
+export type AuthenticationRequest = z.infer<
+  typeof AuthSchemas.authenticationRequest
 >;
+export type AuthenticationResponse = z.infer<
+  typeof AuthSchemas.authenticationResponse
+>;
+export type RegisterRequest = z.infer<typeof AuthSchemas.registerRequest>;
+
+export type DecodedToken = z.infer<typeof AuthSchemas.decodedToken>;

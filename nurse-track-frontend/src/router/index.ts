@@ -14,7 +14,7 @@ const NurseDashboard = () => import('../views/dashboard/NurseDashboard.vue');
 
 //Protected route logic
 const requiresAuth = (allowedRoles?: string[]) => {
-  return (to: any, from: any, next: any) => {
+  return (_to: any, _from: any, next: any) => {
     const authStore = useAuthStore();
 
     if (!authStore.isAuthenticated) {

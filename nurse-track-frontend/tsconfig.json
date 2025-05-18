@@ -5,6 +5,8 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "types": ["@vuelidate/zod", "@vuelidate/core", "@vuelidate/validators"]
+    "types": ["@vuelidate/zod", "@vuelidate/core", "@vuelidate/validators"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }

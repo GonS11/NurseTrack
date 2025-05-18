@@ -9,6 +9,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.nurse_track_back.nurse_track_back.domain.models.User;
+
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
@@ -17,34 +19,38 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService
-{
+public class JwtService {
     private static final String SECRET_KEY = "6Hhg8pPml1g4hqrD5Csro73D6e4qiJenrwV+76VrgxA=";
 
-    public String extractUsername(String token)
-    {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver)
-    {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
 
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails)
-    {
-        Map<String,Object> claims = new HashMap<>();
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
 
-        claims.put("authorities",userDetails.getAuthorities());
+        User user = (User) userDetails; // Cast a tu clase User
+
+        claims.put("roles", userDetails.getAuthorities());
+        claims.put("username", user.getUsername());
+        claims.put("email", user.getEmail());
+        claims.put("firstname", user.getFirstname());
+        claims.put("lastname", user.getLastname());
+        claims.put("licenseNumber", user.getLicenseNumber());
+        claims.put("isActive", user.getIsActive());
+
 
         return generateToken(claims, userDetails);
     }
 
-    //Con claims
-    public String generateToken(Map<String, Object> extractClaims, UserDetails userDetails)
-    {
+    // Con claims
+    public String generateToken(Map<String, Object> extractClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extractClaims)
                 .setSubject(userDetails.getUsername())
@@ -54,26 +60,21 @@ public class JwtService
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails)
-    {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
 
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token)
-    {
+    private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token)
-    {
+    private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-
-    private Claims extractAllClaims(String token)
-    {
+    private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith((SecretKey) getSigningKey())
                 .build()
@@ -81,9 +82,7 @@ public class JwtService
                 .getPayload();
     }
 
-
-    private Key getSigningKey()
-    {
+    private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
 
         return Keys.hmacShaKeyFor(keyBytes);

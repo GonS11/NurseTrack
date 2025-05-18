@@ -13,57 +13,78 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-@EnableWebSecurity  // Activa seguridad web
-@EnableMethodSecurity // Permite @PreAuthorize, @RolesAllowed, etc. :contentReference[oaicite:4]{index=4}
+@EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfiguration
-{
+public class SecurityConfiguration {
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
-    // Define un entry point que responde 401 en vez de redirigir :contentReference[oaicite:5]{index=5}
     @Bean
-    public AuthenticationEntryPoint restAuthenticationEntryPoint()
-    {
+    public AuthenticationEntryPoint restAuthenticationEntryPoint() {
         return (request, response, authException) ->
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
-    {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Desactiva CSRF y HTTP Basic (por defecto Spring Security habilita HTTP Basic) :contentReference[oaicite:6]{index=6}
+                // 1. Configuración CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 2. Deshabilitar protecciones no necesarias para API REST
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
 
-                // 2. Configura las reglas de autorización con la nueva API funcional :contentReference[oaicite:7]{index=7}
+                // 3. Configuración de autorizaciones
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()   // Permite registro/autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/supervisor/**").hasRole("SUPERVISOR")
                         .requestMatchers("/api/nurse/**").hasRole("NURSE")
-                        .anyRequest().authenticated()                  // Resto de rutas requieren token
+                        .anyRequest().authenticated()
                 )
 
-                // 3. Política sin estado para API REST :contentReference[oaicite:8]{index=8}
+                // 4. Configuración de sesión
                 .sessionManagement(session ->
                                            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 4. Provee el AuthenticationProvider que valida credenciales / JWT :contentReference[oaicite:9]{index=9}
+                // 5. Proveedor de autenticación
                 .authenticationProvider(authenticationProvider)
 
-                // 5. Gestiona respuestas 401 en caso de fallo de autenticación :contentReference[oaicite:10]{index=10}
+                // 6. Manejo de excepciones
                 .exceptionHandling(ex ->
                                            ex.authenticationEntryPoint(restAuthenticationEntryPoint())
                 )
 
-                // 6. Filtra JWT antes que la autenticación de usuario/password :contentReference[oaicite:11]{index=11}
+                // 7. Filtro JWT
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // 8. Configuración CORS detallada
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Frontend URL
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
