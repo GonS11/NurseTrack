@@ -1,33 +1,42 @@
-#version: '3.8' # Puedes eliminar esta línea si quieres (es opcional ahora)
 services:
-  mysqldb:
-    image: mysql:8.0
-    container_name: mysqldb
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: nurse_track
-    ports:
-      - '3306:3306'
-    volumes:
-      - db_data:/var/lib/mysql
-
   backend:
     build:
-      context: ./nurse-track-backend
+      context: ./nurse-track-back
       dockerfile: Dockerfile
     container_name: nursetrack-backend
     restart: always
     ports:
       - '8080:8080'
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/nurse_track
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/nurse-track-back
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_SHOW_SQL: 'true'
     depends_on:
-      - mysqldb
+      mysql:
+        condition: service_healthy
 
-# Asegúrate de que esta sección esté al mismo nivel que 'services' (sin indentación)
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: nurse-track-back
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--default-authentication-plugin=mysql_native_password',
+      ]
+
 volumes:
-  db_data:
-    driver: local
+  mysql_data:
