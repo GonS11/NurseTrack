@@ -12,15 +12,17 @@ export const UserSchemas = {
       username: validation.username(),
       email: validation.email(),
       password: validation.password(),
-      role: z.nativeEnum(UserRole, { required_error: 'Role is required' }),
+      role: UserRoleSchema,
       licenseNumber: validation.optionalLicenseNumber(),
     })
     .strict(),
 
   update: z
     .object({
-      firstName: validation.optionalString(1, 50),
-      lastName: validation.optionalString(1, 50),
+      firstname: validation.optionalString(1, 50),
+      lastname: validation.optionalString(1, 50),
+      password: validation.optionalPassword(),
+      role: UserRoleSchema.optional(),
       licenseNumber: validation.optionalLicenseNumber(),
       isActive: z.boolean().optional(),
     })
@@ -29,20 +31,20 @@ export const UserSchemas = {
   response: z
     .object({
       id: validation.requiredId(),
-      firstName: validation.requiredString(),
-      lastName: validation.requiredString(),
+      firstname: validation.requiredString(),
+      lastname: validation.requiredString(),
       username: validation.requiredString(),
-      role: z.nativeEnum(UserRole),
+      role: UserRoleSchema,
       isActive: z.boolean(),
       createdAt: validation.dateTime(),
-      fullName: validation.requiredString(),
     })
     .strict(),
 
   simpleResponse: z
     .object({
       id: validation.requiredId(),
-      fullName: validation.requiredString(),
+      firstname: validation.requiredString(),
+      lastname: validation.requiredString(),
       username: validation.requiredString(),
     })
     .strict(),

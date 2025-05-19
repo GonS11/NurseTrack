@@ -9,7 +9,6 @@ const app = createApp(App);
 // Crea la instancia de Pinia
 const pinia = createPinia();
 
-// Instala Pinia antes que el router
 app.use(pinia);
 app.use(router);
 

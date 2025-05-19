@@ -23,4 +23,6 @@ export const useAuthService = {
     );
     return response.data;
   },
+
+  async getCurrentUser() {},
 };

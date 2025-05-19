@@ -7,8 +7,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface ShiftTemplateMapper
-{
+public interface ShiftTemplateMapper {
     ShiftTemplateResponse toDTO(ShiftTemplate shiftTemplate);
 
     List<ShiftTemplateResponse> toDTOList(List<ShiftTemplate> shiftTemplates);

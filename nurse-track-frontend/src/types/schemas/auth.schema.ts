@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { validation } from '../validation';
+import { UserRole } from '../enums/user-role.enum';
 
 export const AuthSchemas = {
   authenticationRequest: z
@@ -25,7 +26,7 @@ export const AuthSchemas = {
     .strict(),
 
   decodedToken: z.object({
-    role: validation.requiredString(),
+    role: z.nativeEnum(UserRole),
     username: validation.requiredString(),
     email: validation.requiredString(),
     firstname: validation.requiredString(),

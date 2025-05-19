@@ -72,12 +72,14 @@ import {
   LockClosedIcon,
 } from '@heroicons/vue/24/outline';
 import { useAuthStore } from '../../stores/auth.store';
+import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
 const username = ref('');
 const password = ref('');
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+const router = useRouter();
 
 const handleSubmit = async () => {
   isLoading.value = true;
@@ -85,7 +87,7 @@ const handleSubmit = async () => {
 
   try {
     await authStore.login(username.value, password.value);
-    window.location.href = '/dashboard'; // Redirect after successful login
+    router.push({ name: 'dashboard' }); // Redirect after successful login
   } catch (err: any) {
     error.value =
       err.response?.data?.message || 'Login failed. Please try again.';

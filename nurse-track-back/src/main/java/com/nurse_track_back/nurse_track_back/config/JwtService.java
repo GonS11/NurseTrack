@@ -45,7 +45,6 @@ public class JwtService {
         claims.put("licenseNumber", user.getLicenseNumber());
         claims.put("isActive", user.getIsActive());
 
-
         return generateToken(claims, userDetails);
     }
 

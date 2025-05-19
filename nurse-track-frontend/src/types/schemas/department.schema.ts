@@ -8,6 +8,7 @@ export const DepartmentSchemas = {
       location: validation.requiredString(2, 100),
     })
     .strict(),
+
   update: z
     .object({
       name: validation.optionalString(2, 100),
@@ -15,6 +16,7 @@ export const DepartmentSchemas = {
       isActive: z.boolean().optional(),
     })
     .strict(),
+
   response: z
     .object({
       id: validation.requiredId(),

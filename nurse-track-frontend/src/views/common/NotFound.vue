@@ -1,3 +1,3 @@
 <template>
-  <h1>My Schedule</h1>
+  <h1>Not Found</h1>
 </template>

@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,50 +18,44 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-//Disparar siempre que se hace una petition
-public class JwtAuthenticationFilter extends OncePerRequestFilter
-{
+// Disparar siempre que se hace una petition
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
-            throws ServletException, IOException
-    {
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String username;
 
-        if(authHeader == null || !authHeader.startsWith("Bearer "))
-        {
-            filterChain.doFilter(request,response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        jwtToken = authHeader.substring(7); //7 pq hay que quitar "Bearer "
+        jwtToken = authHeader.substring(7); // 7 pq hay que quitar "Bearer "
         username = jwtService.extractUsername(jwtToken);// Extract username from JWT token;
 
-        //Si hay username y no es ta autenticado, buscarlo
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null)
-        {
-            //Si existe recuperar
+        // Si hay username y no es ta autenticado, buscarlo
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // Si existe recuperar
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            //Ver si es valido
-            if(jwtService.isTokenValid(jwtToken, userDetails))
-            {
-                //Si es valido crear un objeto de autenticacion
+            // Ver si es valido
+            if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                // Si es valido crear un objeto de autenticacion
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities()
-                );
+                        userDetails.getAuthorities());
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                //Se actualiza autenticacion
+                // Se actualiza autenticacion
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 

@@ -10,7 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,31 +65,31 @@ public class User implements UserDetails {
     private SupervisorDepartment supervisorDepartment;
 
     @OneToMany(mappedBy = "nurse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NurseDepartment> nurseDepartments = new ArrayList<>();
+    private List<NurseDepartment> nurseDepartments;
 
     @OneToMany(mappedBy = "nurse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Shift> assignedShifts = new ArrayList<>();
+    private List<Shift> assignedShifts;
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Shift> createdShifts = new ArrayList<>();
+    private List<Shift> createdShifts;
 
     @OneToMany(mappedBy = "requestingNurse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShiftChangeRequest> shiftChangeRequests = new ArrayList<>();
+    private List<ShiftChangeRequest> shiftChangeRequests;
 
     @OneToMany(mappedBy = "receivingNurse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShiftChangeRequest> receivedShiftChangeRequests = new ArrayList<>();
+    private List<ShiftChangeRequest> receivedShiftChangeRequests;
 
     @OneToMany(mappedBy = "reviewedBy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShiftChangeRequest> reviewedShiftChangeRequests = new ArrayList<>();
+    private List<ShiftChangeRequest> reviewedShiftChangeRequests;
 
     @OneToMany(mappedBy = "requestingNurse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VacationRequest> vacationRequests = new ArrayList<>();
+    private List<VacationRequest> vacationRequests;
 
     @OneToMany(mappedBy = "reviewedBy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VacationRequest> reviewedVacationRequests = new ArrayList<>();
+    private List<VacationRequest> reviewedVacationRequests;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Notification> notifications;
 
     // UserDetails
     @Override

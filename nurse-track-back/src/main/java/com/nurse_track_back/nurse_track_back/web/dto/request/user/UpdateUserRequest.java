@@ -10,15 +10,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateUserRequest
-{
+public class UpdateUserRequest {
     @Size(max = 50, message = "First name must not exceed 50 characters")
     private String firstname;
 
     @Size(max = 50, message = "Last name must not exceed 50 characters")
     private String lastname;
 
-    //@ValidPassword
+    // @ValidPassword
     private String password;
 
     private Role role;

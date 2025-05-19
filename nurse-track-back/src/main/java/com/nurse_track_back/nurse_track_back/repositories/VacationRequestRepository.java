@@ -8,12 +8,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 @Repository
-public interface VacationRequestRepository extends JpaRepository<VacationRequest, Long>
-{
+public interface VacationRequestRepository extends JpaRepository<VacationRequest, Long> {
     @Query("""
                 SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END
                 FROM VacationRequest v
@@ -26,9 +24,9 @@ public interface VacationRequestRepository extends JpaRepository<VacationRequest
                 )
             """)
     boolean existsByRequesterAndStatusAndDateRangeOverlap(@Param("nurseId") Long nurseId,
-                                                          @Param("status") RequestStatus status,
-                                                          @Param("startDate") LocalDate startDate,
-                                                          @Param("endDate") LocalDate endDate);
+            @Param("status") RequestStatus status,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 
     List<VacationRequest> findByRequestingNurseId(Long nurseId);
 
@@ -39,7 +37,7 @@ public interface VacationRequestRepository extends JpaRepository<VacationRequest
                 AND vr.status = :status
             """)
     List<VacationRequest> findByDepartmentAndStatus(@Param("departmentId") Long departmentId,
-                                                    @Param("status") RequestStatus status);
+            @Param("status") RequestStatus status);
 
     @Query("""
                 SELECT DISTINCT vr FROM VacationRequest vr

@@ -7,7 +7,6 @@ import com.nurse_track_back.nurse_track_back.domain.models.User;
 import com.nurse_track_back.nurse_track_back.domain.models.VacationRequest;
 import com.nurse_track_back.nurse_track_back.exceptions.ResourceNotFoundException;
 import com.nurse_track_back.nurse_track_back.repositories.ShiftRepository;
-import com.nurse_track_back.nurse_track_back.repositories.SupervisorDepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
 import com.nurse_track_back.nurse_track_back.repositories.VacationRequestRepository;
 import com.nurse_track_back.nurse_track_back.utils.SendNotification;
@@ -28,19 +27,16 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class VacationRequestService
-{
+public class VacationRequestService {
     private final VacationRequestRepository vacationRequestRepository;
     private final VacationRequestMapper vacationRequestMapper;
-    private final SupervisorDepartmentRepository supervisorDepartmentRepository;
     private final VacationRequestValidation validator;
     private final UserRepository userRepository;
     private final SendNotification sendNotification;
     private final ShiftRepository shiftRepository;
 
     // ========== CRUD Operations ==========
-    public VacationRequestResponse createVacationRequest(CreateVacationRequest request)
-    {
+    public VacationRequestResponse createVacationRequest(CreateVacationRequest request) {
         VacationRequest vacationRequest = vacationRequestMapper.toEntity(request, userRepository);
         validator.validateVacationRequestCreation(request);
 
@@ -50,16 +46,14 @@ public class VacationRequestService
                 savedRequest.getRequestingNurse().getId(),
                 null,
                 savedRequest.getReviewedBy() != null ? savedRequest.getReviewedBy().getId() : null,
-                NotificationType.VACATION_REQUEST
-        );
+                NotificationType.VACATION_REQUEST);
 
         return vacationRequestMapper.toDTO(savedRequest);
     }
 
     public VacationRequestResponse updateVacationRequestStatus(Long requestId,
-                                                               UpdateVacationRequest request,
-                                                               Long currentUserId)
-    {
+            UpdateVacationRequest request,
+            Long currentUserId) {
         VacationRequest vacationRequest = vacationRequestRepository.findById(requestId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Vacation request", requestId));
 
@@ -68,8 +62,7 @@ public class VacationRequestService
 
         // Asignar campos automáticamente después de la validación
         if (request.getStatus() == RequestStatus.APPROVED
-                || request.getStatus() == RequestStatus.REJECTED)
-        {
+                || request.getStatus() == RequestStatus.REJECTED) {
             User reviewer = userRepository.findById(currentUserId)
                     .orElseThrow(() -> ResourceNotFoundException.create("User", currentUserId));
 
@@ -86,14 +79,12 @@ public class VacationRequestService
                 null,
                 request.getStatus(),
                 request.getReviewedNotes(),
-                NotificationType.VACATION_REQUEST
-        );
+                NotificationType.VACATION_REQUEST);
 
         // Guardar y procesar conflictos
         VacationRequest updatedRequest = vacationRequestRepository.save(vacationRequest);
 
-        if (updatedRequest.getStatus() == RequestStatus.APPROVED)
-        {
+        if (updatedRequest.getStatus() == RequestStatus.APPROVED) {
             checkShiftConflicts(updatedRequest);
         }
 
@@ -101,38 +92,33 @@ public class VacationRequestService
     }
 
     // ========== Query Operations ==========
-    public VacationRequestResponse getVacationRequestById(Long requestId, Long currentUserId)
-    {
+    public VacationRequestResponse getVacationRequestById(Long requestId, Long currentUserId) {
         VacationRequest vacationRequest = vacationRequestRepository.findById(requestId)
-                .orElseThrow(() -> ResourceNotFoundException.create("Vacation request",requestId));
+                .orElseThrow(() -> ResourceNotFoundException.create("Vacation request", requestId));
 
         // Verify the current user has access to this request
-        if (!vacationRequest.getRequestingNurse().getId().equals(currentUserId))
-        {
+        if (!vacationRequest.getRequestingNurse().getId().equals(currentUserId)) {
             throw new AccessDeniedException("You can only access your own requests");
         }
 
         return vacationRequestMapper.toDTO(vacationRequest);
     }
 
-    public List<VacationRequestResponse> getVacationRequestsByNurse(Long nurseId)
-    {
+    public List<VacationRequestResponse> getVacationRequestsByNurse(Long nurseId) {
         return vacationRequestRepository.findByRequestingNurseId(nurseId)
                 .stream()
                 .map(vacationRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<VacationRequestResponse> getPendingVacationRequestsByDepartment(Long departmentId, Long currentUserId)
-    {
+    public List<VacationRequestResponse> getPendingVacationRequestsByDepartment(Long departmentId, Long currentUserId) {
         return vacationRequestRepository.findByDepartmentAndStatus(departmentId, RequestStatus.PENDING)
                 .stream()
                 .map(vacationRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<VacationRequestResponse> getVacationRequestsByDepartment(Long departmentId)
-    {
+    public List<VacationRequestResponse> getVacationRequestsByDepartment(Long departmentId) {
         return vacationRequestRepository.findByDepartment(departmentId)
                 .stream()
                 .map(vacationRequestMapper::toDTO)
@@ -140,17 +126,15 @@ public class VacationRequestService
     }
 
     // ========== Business Logic ==========
-    private void checkShiftConflicts(VacationRequest request)
-    {
-        List<Shift> conflictingShifts = shiftRepository.findAllByNurseIdAndShiftDateBetween(request.getRequestingNurse().getId(),
-                                                                                            request.getStartDate(),
-                                                                                            request.getEndDate());
+    private void checkShiftConflicts(VacationRequest request) {
+        List<Shift> conflictingShifts = shiftRepository.findAllByNurseIdAndShiftDateBetween(
+                request.getRequestingNurse().getId(),
+                request.getStartDate(),
+                request.getEndDate());
 
-        if (!conflictingShifts.isEmpty())
-        {
+        if (!conflictingShifts.isEmpty()) {
             throw new IllegalStateException("Approved vacation conflicts with existing shifts");
         }
     }
-
 
 }

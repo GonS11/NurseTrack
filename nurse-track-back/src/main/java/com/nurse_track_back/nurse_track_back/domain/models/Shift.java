@@ -8,64 +8,61 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "shifts",
-        indexes = {
+@Table(name = "shifts", indexes = {
                 @Index(name = "idx_shifts_coverage", columnList = "department_id, shift_date, status"),
                 @Index(name = "idx_shifts_nurse_date", columnList = "nurse_id, shift_date")
-        })
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Shift
-{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Shift {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "nurse_id", nullable = false)
-    private User nurse;
+        @ManyToOne
+        @JoinColumn(name = "nurse_id", nullable = false)
+        private User nurse;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id", nullable = false)
-    private Department department;
+        @ManyToOne
+        @JoinColumn(name = "department_id", nullable = false)
+        private Department department;
 
-    @ManyToOne
-    @JoinColumn(name = "shift_template_id", nullable = false)
-    private ShiftTemplate shiftTemplate;
+        @ManyToOne
+        @JoinColumn(name = "shift_template_id", nullable = false)
+        private ShiftTemplate shiftTemplate;
 
-    @Column(name = "shift_date", nullable = false)
-    private LocalDate shiftDate;
+        @Column(name = "shift_date", nullable = false)
+        private LocalDate shiftDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('SCHEDULED','COMPLETED','CANCELLED','SWAPPED') DEFAULT 'SCHEDULED'")
-    private ShiftStatus status;
+        @Enumerated(EnumType.STRING)
+        @Column(columnDefinition = "ENUM('SCHEDULED','COMPLETED','CANCELLED','SWAPPED') DEFAULT 'SCHEDULED'")
+        private ShiftStatus status;
 
-    @Lob
-    private String notes;
+        @Lob
+        private String notes;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by_id", nullable = false)
-    private User createdBy;
+        @ManyToOne
+        @JoinColumn(name = "created_by_id", nullable = false)
+        private User createdBy;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+        @CreationTimestamp
+        @Column(name = "created_at", updatable = false)
+        private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+        @UpdateTimestamp
+        @Column(name = "updated_at")
+        private LocalDateTime updatedAt;
 
-    // Relaciones
-    @OneToMany(mappedBy = "offeredShift", cascade = CascadeType.ALL)
-    private List<ShiftChangeRequest> offeredInShiftChanges = new ArrayList<>();
+        // Relaciones
+        @OneToMany(mappedBy = "offeredShift", cascade = CascadeType.ALL)
+        private List<ShiftChangeRequest> offeredInShiftChanges;
 
-    @OneToMany(mappedBy = "desiredShift", cascade = CascadeType.ALL)
-    private List<ShiftChangeRequest> desiredInShiftChanges = new ArrayList<>();
+        @OneToMany(mappedBy = "desiredShift", cascade = CascadeType.ALL)
+        private List<ShiftChangeRequest> desiredInShiftChanges;
 }

@@ -13,35 +13,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/nurses/{nurseId}")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('NURSE') and #nurseId == principal.id")
-public class NurseShiftController
-{
+public class NurseShiftController {
     private final NurseDepartmentService nurseDepartmentService;
     private final ShiftService shiftService;
     private final DepartmentService departmentService;
 
     @GetMapping("/departments")
-    public ResponseEntity<List<DepartmentResponse>> getNurseDepartments(@PathVariable("nurseId") Long nurseId)
-    {
+    public ResponseEntity<List<DepartmentResponse>> getNurseDepartments(@PathVariable("nurseId") Long nurseId) {
         return ResponseEntity.ok(departmentService.getDepartmentsForNurse(nurseId));
     }
 
     @GetMapping("/shifts")
-    public ResponseEntity<List<ShiftResponse>> getNurseShifts(@PathVariable("nurseId") Long nurseId)
-    {
+    public ResponseEntity<List<ShiftResponse>> getNurseShifts(@PathVariable("nurseId") Long nurseId) {
         return ResponseEntity.ok(shiftService.getAllShiftByUserId(nurseId));
     }
 
     @GetMapping("/departments/{departmentId}/shifts")
     public ResponseEntity<List<ShiftResponse>> getDepartmentShiftsForNurse(@PathVariable("nurseId") Long nurseId,
-                                                                           @PathVariable("departmentId") Long departmentId)
-    {
+            @PathVariable("departmentId") Long departmentId) {
         nurseDepartmentService.validateNurseDepartmentAssociation(nurseId, departmentId);
         return ResponseEntity.ok(shiftService.getShiftsByNurseAndDepartment(nurseId, departmentId));
     }

@@ -52,6 +52,14 @@ export const validation = {
       .max(50, 'The password cannot exceed 50 characters');
   },
 
+  optionalPassword: () => {
+    return z
+      .string()
+      .min(8, 'The password should have at least 8 characters')
+      .max(50, 'The password cannot exceed 50 characters')
+      .optional();
+  },
+
   // License number
   licenseNumber: () => {
     return z

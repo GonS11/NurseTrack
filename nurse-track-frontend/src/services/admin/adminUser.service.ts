@@ -14,7 +14,7 @@ export const useAdminUserService = {
     active?: boolean,
     page: number = 0,
     size: number = 10,
-    sort: string = 'lastName,asc',
+    sort: string = 'lastname,asc',
   ): Promise<Page<UserResponse>> {
     const response = await api.get<Page<UserResponse>>('/admin/users', {
       params: { query, role, active, page, size, sort },

@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @ValidUserCreation
-public class RegisterRequest
-{
+public class RegisterRequest {
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
     private String firstname;
@@ -38,8 +37,8 @@ public class RegisterRequest
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     private String password;
 
-    //@NotNull(message = "Role is required") // SOlo nurse o supervisor
-    //private Role role;
+    // @NotNull(message = "Role is required") // SOlo nurse o supervisor
+    // private Role role;
 
     @Size(max = 50, message = "License number must not exceed 50 characters")
     @ValidLicenseNumber

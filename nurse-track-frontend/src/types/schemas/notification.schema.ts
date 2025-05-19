@@ -19,7 +19,7 @@ export const NotificationSchemas = {
   response: z.object({
     id: validation.requiredId(),
     user: UserSchemas.simpleResponse,
-    notificationType: NotificationTypeSchema,
+    type: NotificationTypeSchema,
     title: validation.requiredString(1, 100),
     message: validation.requiredString(1, 1000),
     isRead: z.boolean(),

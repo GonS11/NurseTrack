@@ -1,201 +1,179 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from 'vue-router';
+import AppShell from '../components/layout/AppShell.vue';
 import { useAuthStore } from '../services';
 import { UserRole } from '../types/enums/user-role.enum';
-import AppShell from '../components/layout/AppShell.vue';
+import { isUserRole } from '../utils/isUserRole';
 
-// Import the LoginPage component
+// Lazy-loaded views
 const LoginPage = () => import('../views/auth/LoginPage.vue');
+const UsersManagement = () => import('../views/admin/UsersManagement.vue');
+const DepartmentsManagement = () =>
+  import('../views/admin/DepartmentsManagement.vue');
+const ShiftTemplates = () => import('../views/admin/ShiftTemplates.vue');
+const DepartmentManagement = () =>
+  import('../views/supervisor/DepartmentManagement.vue');
+const StaffManagement = () => import('../views/supervisor/StaffManagement.vue');
+const ShiftSchedule = () => import('../views/supervisor/ShiftSchedule.vue');
+const RequestsManagement = () =>
+  import('../views/supervisor/RequestsManagement.vue');
+const MyDepartments = () => import('../views/nurse/MyDepartments.vue');
+const MySchedule = () => import('../views/nurse/MySchedule.vue');
+const RequestShiftSwap = () => import('../views/nurse/RequestShiftSwap.vue');
+const RequestVacation = () => import('../views/nurse/RequestVacation.vue');
+const UserProfile = () => import('../views/common/UserProfile.vue');
+const Notifications = () => import('../views/common/Notifications.vue');
+const Settings = () => import('../views/common/Settings.vue');
+const NotFound = () => import('../views/common/NotFound.vue');
 
-//Dashboards
-const AdminDashboard = () => import('../views/dashboard/AdminDashboard.vue');
-const SupervisorDashboard = () =>
-  import('../views/dashboard/SupervisorDashboard.vue');
-const NurseDashboard = () => import('../views/dashboard/NurseDashboard.vue');
-
-//Protected route logic
-const requiresAuth = (allowedRoles?: string[]) => {
-  return (_to: any, _from: any, next: any) => {
-    const authStore = useAuthStore();
-
-    if (!authStore.isAuthenticated) {
-      return next('/login');
-    }
-
-    if (
-      allowedRoles &&
-      authStore.user &&
-      !allowedRoles.includes(authStore.user.role)
-    ) {
-      return next('/');
-    }
-
-    next();
-  };
-};
-
-//Route logic on user role
-const DashboardRoute = () => {
-  const authStore = useAuthStore();
-
-  if (!authStore.user) {
-    return { path: '/login' };
-  }
-
-  switch (authStore.user.role) {
-    case UserRole.ADMIN:
-      return { component: AdminDashboard };
-    case UserRole.SUPERVISOR:
-      return { component: SupervisorDashboard };
-    case UserRole.NURSE:
-      return { component: NurseDashboard };
-    default:
-      return { path: '/login' };
-  }
-};
-
-const routes = [
-  //Auth routes
+// Route definitions
+const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
     component: LoginPage,
     meta: { public: true },
   },
-
-  // App routes with AppShell layout
   {
     path: '/',
     component: AppShell,
     children: [
-      // Dashboard - Redirect based on user role
       {
         path: '',
         name: 'dashboard',
-        beforeEnter: requiresAuth(),
-        component: DashboardRoute,
+        meta: { requiresAuth: true },
+        redirect: () => {
+          const { user } = useAuthStore();
+          if (!user) return { name: 'login' };
+          switch (user.role) {
+            case UserRole.ADMIN:
+              return { name: 'admin-users' };
+            case UserRole.SUPERVISOR:
+              return { name: 'supervisor-department' };
+            case UserRole.NURSE:
+              return { name: 'nurse-departments' };
+          }
+        },
       },
-
-      // Admin Routes
       {
         path: 'admin',
+        meta: { requiresAuth: true, allowedRoles: [UserRole.ADMIN] },
         children: [
-          {
-            path: 'users',
-            name: 'admin-users',
-            beforeEnter: requiresAuth([UserRole.ADMIN]),
-            component: () => import('../views/admin/UsersManagement.vue'),
-          },
+          { path: 'users', name: 'admin-users', component: UsersManagement },
           {
             path: 'departments',
             name: 'admin-departments',
-            beforeEnter: requiresAuth([UserRole.ADMIN]),
-            component: () => import('../views/admin/DepartmentsManagement.vue'),
+            component: DepartmentsManagement,
           },
           {
             path: 'shift-templates',
             name: 'admin-shift-templates',
-            beforeEnter: requiresAuth([UserRole.ADMIN]),
-            component: () => import('../views/admin/ShiftTemplates.vue'),
+            component: ShiftTemplates,
           },
         ],
       },
-
-      // Supervisor Routes
+      // Supervisor
       {
         path: 'supervisor',
+        meta: { requiresAuth: true, allowedRoles: [UserRole.SUPERVISOR] },
         children: [
           {
             path: 'department',
             name: 'supervisor-department',
-            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
-            component: () =>
-              import('../views/supervisor/DepartmentManagement.vue'),
+            component: DepartmentManagement,
           },
           {
             path: 'staff',
             name: 'supervisor-staff',
-            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
-            component: () => import('../views/supervisor/StaffManagement.vue'),
+            component: StaffManagement,
           },
           {
             path: 'shifts',
             name: 'supervisor-shifts',
-            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
-            component: () => import('../views/supervisor/ShiftSchedule.vue'),
+            component: ShiftSchedule,
           },
           {
             path: 'requests',
             name: 'supervisor-requests',
-            beforeEnter: requiresAuth([UserRole.SUPERVISOR]),
-            component: () =>
-              import('../views/supervisor/RequestsManagement.vue'),
+            component: RequestsManagement,
           },
         ],
       },
-
-      // Nurse Routes
+      // Nurse
       {
         path: 'nurse',
+        meta: { requiresAuth: true, allowedRoles: [UserRole.NURSE] },
         children: [
           {
             path: 'departments',
             name: 'nurse-departments',
-            beforeEnter: requiresAuth([UserRole.NURSE]),
-            component: () => import('../views/nurse/MyDepartments.vue'),
+            component: MyDepartments,
           },
           {
             path: 'schedule',
             name: 'nurse-schedule',
-            beforeEnter: requiresAuth([UserRole.NURSE]),
-            component: () => import('../views/nurse/MySchedule.vue'),
+            component: MySchedule,
           },
           {
             path: 'shift-swap',
             name: 'nurse-shift-swap',
-            beforeEnter: requiresAuth([UserRole.NURSE]),
-            component: () => import('../views/nurse/RequestShiftSwap.vue'),
+            component: RequestShiftSwap,
           },
           {
             path: 'vacation',
             name: 'nurse-vacation',
-            beforeEnter: requiresAuth([UserRole.NURSE]),
-            component: () => import('../views/nurse/RequestVacation.vue'),
+            component: RequestVacation,
           },
         ],
       },
-
-      // Common Routes
+      // Common
       {
         path: 'profile',
         name: 'profile',
-        beforeEnter: requiresAuth(),
-        component: () => import('../views/common/UserProfile.vue'),
+        component: UserProfile,
+        meta: { requiresAuth: true },
       },
       {
         path: 'notifications',
         name: 'notifications',
-        beforeEnter: requiresAuth(),
-        component: () => import('../views/common/Notifications.vue'),
+        component: Notifications,
+        meta: { requiresAuth: true },
       },
       {
         path: 'settings',
         name: 'settings',
-        beforeEnter: requiresAuth(),
-        component: () => import('../views/common/Settings.vue'),
+        component: Settings,
+        meta: { requiresAuth: true },
       },
     ],
   },
-
-  // Catch all route
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/',
-  },
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, _from, next) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return next({ name: 'login', query: { redirect: to.fullPath } });
+  }
+
+  const allowed = to.meta.allowedRoles as UserRole[] | undefined;
+  if (allowed && user) {
+    // Validamos que user.role es un UserRole
+    if (!isUserRole(user.role) || !allowed.includes(user.role)) {
+      return next({ name: 'dashboard' });
+    }
+  }
+
+  next();
 });
 
 export default router;

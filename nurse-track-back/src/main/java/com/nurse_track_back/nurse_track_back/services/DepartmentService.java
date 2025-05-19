@@ -5,7 +5,6 @@ import com.nurse_track_back.nurse_track_back.domain.models.NurseDepartment;
 import com.nurse_track_back.nurse_track_back.exceptions.AssignmentException;
 import com.nurse_track_back.nurse_track_back.repositories.NurseDepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.SupervisorDepartmentRepository;
-import com.nurse_track_back.nurse_track_back.repositories.UserRepository;
 import com.nurse_track_back.nurse_track_back.web.dto.request.department.CreateDepartmentRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.request.department.UpdateDepartmentRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.response.DepartmentResponse;
@@ -29,10 +28,8 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class DepartmentService
-{
+public class DepartmentService {
     private final SupervisorDepartmentRepository supervisorDepartmentRepository;
-    private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
     private final NurseDepartmentRepository nurseDepartmentRepository;
@@ -65,14 +62,12 @@ public class DepartmentService
     }
 
     @Transactional(readOnly = true)
-    public List<DepartmentResponse> getAllUserDepartments(Long userId)
-    {
+    public List<DepartmentResponse> getAllUserDepartments(Long userId) {
         return departmentMapper.toDTOList(supervisorDepartmentRepository.findDepartmentsBySupervisorId(userId));
     }
 
     @Transactional(readOnly = true)
-    public List<DepartmentResponse> getDepartmentsForNurse(Long nurseId)
-    {
+    public List<DepartmentResponse> getDepartmentsForNurse(Long nurseId) {
         List<NurseDepartment> assignments = nurseDepartmentRepository.findAllByNurseId(nurseId);
 
         if (assignments.isEmpty()) {

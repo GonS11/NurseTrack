@@ -1,3 +1,5 @@
+#version: '3.8'
+
 services:
   backend:
     build:
@@ -8,17 +10,24 @@ services:
     ports:
       - '8080:8080'
     environment:
+      # Spring Boot DataSource
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/nurse-track-back
       SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: '' # contraseña vacía
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
       SPRING_JPA_SHOW_SQL: 'true'
     depends_on:
       mysql:
         condition: service_healthy
+    # (opcional) Mapea tu src para recarga en caliente con devtools:
+    volumes:
+      - ./nurse-track-back/src:/app/src
 
   mysql:
     image: mysql:8.0
+    container_name: nursetrack-mysql
+    restart: always
     environment:
       MYSQL_DATABASE: nurse-track-back
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'

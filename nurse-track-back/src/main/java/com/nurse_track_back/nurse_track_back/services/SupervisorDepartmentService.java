@@ -2,7 +2,6 @@ package com.nurse_track_back.nurse_track_back.services;
 
 import com.nurse_track_back.nurse_track_back.domain.models.Department;
 import com.nurse_track_back.nurse_track_back.domain.models.SupervisorDepartment;
-import com.nurse_track_back.nurse_track_back.domain.models.User;
 import com.nurse_track_back.nurse_track_back.exceptions.ResourceNotFoundException;
 import com.nurse_track_back.nurse_track_back.exceptions.SecurityException;
 import com.nurse_track_back.nurse_track_back.repositories.DepartmentRepository;
@@ -21,14 +20,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SupervisorDepartmentService
-{
+public class SupervisorDepartmentService {
     private final SupervisorDepartmentRepository supervisorDepartmentRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
@@ -36,8 +33,7 @@ public class SupervisorDepartmentService
     private final DepartmentMapper departmentMapper;
 
     @Transactional(readOnly = true)
-    public Page<SupervisorDepartmentResponse> getAllAssignments(int page, int size, String sortBy)
-    {
+    public Page<SupervisorDepartmentResponse> getAllAssignments(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         Page<SupervisorDepartment> assingmentsPage = supervisorDepartmentRepository.findAll(pageable);
 
@@ -46,17 +42,14 @@ public class SupervisorDepartmentService
     }
 
     @Transactional(readOnly = true)
-    public List<DepartmentResponse> getAllUnassignedDepartments()
-    {
+    public List<DepartmentResponse> getAllUnassignedDepartments() {
         List<Department> unassigned = departmentRepository.findSupervisorUnassignedDepartments();
         return departmentMapper.toDTOList(unassigned);
     }
 
     @Transactional(readOnly = true)
-    public SupervisorDepartmentResponse getByDepartmentId(Long id)
-    {
-        if(!departmentRepository.existsById(id))
-        {
+    public SupervisorDepartmentResponse getByDepartmentId(Long id) {
+        if (!departmentRepository.existsById(id)) {
             throw ResourceNotFoundException.create("department", id);
         }
 
@@ -65,31 +58,27 @@ public class SupervisorDepartmentService
                 .orElseThrow(() -> ResourceNotFoundException.create("Department", id));
     }
 
-
-    public SupervisorDepartmentResponse assignSupervisor(AssignSupervisorRequest request)
-    {
-        SupervisorDepartment assignment = supervisorDepartmentMapper.toEntity(request, userRepository, departmentRepository);
+    public SupervisorDepartmentResponse assignSupervisor(AssignSupervisorRequest request) {
+        SupervisorDepartment assignment = supervisorDepartmentMapper.toEntity(request, userRepository,
+                departmentRepository);
 
         return supervisorDepartmentMapper.toDTO(supervisorDepartmentRepository.save(assignment));
     }
 
-
-    public void removeSupervisor(Long departmentId)
-    {
+    public void removeSupervisor(Long departmentId) {
         SupervisorDepartment assignment = supervisorDepartmentRepository.findByDepartmentId(departmentId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Assignment for department", departmentId));
 
         supervisorDepartmentRepository.delete(assignment);
     }
 
-    public void validateSupervisorAccess(Long supervisorId, Long departmentId)
-    {
-        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisorIdAndDepartmentId(supervisorId, departmentId);
+    public void validateSupervisorAccess(Long supervisorId, Long departmentId) {
+        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisorIdAndDepartmentId(supervisorId,
+                departmentId);
 
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             throw SecurityException.create("validateSupervisorAccess",
-                                           "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
+                    "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
 
         }
     }

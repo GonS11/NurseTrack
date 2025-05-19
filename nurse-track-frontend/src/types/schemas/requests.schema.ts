@@ -39,7 +39,7 @@ export const VacationRequestSchema = {
   response: z
     .object({
       id: validation.requiredId(),
-      requester: UserSchemas.simpleResponse,
+      requestingNurse: UserSchemas.simpleResponse,
       startDate: z.string(), // LocalDate as ISO string
       endDate: z.string(), // LocalDate as ISO string
       reason: validation.requiredString(1, 2000),
@@ -48,6 +48,7 @@ export const VacationRequestSchema = {
       reviewedBy: UserSchemas.simpleResponse.optional(),
       reviewedAt: validation.dateTime().optional(),
       createdAt: validation.dateTime(),
+      durationDays: validation.dateTime(),
     })
     .strict(),
 };
@@ -59,8 +60,8 @@ export const ShiftChangeRequestSchemas = {
       offeredShiftId: validation.requiredId(),
       receivingNurseId: validation.requiredId(),
       desiredShiftId: validation.requiredId(),
-      status: StatusSchema.default(Status.PENDING),
       reason: validation.requiredString(1, 1000),
+      status: StatusSchema.default(Status.PENDING),
     })
     .strict(),
 

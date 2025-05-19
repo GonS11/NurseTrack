@@ -8,41 +8,41 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notifications",
-        indexes = {
+@Table(name = "notifications", indexes = {
                 @Index(name = "idx_notifications_user", columnList = "user_id, is_read"),
                 @Index(name = "idx_notifications_type", columnList = "type")
-        })
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Notification
-{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Notification {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+        @ManyToOne
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
 
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('SHIFT_CHANGE','VACATION_REQUEST','GENERAL','SYSTEM','EMERGENCY') DEFAULT 'GENERAL'")
-    private NotificationType type = NotificationType.GENERAL;
+        @Builder.Default
+        @Enumerated(EnumType.STRING)
+        @Column(columnDefinition = "ENUM('SHIFT_CHANGE','VACATION_REQUEST','GENERAL','SYSTEM','EMERGENCY') DEFAULT 'GENERAL'")
+        private NotificationType type = NotificationType.GENERAL;
 
-    @Column(nullable = false)
-    private String title;
+        @Column(nullable = false)
+        private String title;
 
-    @Lob
-    @Column(nullable = false)
-    private String message;
+        @Lob
+        @Column(nullable = false)
+        private String message;
 
-    @Column(name = "is_read")
-    private Boolean isRead = false;
+        @Builder.Default
+        @Column(name = "is_read")
+        private Boolean isRead = false;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+        @CreationTimestamp
+        @Column(name = "created_at", updatable = false)
+        private LocalDateTime createdAt;
 }

@@ -39,7 +39,7 @@
             <p
               class="text-sm font-medium text-gray-700 group-hover:text-gray-900"
             >
-              {{ user?.fullName || `${user?.firstName} ${user?.lastName}` }}
+              {{ user?.fullName || `${user?.firstname} ${user?.lastname}` }}
             </p>
             <p
               class="text-xs font-medium text-gray-500 group-hover:text-gray-700"

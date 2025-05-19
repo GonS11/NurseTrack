@@ -58,14 +58,29 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('authToken'); // Key corregida
       // Limpiar cualquier otra data relacionada
     },
+
+    async getCurrentUser() {
+      if (!this.token) {
+        this.logout();
+        throw new Error('No hay token de autenticación');
+      }
+      try {
+        // jwtDecode lanzará si el token está expirado o mal formado
+        const userData = jwtDecode<DecodedToken>(this.token);
+        this.user = userData;
+      } catch (e) {
+        console.error('Token inválido o expirado:', e);
+        this.logout();
+        throw e;
+      }
+    },
   },
 
   getters: {
     isAuthenticated: (state) => !!state.token,
-    isAdmin: (state) => state.user?.role?.includes(UserRole.ADMIN) || false,
-    isSupervisor: (state) =>
-      state.user?.role?.includes(UserRole.SUPERVISOR) || false,
-    isNurse: (state) => state.user?.role?.includes(UserRole.NURSE) || false,
+    isAdmin: (state) => state.user?.role === UserRole.ADMIN,
+    isSupervisor: (state) => state.user?.role === UserRole.SUPERVISOR,
+    isNurse: (state) => state.user?.role === UserRole.NURSE,
     currentUser: (state) => state.user,
   },
 });

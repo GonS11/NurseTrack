@@ -13,37 +13,32 @@ import com.nurse_track_back.nurse_track_back.web.dto.response.NurseDepartmentRes
 import com.nurse_track_back.nurse_track_back.web.dto.response.ShiftResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/supervisor/departments")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('SUPERVISOR')")
-public class SupervisorDepartmentController
-{
+public class SupervisorDepartmentController {
     private final DepartmentService departmentService;
     private final SupervisorDepartmentService supervisorDepartmentService;
     private final NurseDepartmentService nurseDepartmentService;
     private final ShiftService shiftService;
 
     @GetMapping()
-    public ResponseEntity<List<DepartmentResponse>> getAllMyDepartments(@AuthenticationPrincipal User supervisor)
-    {
+    public ResponseEntity<List<DepartmentResponse>> getAllMyDepartments(@AuthenticationPrincipal User supervisor) {
         return ResponseEntity.ok(departmentService.getAllUserDepartments(supervisor.getId()));
     }
 
     @GetMapping("/{departmentId}")
     public ResponseEntity<DepartmentResponse> getMyDepartment(@PathVariable("departmentId") Long departmentId,
-                                                              @AuthenticationPrincipal User supervisor)
-    {
+            @AuthenticationPrincipal User supervisor) {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
         return ResponseEntity.ok(departmentService.getDepartmentById(departmentId));
@@ -52,9 +47,9 @@ public class SupervisorDepartmentController
     // ==================== ENFERMERAS DEL DEPARTAMENTO ====================
 
     @GetMapping("/{departmentId}/nurses")
-    public ResponseEntity<List<NurseDepartmentResponse>> getDepartmentNurses(@PathVariable("departmentId") Long departmentId,
-                                                                             @AuthenticationPrincipal User supervisor)
-    {
+    public ResponseEntity<List<NurseDepartmentResponse>> getDepartmentNurses(
+            @PathVariable("departmentId") Long departmentId,
+            @AuthenticationPrincipal User supervisor) {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
         return ResponseEntity.ok(nurseDepartmentService.getByDepartmentId(departmentId));
@@ -62,9 +57,8 @@ public class SupervisorDepartmentController
 
     @PostMapping("/{departmentId}/nurses")
     public ResponseEntity<NurseDepartmentResponse> addNurseToDepartment(@PathVariable("departmentId") Long departmentId,
-                                                                        @Valid @RequestBody AssignNurseRequest request,
-                                                                        @AuthenticationPrincipal User supervisor)
-    {
+            @Valid @RequestBody AssignNurseRequest request,
+            @AuthenticationPrincipal User supervisor) {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(nurseDepartmentService.assignNurseToDepartment(request));
@@ -72,9 +66,8 @@ public class SupervisorDepartmentController
 
     @DeleteMapping("/{departmentId}/nurses/{nurseId}")
     public ResponseEntity<Void> removeNurseFromDepartment(@PathVariable("departmentId") Long departmentId,
-                                                          @PathVariable("nurseId") Long nurseId,
-                                                          @AuthenticationPrincipal User supervisor)
-    {
+            @PathVariable("nurseId") Long nurseId,
+            @AuthenticationPrincipal User supervisor) {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
         nurseDepartmentService.removeNurseFromDepartment(nurseId, departmentId);
@@ -85,8 +78,7 @@ public class SupervisorDepartmentController
 
     @GetMapping("/{departmentId}/shifts")
     public ResponseEntity<List<ShiftResponse>> getDepartmentShifts(@PathVariable("departmentId") Long departmentId,
-                                                                   @AuthenticationPrincipal User supervisor)
-    {
+            @AuthenticationPrincipal User supervisor) {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
         return ResponseEntity.ok(shiftService.getAllShiftsByDepartmentId(departmentId));
@@ -94,9 +86,8 @@ public class SupervisorDepartmentController
 
     @PostMapping("/{departmentId}/shifts")
     public ResponseEntity<ShiftResponse> createShift(@PathVariable("departmentId") Long departmentId,
-                                                     @Valid @RequestBody CreateShiftRequest request,
-                                                     @AuthenticationPrincipal User supervisor)
-    {
+            @Valid @RequestBody CreateShiftRequest request,
+            @AuthenticationPrincipal User supervisor) {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
 
         request.setCreatedById(supervisor.getId());
@@ -107,9 +98,9 @@ public class SupervisorDepartmentController
 
     @PutMapping("/{departmentId}/shifts/{shiftId}")
     public ResponseEntity<ShiftResponse> updateShift(@PathVariable("departmentId") Long departmentId,
-                                                     @PathVariable("shiftId") Long shiftId,
-                                                     @Valid @RequestBody UpdateShiftRequest request,
-                                                     @AuthenticationPrincipal User supervisor)
+            @PathVariable("shiftId") Long shiftId,
+            @Valid @RequestBody UpdateShiftRequest request,
+            @AuthenticationPrincipal User supervisor)
 
     {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);
@@ -119,8 +110,8 @@ public class SupervisorDepartmentController
 
     @DeleteMapping("/{departmentId}/shifts/{shiftId}")
     public ResponseEntity<Void> cancelShift(@PathVariable("departmentId") Long departmentId,
-                                            @PathVariable("shiftId") Long shiftId,
-                                            @AuthenticationPrincipal User supervisor)
+            @PathVariable("shiftId") Long shiftId,
+            @AuthenticationPrincipal User supervisor)
 
     {
         supervisorDepartmentService.validateSupervisorAccess(supervisor.getId(), departmentId);

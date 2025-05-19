@@ -13,55 +13,51 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService
-{
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
+public class AuthenticationService {
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final JwtService jwtService;
+        private final AuthenticationManager authenticationManager;
 
-    //Crea un user en la BD y devuelve el token generado
-    public AuthenticationResponse register(RegisterRequest request)
-    {
-        User user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.NURSE) //Siempre nurse
-                .licenseNumber(request.getLicenseNumber())
-                .isActive(true)
-                .build();
+        // Crea un user en la BD y devuelve el token generado
+        public AuthenticationResponse register(RegisterRequest request) {
+                User user = User.builder()
+                                .firstname(request.getFirstname())
+                                .lastname(request.getLastname())
+                                .username(request.getUsername())
+                                .email(request.getEmail())
+                                .password(passwordEncoder.encode(request.getPassword()))
+                                .role(Role.NURSE) // Siempre nurse
+                                .licenseNumber(request.getLicenseNumber())
+                                .isActive(true)
+                                .build();
 
-        userRepository.save(user);
+                userRepository.save(user);
 
-        var jwtToken = jwtService.generateToken(user);
+                var jwtToken = jwtService.generateToken(user);
 
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
+                return AuthenticationResponse.builder()
+                                .token(jwtToken)
+                                .build();
+        }
 
-    //El manager llama a authenticate
-    public AuthenticationResponse authenticate(AuthenticationRequest request)
-    {
-        //Aqui se autentifica y se lanzan excepciones
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+        // El manager llama a authenticate
+        public AuthenticationResponse authenticate(AuthenticationRequest request) {
+                // Aqui se autentifica y se lanzan excepciones
+                authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getUsername(),
+                                                request.getPassword()));
 
-        //Una vez autenticado devolver token
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User with username " + request.getUsername() + " not found"));
+                // Una vez autenticado devolver token
+                User user = userRepository.findByUsername(request.getUsername())
+                                .orElseThrow(() -> new UsernameNotFoundException(
+                                                "User with username " + request.getUsername() + " not found"));
 
-        var jwtToken = jwtService.generateToken(user);
+                var jwtToken = jwtService.generateToken(user);
 
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
+                return AuthenticationResponse.builder()
+                                .token(jwtToken)
+                                .build();
+        }
 }

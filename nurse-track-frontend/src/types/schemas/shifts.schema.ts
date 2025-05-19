@@ -9,22 +9,13 @@ export const ShiftStatusSchema = z.nativeEnum(ShiftStatus);
 export const ShiftTypeSchema = z.nativeEnum(ShiftType);
 
 export const ShiftTemplateSchemas = {
-  create: z
-    .object({
-      name: validation.requiredString(1, 100),
-      shiftStartTime: validation.dateTime(),
-      shiftEndTime: validation.dateTime(),
-      shiftType: ShiftTypeSchema,
-    })
-    .strict(),
-
   response: z
     .object({
       id: validation.requiredId(),
       name: validation.requiredString(1, 100),
       shiftStartTime: validation.dateTime(),
       shiftEndTime: validation.dateTime(),
-      shiftType: ShiftTypeSchema,
+      type: ShiftTypeSchema,
       createdAt: validation.dateTime(),
       updatedAt: validation.dateTime(),
     })
@@ -89,10 +80,6 @@ export const ShiftSchemas = {
 export type CreateShiftRequest = z.infer<typeof ShiftSchemas.create>;
 export type UpdateShiftRequest = z.infer<typeof ShiftSchemas.update>;
 export type ShiftResponse = z.infer<typeof ShiftSchemas.response>;
-
-export type CreateShiftTemplateRequest = z.infer<
-  typeof ShiftTemplateSchemas.create
->;
 export type ShiftTemplateResponse = z.infer<
   typeof ShiftTemplateSchemas.response
 >;

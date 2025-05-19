@@ -13,18 +13,16 @@ import org.mapstruct.Named;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper
-{
+public interface UserMapper {
     // Entity -> Response
     @Named("userToDto")
     UserResponse toDTO(User user);
 
     @Named("userToSimpleResponse")
-    @Mapping(target = "fullname", expression = "java(user.getFirstname() + \" \" + user.getLastname())")
     UserSimpleResponse toUserSimpleResponse(User user);
 
     // CreateRequest -> Entity
-    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -41,7 +39,7 @@ public interface UserMapper
     User toEntity(CreateUserRequest request);
 
     // UpdateRequest -> Entity existente
-    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -56,7 +54,7 @@ public interface UserMapper
     @Mapping(target = "vacationRequests", ignore = true)
     @Mapping(target = "reviewedVacationRequests", ignore = true)
     @Mapping(target = "notifications", ignore = true)
-    @Mapping(target = "authorities", ignore = true )
+    @Mapping(target = "authorities", ignore = true)
     void updateModel(UpdateUserRequest request, @MappingTarget User user);
 
     // List
