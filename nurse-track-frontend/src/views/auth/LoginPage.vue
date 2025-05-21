@@ -82,17 +82,17 @@ const error = ref<string | null>(null);
 const router = useRouter();
 
 const handleSubmit = async () => {
-  isLoading.value = true;
-  error.value = null;
-
   try {
     await authStore.login(username.value, password.value);
-    router.push({ name: 'dashboard' }); // Redirect after successful login
+
+    // Redirección segura con catch
+    await router.push({ name: 'dashboard' });
   } catch (err: any) {
-    error.value =
-      err.response?.data?.message || 'Login failed. Please try again.';
-  } finally {
-    isLoading.value = false;
+    // Mejorar manejo de errores
+    if (err instanceof Error) {
+      error.value = err.message;
+    }
+    console.error('Login error:', err);
   }
 };
 

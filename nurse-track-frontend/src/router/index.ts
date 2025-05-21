@@ -47,14 +47,19 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
         redirect: () => {
           const { user } = useAuthStore();
-          if (!user) return { name: 'login' };
+
+          // Añadir validación adicional
+          if (!user || !user.role) return { name: 'login' };
+
           switch (user.role) {
             case UserRole.ADMIN:
-              return { name: 'admin-users' };
+              return { name: 'admin-users' }; // <- Verificar que esta ruta existe
             case UserRole.SUPERVISOR:
               return { name: 'supervisor-department' };
             case UserRole.NURSE:
               return { name: 'nurse-departments' };
+            default:
+              return { name: 'login' }; // <- Caso por defecto
           }
         },
       },
