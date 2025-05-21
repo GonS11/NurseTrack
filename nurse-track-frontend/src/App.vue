@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-// Reemplazar el watch actual con:
 import { watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from './stores/auth.store';
