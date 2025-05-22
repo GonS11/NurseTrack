@@ -11,8 +11,7 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface DepartmentMapper
-{
+public interface DepartmentMapper {
     // Entity -> Response
     DepartmentResponse toDTO(Department department);
 
@@ -26,7 +25,7 @@ public interface DepartmentMapper
     @Mapping(target = "nursesAssignments", ignore = true)
     Department toEntity(CreateDepartmentRequest request);
 
-    //UpdateRequest -> Entity existente
+    // UpdateRequest -> Entity existente
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

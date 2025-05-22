@@ -9,9 +9,8 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {DepartmentMapper.class, UserMapper.class, GenericUtilsMapper.class})
-public interface NurseDepartmentMapper
-{
+@Mapper(componentModel = "spring", uses = { DepartmentMapper.class, UserMapper.class, GenericUtilsMapper.class })
+public interface NurseDepartmentMapper {
     // Entity → Response
     @Mapping(source = "nurse", target = "nurse", qualifiedByName = "userToSimpleResponse")
     @Mapping(source = "department", target = "department")
@@ -23,7 +22,7 @@ public interface NurseDepartmentMapper
     @Mapping(target = "department", source = "departmentId", qualifiedByName = "departmentIdToDepartment")
     @Mapping(target = "assignedAt", ignore = true)
     NurseDepartment toEntity(AssignNurseRequest request, @Context UserRepository userRepository,
-                             @Context DepartmentRepository departmentRepository);
+            @Context DepartmentRepository departmentRepository);
 
     // 3. Lista de Entities → Lista de Responses
     List<NurseDepartmentResponse> toDtoList(List<NurseDepartment> nurseDepartmentList);

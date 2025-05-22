@@ -14,32 +14,28 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
-public interface GenericUtilsMapper
-{
+public interface GenericUtilsMapper {
     @Named("userIdToUser")
-    static User userIdToUser(Long userId, @Context UserRepository userRepository)
-    {
+    static User userIdToUser(Long userId, @Context UserRepository userRepository) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.create("User", userId));
     }
 
     @Named("departmentIdToDepartment")
-    static Department departmentIdToDepartment(Long departmentId, @Context DepartmentRepository departmentRepository)
-    {
+    static Department departmentIdToDepartment(Long departmentId, @Context DepartmentRepository departmentRepository) {
         return departmentRepository.findById(departmentId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Department", departmentId));
     }
 
     @Named("shiftTemplateIdToShiftTemplate")
-    static ShiftTemplate shiftTemplateIdToShiftTemplate(Long shiftTemplateId, @Context ShiftTemplateRepository shiftTemplateRepository)
-    {
+    static ShiftTemplate shiftTemplateIdToShiftTemplate(Long shiftTemplateId,
+            @Context ShiftTemplateRepository shiftTemplateRepository) {
         return shiftTemplateRepository.findById(shiftTemplateId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Shift template", shiftTemplateId));
     }
 
     @Named("shiftIdToShift")
-    static Shift shiftIdToShift(Long shiftId, @Context ShiftRepository shiftRepository)
-    {
+    static Shift shiftIdToShift(Long shiftId, @Context ShiftRepository shiftRepository) {
         return shiftRepository.findById(shiftId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Shift", shiftId));
     }

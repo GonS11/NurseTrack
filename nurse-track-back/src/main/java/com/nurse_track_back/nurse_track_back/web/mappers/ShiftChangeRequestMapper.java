@@ -10,10 +10,8 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",
-        uses = {UserMapper.class, ShiftMapper.class, GenericUtilsMapper.class})
-public interface ShiftChangeRequestMapper
-{
+@Mapper(componentModel = "spring", uses = { UserMapper.class, ShiftMapper.class, GenericUtilsMapper.class })
+public interface ShiftChangeRequestMapper {
     @Mapping(target = "requestingNurse", source = "requestingNurse", qualifiedByName = "userToSimpleResponse")
     @Mapping(target = "receivingNurse", source = "receivingNurse", qualifiedByName = "userToSimpleResponse")
     @Mapping(target = "reviewedBy", source = "reviewedBy", qualifiedByName = "userToSimpleResponse")
@@ -32,8 +30,8 @@ public interface ShiftChangeRequestMapper
     @Mapping(target = "reviewedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     ShiftChangeRequest toEntity(CreateShiftChangeRequest dto,
-                                @Context UserRepository userRepository,
-                                @Context ShiftRepository shiftRepository);
+            @Context UserRepository userRepository,
+            @Context ShiftRepository shiftRepository);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "requestingNurse", ignore = true)
@@ -46,7 +44,6 @@ public interface ShiftChangeRequestMapper
     @Mapping(target = "reviewedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateModel(UpdateShiftChangeRequest request, @MappingTarget ShiftChangeRequest shiftChangeRequest);
-
 
     List<ShiftChangeResponse> toDTOList(List<ShiftChangeRequest> requests);
 }

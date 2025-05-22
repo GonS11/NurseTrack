@@ -10,9 +10,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, GenericUtilsMapper.class})
-public interface VacationRequestMapper
-{
+@Mapper(componentModel = "spring", uses = { UserMapper.class, GenericUtilsMapper.class })
+public interface VacationRequestMapper {
     @Mapping(target = "requestingNurse", source = "requestingNurse", qualifiedByName = "userToSimpleResponse")
     @Mapping(target = "reviewedBy", source = "reviewedBy", qualifiedByName = "userToSimpleResponse")
     VacationRequestResponse toDTO(VacationRequest entity);
@@ -34,6 +33,6 @@ public interface VacationRequestMapper
     @Mapping(target = "reviewedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateModel(UpdateVacationRequest request,
-                     @MappingTarget VacationRequest vacationRequest,
-                     @Context UserRepository userRepository);
+            @MappingTarget VacationRequest vacationRequest,
+            @Context UserRepository userRepository);
 }
