@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { validation } from '../validation';
-import { Status } from '../enums/status.enum';
 import { UserSchemas } from './user.schema';
-
-export const StatusSchema = z.nativeEnum(Status);
+import { RequestStatus } from '../enums/status.enum';
 
 export const VacationRequestSchema = {
   create: z
@@ -24,14 +22,14 @@ export const VacationRequestSchema = {
           { message: 'End date must be in the future or present' },
         ),
       reason: validation.requiredString(1, 2000),
-      status: StatusSchema.default(Status.PENDING),
+      status: validation.requestStatus().default(RequestStatus.PENDING),
       reviewedById: validation.requiredId(),
     })
     .strict(),
 
   update: z
     .object({
-      status: StatusSchema,
+      status: validation.requestStatus(),
       reviewedNotes: validation.optionalString(0, 2000),
     })
     .strict(),
@@ -44,7 +42,7 @@ export const VacationRequestSchema = {
       endDate: z.string(), // LocalDate as ISO string
       reason: validation.requiredString(1, 2000),
       reviewedNotes: validation.optionalString(0, 2000),
-      status: StatusSchema,
+      status: validation.requestStatus(),
       reviewedBy: UserSchemas.simpleResponse.optional(),
       reviewedAt: validation.dateTime().optional(),
       createdAt: validation.dateTime(),
@@ -61,13 +59,17 @@ export const ShiftChangeRequestSchemas = {
       receivingNurseId: validation.requiredId(),
       desiredShiftId: validation.requiredId(),
       reason: validation.requiredString(1, 1000),
-      status: StatusSchema.default(Status.PENDING),
+      status: validation.requestStatus().default(RequestStatus.PENDING),
     })
     .strict(),
 
   update: z
     .object({
-      status: z.enum([Status.APPROVED, Status.REJECTED, Status.CANCELLED]),
+      status: z.enum([
+        RequestStatus.APPROVED,
+        RequestStatus.REJECTED,
+        RequestStatus.CANCELLED,
+      ]),
       reviewedNotes: validation.requiredString(1, 1000),
     })
     .strict(),
@@ -81,7 +83,7 @@ export const ShiftChangeRequestSchemas = {
       desiredShiftId: validation.requiredId(),
       reason: validation.requiredString(1, 1000),
       reviewedNotes: validation.optionalString(0, 1000),
-      status: StatusSchema,
+      status: validation.requestStatus(),
       reviewedBy: UserSchemas.simpleResponse.optional(),
       createdAt: validation.dateTime(),
       reviewedAt: validation.dateTime().optional(),

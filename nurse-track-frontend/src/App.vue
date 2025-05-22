@@ -3,36 +3,28 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { watchEffect } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from './stores/auth.store';
-import router from './router';
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 
-watch(
-  () => authStore.isAuthenticated,
+// Watcher reactivo mejorado
+watchEffect(async () => {
+  const isPublic = route.meta.public;
+  const currentName = route.name;
 
-  (isAuthenticated) => {
-    const currentRouteName = route.name;
-
-    if (!isAuthenticated && !route.meta.public) {
-      router.replace({ name: 'login' });
-    } else if (isAuthenticated && currentRouteName === 'login') {
-      router.replace({ name: 'dashboard' }).catch(() => {});
-    }
-  },
-  { immediate: true },
-);
-
-// También vigila cambios de ruta
-watch(
-  () => route.path,
-  () => {
-    if (!authStore.isAuthenticated && !route.meta.public) {
-      router.replace({ name: 'login' });
-    }
-  },
-);
+  if (!authStore.isAuthenticated && !isPublic) {
+    await router.replace({ name: 'login' });
+  } else if (authStore.isAuthenticated && currentName === 'login') {
+    const redirect = route.query.redirect?.toString() || 'dashboard';
+    await router.replace({ name: redirect });
+  }
+});
 </script>
+
+<style lang="scss">
+@use './App.scss';
+</style>

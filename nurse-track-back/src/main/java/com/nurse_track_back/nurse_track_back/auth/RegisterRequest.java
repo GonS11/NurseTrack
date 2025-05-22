@@ -37,9 +37,6 @@ public class RegisterRequest {
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     private String password;
 
-    // @NotNull(message = "Role is required") // SOlo nurse o supervisor
-    // private Role role;
-
     @Size(max = 50, message = "License number must not exceed 50 characters")
     @ValidLicenseNumber
     private String licenseNumber;

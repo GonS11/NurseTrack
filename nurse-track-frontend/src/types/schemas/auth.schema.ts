@@ -1,12 +1,11 @@
 import { z } from 'zod';
 import { validation } from '../validation';
-import { UserRole } from '../enums/user-role.enum';
 
 export const AuthSchemas = {
   authenticationRequest: z
     .object({
-      username: validation.requiredString(5, 50),
-      password: validation.requiredString(8, 40),
+      username: validation.requiredString(3, 50),
+      password: validation.password(),
     })
     .strict(),
 
@@ -16,17 +15,17 @@ export const AuthSchemas = {
 
   registerRequest: z
     .object({
-      firstname: validation.requiredString(),
-      lastname: validation.requiredString(),
-      username: validation.requiredString(),
+      firstname: validation.requiredString(1, 50),
+      lastname: validation.requiredString(1, 50),
+      username: validation.username(),
       email: validation.email(),
       password: validation.password(),
-      licenseNumber: validation.licenseNumber(),
+      licenseNumber: validation.optionalLicenseNumber(),
     })
     .strict(),
 
   decodedToken: z.object({
-    role: z.nativeEnum(UserRole),
+    roles: validation.userRole(),
     username: validation.requiredString(),
     email: validation.requiredString(),
     firstname: validation.requiredString(),

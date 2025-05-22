@@ -1,4 +1,5 @@
 import api from '../../api/axios';
+import type { Page } from '../../types/common';
 import type {
   CreateDepartmentRequest,
   DepartmentResponse,
@@ -7,8 +8,17 @@ import type {
 
 export const useAdminDepartmentService = {
   // Fetch all departments
-  async getAllDepartments(): Promise<DepartmentResponse[]> {
-    const response = await api.get<DepartmentResponse[]>('/admin/departments');
+  async getAllDepartments(
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'id',
+  ): Promise<Page<DepartmentResponse>> {
+    const response = await api.get<Page<DepartmentResponse>>(
+      '/admin/departments',
+      {
+        params: { page, size, sortBy },
+      },
+    );
     return response.data;
   },
 
@@ -57,7 +67,7 @@ export const useAdminDepartmentService = {
   },
 
   // Deactivate a department
-  async deactivateDepartment(departmentId: number): Promise<void> {
+  async desactivateDepartment(departmentId: number): Promise<void> {
     await api.put(`/admin/departments/${departmentId}/desactivate`);
   },
 

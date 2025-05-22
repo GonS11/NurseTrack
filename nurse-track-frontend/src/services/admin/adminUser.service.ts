@@ -9,15 +9,12 @@ import type {
 export const useAdminUserService = {
   // Fetch users with optional filters and pagination
   async getUsers(
-    query?: string,
-    role?: string,
-    active?: boolean,
     page: number = 0,
     size: number = 10,
-    sort: string = 'lastname,asc',
+    sortBy: string = 'id',
   ): Promise<Page<UserResponse>> {
     const response = await api.get<Page<UserResponse>>('/admin/users', {
-      params: { query, role, active, page, size, sort },
+      params: { page, size, sortBy }, // Eliminar query, role, active
     });
     return response.data;
   },
@@ -52,8 +49,8 @@ export const useAdminUserService = {
   },
 
   // Deactivate a user
-  async deactivateUser(userId: number): Promise<void> {
-    await api.put(`/admin/users/${userId}/deactivate`);
+  async desactivateUser(userId: number): Promise<void> {
+    await api.put(`/admin/users/${userId}/desactivate`);
   },
 
   // Delete a user

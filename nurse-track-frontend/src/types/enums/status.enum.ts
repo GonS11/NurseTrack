@@ -1,4 +1,4 @@
-export enum Status {
+export enum RequestStatus {
   CANCELLED = 'CANCELLED',
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
@@ -10,20 +10,20 @@ export interface StatusConfig {
   badgeStyle: string; // For UI styling
 }
 
-export const StatusData: Record<Status, StatusConfig> = {
-  [Status.CANCELLED]: {
+export const RequestStatusData: Record<RequestStatus, StatusConfig> = {
+  [RequestStatus.CANCELLED]: {
     displayName: 'Cancelled',
     badgeStyle: 'danger',
   },
-  [Status.PENDING]: {
+  [RequestStatus.PENDING]: {
     displayName: 'Pending',
     badgeStyle: 'warning',
   },
-  [Status.APPROVED]: {
+  [RequestStatus.APPROVED]: {
     displayName: 'Approved',
     badgeStyle: 'info',
   },
-  [Status.REJECTED]: {
+  [RequestStatus.REJECTED]: {
     displayName: 'Rejected',
     badgeStyle: 'secondary',
   },

@@ -1,12 +1,8 @@
 import { z } from 'zod';
 import { validation } from '../validation';
 import { ShiftStatus } from '../enums/shift-status.enum';
-import { ShiftType } from '../enums/shift-types.enum';
 import { UserSchemas } from './user.schema';
 import { DepartmentSchemas } from './department.schema';
-
-export const ShiftStatusSchema = z.nativeEnum(ShiftStatus);
-export const ShiftTypeSchema = z.nativeEnum(ShiftType);
 
 export const ShiftTemplateSchemas = {
   response: z
@@ -15,7 +11,7 @@ export const ShiftTemplateSchemas = {
       name: validation.requiredString(1, 100),
       shiftStartTime: validation.dateTime(),
       shiftEndTime: validation.dateTime(),
-      type: ShiftTypeSchema,
+      type: validation.shiftTypes(),
       createdAt: validation.dateTime(),
       updatedAt: validation.dateTime(),
     })
@@ -35,7 +31,7 @@ export const ShiftSchemas = {
             new Date(date) >= new Date(new Date().toISOString().split('T')[0]),
           { message: 'Shift date must be today or in the future' },
         ),
-      status: ShiftStatusSchema.default(ShiftStatus.SCHEDULED),
+      status: validation.shiftStatus().default(ShiftStatus.SCHEDULED),
       notes: validation.optionalString(0, 500),
       createdById: validation.requiredId(),
     })
@@ -53,7 +49,7 @@ export const ShiftSchemas = {
             new Date(date) >= new Date(new Date().toISOString().split('T')[0]),
           { message: 'Shift date must be today or in the future' },
         ),
-      status: ShiftStatusSchema.optional(),
+      status: validation.shiftStatus().optional(),
       notes: validation.optionalString(0, 500),
     })
     .strict(),
@@ -65,7 +61,7 @@ export const ShiftSchemas = {
       department: DepartmentSchemas.response,
       shiftTemplate: ShiftTemplateSchemas.response,
       shiftDate: z.string(), // LocalDate as ISO string
-      status: ShiftStatusSchema,
+      status: validation.shiftStatus(),
       notes: validation.optionalString(0, 500),
       createdBy: UserSchemas.simpleResponse,
       createdAt: validation.dateTime(),

@@ -4,7 +4,7 @@
 .login-page {
   @include flex-center(column);
   min-height: 100vh;
-  background-color: mix($white, $gray-100, 90%);
+  background-color: mix($primary, black, 90%);
   padding: map-get($spacers, 3);
 
   .container {

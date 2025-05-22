@@ -1,10 +1,15 @@
 // Colores
-$primary: #42b983;
-$secondary: #35495e;
-$success: #4caf50;
-$error: #ef5350;
-$warning: #ff9800;
-$info: #2196f3;
+$primary: #2a7f8b; // Azul sanitario profesional
+$primary-hover: #1e5e69; // Variante oscura
+$secondary: #6c757d; // Gris neutral
+$success: #4caf50; // Verde para confirmaciones
+$error: #e53935; // Rojo sanitario estándar
+$background: #f8fbfd; // Fondo claro profesional
+$text-primary: #2d3748; // Texto de alto contraste
+
+// Nuevas variables para el login
+$input-focus-glow: rgba(42, 127, 139, 0.2);
+$card-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.1);
 
 // Escala de grises
 $white: #ffffff;
@@ -34,7 +39,6 @@ $spacers: (
 );
 
 // Tipografía
-$font-family-sans-serif: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-size-base: 1rem;
 $line-height-base: 1.6;
 

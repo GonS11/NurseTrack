@@ -53,13 +53,13 @@ const routes: RouteRecordRaw[] = [
 
           switch (user.role) {
             case UserRole.ADMIN:
-              return { name: 'admin-users' }; // <- Verificar que esta ruta existe
+              return { name: 'admin-users' };
             case UserRole.SUPERVISOR:
               return { name: 'supervisor-department' };
             case UserRole.NURSE:
               return { name: 'nurse-departments' };
             default:
-              return { name: 'login' }; // <- Caso por defecto
+              return { name: 'login' };
           }
         },
       },

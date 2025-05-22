@@ -1,8 +1,5 @@
 import { z } from 'zod';
 import { validation } from '../validation';
-import { UserRole } from '../enums/user-role.enum';
-
-export const UserRoleSchema = z.nativeEnum(UserRole);
 
 export const UserSchemas = {
   create: z
@@ -12,7 +9,7 @@ export const UserSchemas = {
       username: validation.username(),
       email: validation.email(),
       password: validation.password(),
-      role: UserRoleSchema,
+      role: validation.userRole(),
       licenseNumber: validation.optionalLicenseNumber(),
     })
     .strict(),
@@ -22,7 +19,7 @@ export const UserSchemas = {
       firstname: validation.optionalString(1, 50),
       lastname: validation.optionalString(1, 50),
       password: validation.optionalPassword(),
-      role: UserRoleSchema.optional(),
+      role: validation.userRole().optional(),
       licenseNumber: validation.optionalLicenseNumber(),
       isActive: z.boolean().optional(),
     })
@@ -34,7 +31,8 @@ export const UserSchemas = {
       firstname: validation.requiredString(),
       lastname: validation.requiredString(),
       username: validation.requiredString(),
-      role: UserRoleSchema,
+      email: validation.email(),
+      role: validation.userRole(),
       isActive: z.boolean(),
       createdAt: validation.dateTime(),
     })

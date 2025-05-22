@@ -1,5 +1,9 @@
 // src/utils/validation.ts
 import { z } from 'zod';
+import { UserRole } from './enums/user-role.enum';
+import { ShiftStatus } from './enums/shift-status.enum';
+import { ShiftType } from './enums/shift-types.enum';
+import { RequestStatus } from './enums/status.enum';
 
 export const validation = {
   //RequiredId
@@ -49,14 +53,14 @@ export const validation = {
     return z
       .string()
       .min(8, 'The password should have at least 8 characters')
-      .max(50, 'The password cannot exceed 50 characters');
+      .max(255, 'The password cannot exceed 255 characters');
   },
 
   optionalPassword: () => {
     return z
       .string()
       .min(8, 'The password should have at least 8 characters')
-      .max(50, 'The password cannot exceed 50 characters')
+      .max(255, 'The password cannot exceed 255 characters')
       .optional();
   },
 
@@ -64,6 +68,7 @@ export const validation = {
   licenseNumber: () => {
     return z
       .string()
+      .max(50, 'License number must not exceed 50 characters')
       .regex(
         /^([A-Z]-)?\d{4,8}$/,
         'Invalid license number format. Expected pattern: A-1234 or 123456',
@@ -71,10 +76,10 @@ export const validation = {
       .trim();
   },
 
-  // License number opcional
   optionalLicenseNumber: () => {
     return z
       .string()
+      .max(50, 'License number must not exceed 50 characters')
       .regex(
         /^([A-Z]-)?\d{4,8}$/,
         'Invalid license number format. Expected pattern: A-1234 or 123456',
@@ -97,6 +102,38 @@ export const validation = {
   // Date time opcional
   optionalDateTime: () => {
     return z.string().datetime().optional();
+  },
+
+  optionalBoolean: () => {
+    return z.boolean().optional();
+  },
+
+  // Roles
+  userRole: () => {
+    return z.nativeEnum(UserRole, {
+      errorMap: () => ({ message: 'Invalid user role' }),
+    });
+  },
+
+  // Shift Status
+  shiftStatus: () => {
+    return z.nativeEnum(ShiftStatus, {
+      errorMap: () => ({ message: 'Invalid shift status' }),
+    });
+  },
+
+  // Shift Type
+  shiftTypes: () => {
+    return z.nativeEnum(ShiftType, {
+      errorMap: () => ({ message: 'Invalid shift type' }),
+    });
+  },
+
+  // Rquest Status
+  requestStatus: () => {
+    return z.nativeEnum(RequestStatus, {
+      errorMap: () => ({ message: 'Invalid request status' }),
+    });
   },
 
   // Convertidor de esquema Zod a Vuelidate

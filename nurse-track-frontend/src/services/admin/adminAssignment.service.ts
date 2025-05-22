@@ -1,4 +1,5 @@
 import api from '../../api/axios';
+import type { Page } from '../../types/common';
 import type {
   AssignNurseRequest,
   AssignSupervisorRequest,
@@ -7,6 +8,18 @@ import type {
 } from '../../types/schemas/assignments.schema';
 
 export const useAdminAssignmentService = {
+  async getAllSupervisorAssignments(
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'departmentId',
+  ): Promise<Page<SupervisorDepartmentResponse>> {
+    const response = await api.get<Page<SupervisorDepartmentResponse>>(
+      '/admin/assignments/departments',
+      { params: { page, size, sortBy } },
+    );
+    return response.data;
+  },
+
   // Get the supervisor assigned to a department
   async getDepartmentSupervisor(
     departmentId: number,
@@ -19,10 +32,11 @@ export const useAdminAssignmentService = {
 
   // Assign a supervisor to a department
   async assignSupervisor(
+    departmentId: number,
     data: AssignSupervisorRequest,
   ): Promise<SupervisorDepartmentResponse> {
     const response = await api.post<SupervisorDepartmentResponse>(
-      `/admin/assignments/departments/${data.departmentId}/supervisor`,
+      `/admin/assignments/departments/${departmentId}/supervisor`,
       data,
     );
     return response.data;
