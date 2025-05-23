@@ -8,11 +8,11 @@ export const useShiftTemplatesStore = defineStore('shiftTemplates', {
   }),
 
   actions: {
-    async fetchShiftTemplates() {
+    async getShiftTemplates() {
       this.shiftTemplates = await useShiftTemplateService.getShiftTemplates();
     },
 
-    async fetchShiftTemplateById(shiftTemplateId: number) {
+    async getShiftTemplateById(shiftTemplateId: number) {
       const shiftTemplate = await useShiftTemplateService.getShiftTemplateById(
         shiftTemplateId,
       );

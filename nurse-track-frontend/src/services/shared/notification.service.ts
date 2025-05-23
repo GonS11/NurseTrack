@@ -20,7 +20,7 @@ export const useNotificationService = {
     return response.data;
   },
 
-  async getNotification(
+  async getNotificationById(
     userId: number,
     notificationId: number,
   ): Promise<NotificationResponse> {

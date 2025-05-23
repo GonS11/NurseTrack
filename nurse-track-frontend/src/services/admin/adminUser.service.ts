@@ -7,7 +7,7 @@ import type {
 } from '../../types/schemas/user.schema';
 
 export const useAdminUserService = {
-  async getUsers(
+  async getAllUsers(
     page: number = 0,
     size: number = 10,
     sortBy: string = 'id',

@@ -31,7 +31,7 @@ export const useAdminAssignmentService = {
     return response.data;
   },
 
-  async getDepartmentSupervisor(
+  async getSupervisorByDepartment(
     departmentId: number,
   ): Promise<SupervisorDepartmentResponse> {
     const response = await api.get<SupervisorDepartmentResponse>(

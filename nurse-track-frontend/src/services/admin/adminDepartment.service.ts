@@ -69,15 +69,15 @@ export const useAdminDepartmentService = {
     return response.data;
   },
 
-  async deleteDepartment(departmentId: number): Promise<void> {
-    await api.delete(`/admin/departments/${departmentId}`);
+  async activateDepartment(departmentId: number): Promise<void> {
+    await api.put(`/admin/departments/${departmentId}/activate`);
   },
 
   async desactivateDepartment(departmentId: number): Promise<void> {
     await api.put(`/admin/departments/${departmentId}/desactivate`);
   },
 
-  async activateDepartment(departmentId: number): Promise<void> {
-    await api.put(`/admin/departments/${departmentId}/activate`);
+  async deleteDepartment(departmentId: number): Promise<void> {
+    await api.delete(`/admin/departments/${departmentId}`);
   },
 };

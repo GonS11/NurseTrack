@@ -29,13 +29,21 @@ export const useSupervisorStore = defineStore('supervisor', {
 
   actions: {
     // ===================== DEPARTMENT ACTIONS =====================
+    async getAllMyDepartments() {
+      try {
+        this.departments =
+          await useSupervisorDepartmentService.getAllMyDepartments();
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    },
 
-    async fetchMyDepartment(departmentId: number) {
+    async getMyDepartment(departmentId: number) {
       try {
         const department = await useSupervisorDepartmentService.getMyDepartment(
           departmentId,
         );
-        this.departments = [department]; // Assuming one department per supervisor
+        this.departments = [department];
       } catch (error) {
         console.error(
           `Error fetching department with ID ${departmentId}:`,
@@ -44,7 +52,8 @@ export const useSupervisorStore = defineStore('supervisor', {
       }
     },
 
-    async fetchDepartmentNurses(departmentId: number) {
+    // ===================== NURSE ACTIONS =====================
+    async getDepartmentNurses(departmentId: number) {
       try {
         this.nurseAssignments =
           await useSupervisorDepartmentService.getDepartmentNurses(
@@ -85,8 +94,8 @@ export const useSupervisorStore = defineStore('supervisor', {
         );
         this.nurseAssignments = this.nurseAssignments.filter(
           (assign) =>
-            assign.nurse.id !== nurseId ||
-            assign.department.id !== departmentId,
+            assign?.nurse?.id !== nurseId ||
+            assign?.department?.id !== departmentId,
         );
       } catch (error) {
         console.error(
@@ -97,8 +106,7 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     // ===================== SHIFT ACTIONS =====================
-
-    async fetchDepartmentShifts(departmentId: number) {
+    async getDepartmentShifts(departmentId: number) {
       try {
         this.shifts = await useSupervisorDepartmentService.getDepartmentShifts(
           departmentId,
@@ -165,8 +173,7 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     // ===================== VACATION REQUEST ACTIONS =====================
-
-    async fetchPendingVacationRequests(departmentId: number) {
+    async getPendingVacationRequests(departmentId: number) {
       try {
         this.vacationRequests =
           await useSupervisorRequestService.getPendingVacationRequests(
@@ -180,7 +187,7 @@ export const useSupervisorStore = defineStore('supervisor', {
       }
     },
 
-    async fetchAllVacationRequests(departmentId: number) {
+    async getAllVacationRequests(departmentId: number) {
       try {
         this.vacationRequests =
           await useSupervisorRequestService.getAllVacationRequests(
@@ -195,12 +202,14 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     async approveVacationRequest(
+      departmentId: number,
       requestId: number,
       request: UpdateVacationRequest,
     ) {
       try {
         const updatedRequest =
           await useSupervisorRequestService.approveVacationRequest(
+            departmentId,
             requestId,
             request,
           );
@@ -220,12 +229,14 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     async rejectVacationRequest(
+      departmentId: number,
       requestId: number,
       request: UpdateVacationRequest,
     ) {
       try {
         const updatedRequest =
           await useSupervisorRequestService.rejectVacationRequest(
+            departmentId,
             requestId,
             request,
           );
@@ -245,8 +256,7 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     // ===================== SHIFT CHANGE REQUEST ACTIONS =====================
-
-    async fetchPendingShiftChangeRequests(departmentId: number) {
+    async getPendingShiftChangeRequests(departmentId: number) {
       try {
         this.shiftChangeRequests =
           await useSupervisorRequestService.getPendingShiftChangeRequests(
@@ -260,7 +270,7 @@ export const useSupervisorStore = defineStore('supervisor', {
       }
     },
 
-    async fetchAllShiftChangeRequests(departmentId: number) {
+    async getAllShiftChangeRequests(departmentId: number) {
       try {
         this.shiftChangeRequests =
           await useSupervisorRequestService.getAllShiftChangeRequests(
@@ -275,12 +285,14 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     async approveShiftChangeRequest(
+      departmentId: number,
       requestId: number,
       request: UpdateShiftChangeRequest,
     ) {
       try {
         const updatedRequest =
           await useSupervisorRequestService.approveShiftChangeRequest(
+            departmentId,
             requestId,
             request,
           );
@@ -300,12 +312,14 @@ export const useSupervisorStore = defineStore('supervisor', {
     },
 
     async rejectShiftChangeRequest(
+      departmentId: number,
       requestId: number,
       request: UpdateShiftChangeRequest,
     ) {
       try {
         const updatedRequest =
           await useSupervisorRequestService.rejectShiftChangeRequest(
+            departmentId,
             requestId,
             request,
           );

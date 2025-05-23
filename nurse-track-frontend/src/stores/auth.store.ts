@@ -55,7 +55,6 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       this.user = null;
       localStorage.removeItem('authToken'); // Key corregida
-      // Limpiar cualquier otra data relacionada
     },
 
     async getCurrentUser() {

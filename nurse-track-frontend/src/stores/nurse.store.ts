@@ -20,10 +20,9 @@ export const useNurseStore = defineStore('nurse', {
 
   actions: {
     // ==================== SHIFT ACTIONS ====================
-
-    async fetchDepartments(nurseId: number) {
+    async getMyDepartments(nurseId: number) {
       try {
-        this.departements = await useNurseShiftService.getNurseDepartments(
+        this.departements = await useNurseShiftService.getMyDepartments(
           nurseId,
         );
       } catch (error) {
@@ -31,17 +30,17 @@ export const useNurseStore = defineStore('nurse', {
       }
     },
 
-    async fetchShifts(nurseId: number) {
+    async getShifts(nurseId: number) {
       try {
-        this.shifts = await useNurseShiftService.getNurseShifts(nurseId);
+        this.shifts = await useNurseShiftService.getShifts(nurseId);
       } catch (error) {
         console.error('Error fetching shifts:', error);
       }
     },
 
-    async getShiftOfDepartment(nurseId: number, departmentId: number) {
+    async getDepartmentShifts(nurseId: number, departmentId: number) {
       try {
-        this.shifts = await useNurseShiftService.getDepartmentShiftsForNurse(
+        this.shifts = await useNurseShiftService.getDepartmentShifts(
           nurseId,
           departmentId,
         );
@@ -51,8 +50,7 @@ export const useNurseStore = defineStore('nurse', {
     },
 
     // ==================== VACATION REQUEST ACTIONS ====================
-
-    async fetchMyVacationRequest() {
+    async getMyVacationRequests() {
       try {
         this.vacationRequests =
           await useNurseRequestService.getMyVacationRequests();
@@ -61,7 +59,7 @@ export const useNurseStore = defineStore('nurse', {
       }
     },
 
-    async fetchVacationRequestById(requestId: number) {
+    async getVacationRequestById(requestId: number) {
       try {
         const vacationRequest =
           await useNurseRequestService.getVacationRequestById(requestId);
@@ -83,6 +81,7 @@ export const useNurseStore = defineStore('nurse', {
       try {
         const newVacationRequest =
           await useNurseRequestService.createVacationRequest(request);
+
         this.vacationRequests.push(newVacationRequest);
       } catch (error) {
         console.error('Error creating vacation request:', error);
@@ -90,8 +89,7 @@ export const useNurseStore = defineStore('nurse', {
     },
 
     // ==================== SHIFT CHANGE REQUEST ACTIONS ====================
-
-    async fetchMyShiftChangeRequests() {
+    async getMyShiftChangeRequests() {
       try {
         this.shiftChangeRequests =
           await useNurseRequestService.getMyShiftChangeRequests();
@@ -100,7 +98,16 @@ export const useNurseStore = defineStore('nurse', {
       }
     },
 
-    async fetchShiftChangeRequestById(requestId: number) {
+    async getMyReceivedShiftChangeRequests() {
+      try {
+        this.shiftChangeRequests =
+          await useNurseRequestService.getMyReceivedShiftChangeRequests();
+      } catch (error) {
+        console.error('Error fetching received shift change requests:', error);
+      }
+    },
+
+    async getShiftChangeRequestById(requestId: number) {
       try {
         const shiftChangeRequest =
           await useNurseRequestService.getShiftChangeRequestById(requestId);
@@ -116,15 +123,6 @@ export const useNurseStore = defineStore('nurse', {
         }
       } catch (error) {
         console.error('Error fetching shift change request by ID:', error);
-      }
-    },
-
-    async fetchMyReceivingShiftChange() {
-      try {
-        this.shiftChangeRequests =
-          await useNurseRequestService.getReceivedShiftChangeRequests();
-      } catch (error) {
-        console.error('Error fetching received shift change requests:', error);
       }
     },
 

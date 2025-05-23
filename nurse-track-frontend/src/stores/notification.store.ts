@@ -39,9 +39,9 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async fetchNotificationById(userId: number, notificationId: number) {
+    async getNotificationById(userId: number, notificationId: number) {
       try {
-        const notification = await useNotificationService.getNotification(
+        const notification = await useNotificationService.getNotificationById(
           userId,
           notificationId,
         );

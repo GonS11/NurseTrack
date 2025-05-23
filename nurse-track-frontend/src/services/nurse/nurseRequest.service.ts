@@ -8,12 +8,9 @@ import type {
 
 export const useNurseRequestService = {
   // ==================== VACATION REQUESTS ====================
-  async createVacationRequest(
-    data: CreateVacationRequest,
-  ): Promise<VacationRequestResponse> {
-    const response = await api.post<VacationRequestResponse>(
+  async getMyVacationRequests(): Promise<VacationRequestResponse[]> {
+    const response = await api.get<VacationRequestResponse[]>(
       '/nurses/requests/vacations',
-      data,
     );
     return response.data;
   },
@@ -27,20 +24,27 @@ export const useNurseRequestService = {
     return response.data;
   },
 
-  async getMyVacationRequests(): Promise<VacationRequestResponse[]> {
-    const response = await api.get<VacationRequestResponse[]>(
+  async createVacationRequest(
+    data: CreateVacationRequest,
+  ): Promise<VacationRequestResponse> {
+    const response = await api.post<VacationRequestResponse>(
       '/nurses/requests/vacations',
+      data,
     );
     return response.data;
   },
-
   // ==================== SHIFT CHANGE REQUESTS ====================
-  async createShiftChangeRequest(
-    data: CreateShiftChangeRequest,
-  ): Promise<ShiftChangeResponse> {
-    const response = await api.post<ShiftChangeResponse>(
+  async getMyShiftChangeRequests(): Promise<ShiftChangeResponse[]> {
+    const response = await api.get<ShiftChangeResponse[]>(
       '/nurses/requests/shift-changes',
-      data,
+    );
+
+    return response.data;
+  },
+
+  async getMyReceivedShiftChangeRequests(): Promise<ShiftChangeResponse[]> {
+    const response = await api.get<ShiftChangeResponse[]>(
+      '/nurses/requests/shift-changes/received',
     );
 
     return response.data;
@@ -56,17 +60,12 @@ export const useNurseRequestService = {
     return response.data;
   },
 
-  async getMyShiftChangeRequests(): Promise<ShiftChangeResponse[]> {
-    const response = await api.get<ShiftChangeResponse[]>(
+  async createShiftChangeRequest(
+    data: CreateShiftChangeRequest,
+  ): Promise<ShiftChangeResponse> {
+    const response = await api.post<ShiftChangeResponse>(
       '/nurses/requests/shift-changes',
-    );
-
-    return response.data;
-  },
-
-  async getReceivedShiftChangeRequests(): Promise<ShiftChangeResponse[]> {
-    const response = await api.get<ShiftChangeResponse[]>(
-      '/nurses/requests/shift-changes/received',
+      data,
     );
 
     return response.data;

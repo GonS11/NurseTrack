@@ -57,9 +57,13 @@ export const useAdminStore = defineStore('admin', {
 
   actions: {
     // ==================== USER ACTIONS ====================
-    async getUsers(page: number = 0, size: number = 10, sortBy: string = 'id') {
+    async getAllUsers(
+      page: number = 0,
+      size: number = 10,
+      sortBy: string = 'id',
+    ) {
       try {
-        this.users = await useAdminUserService.getUsers(page, size, sortBy);
+        this.users = await useAdminUserService.getAllUsers(page, size, sortBy);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -169,6 +173,15 @@ export const useAdminStore = defineStore('admin', {
       try {
         this.departments.content =
           await useAdminDepartmentService.getAllActiveDepartments();
+      } catch (error) {
+        console.error('Error fetching active departments:', error);
+      }
+    },
+
+    async getAllInactiveDepartments() {
+      try {
+        this.departments.content =
+          await useAdminDepartmentService.getAllInactiveDepartments();
       } catch (error) {
         console.error('Error fetching active departments:', error);
       }
@@ -315,7 +328,9 @@ export const useAdminStore = defineStore('admin', {
     async getSupervisorByDepartment(departmentId: number) {
       try {
         const supervisorAssignment =
-          await useAdminAssignmentService.getDepartmentSupervisor(departmentId);
+          await useAdminAssignmentService.getSupervisorByDepartment(
+            departmentId,
+          );
         const existingIndex = this.supervisorAssignments.content.findIndex(
           (assignment) => assignment.department.id === departmentId,
         );
@@ -334,16 +349,10 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async assignSupervisorToDepartment(
-      departmentId: number,
-      request: AssignSupervisorRequest,
-    ) {
+    async assignSupervisorToDepartment(request: AssignSupervisorRequest) {
       try {
         const newAssignment =
-          await useAdminAssignmentService.assignSupervisorToDepartment(
-            departmentId,
-            request,
-          );
+          await useAdminAssignmentService.assignSupervisorToDepartment(request);
 
         const existingIndex = this.supervisorAssignments.content.findIndex(
           (assignment) => assignment.department.id === request.departmentId,
@@ -364,6 +373,7 @@ export const useAdminStore = defineStore('admin', {
         await useAdminAssignmentService.removeSupervisorFromDepartment(
           departmentId,
         );
+
         this.supervisorAssignments.content =
           this.supervisorAssignments.content.filter(
             (assignment) => assignment.department.id !== departmentId,
