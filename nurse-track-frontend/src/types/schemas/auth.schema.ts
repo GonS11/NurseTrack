@@ -25,7 +25,11 @@ export const AuthSchemas = {
     .strict(),
 
   decodedToken: z.object({
-    roles: validation.userRole(),
+    roles: z.array(
+      z.object({
+        authority: validation.userRole(),
+      }),
+    ),
     username: validation.requiredString(),
     email: validation.requiredString(),
     firstname: validation.requiredString(),

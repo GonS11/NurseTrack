@@ -6,8 +6,10 @@ import type {
   NurseDepartmentResponse,
   SupervisorDepartmentResponse,
 } from '../../types/schemas/assignments.schema';
+import type { DepartmentResponse } from '../../types/schemas/department.schema';
 
 export const useAdminAssignmentService = {
+  //=======SUPERVISOR=======
   async getAllSupervisorAssignments(
     page: number = 0,
     size: number = 10,
@@ -17,49 +19,77 @@ export const useAdminAssignmentService = {
       '/admin/assignments/departments',
       { params: { page, size, sortBy } },
     );
+
     return response.data;
   },
 
-  // Get the supervisor assigned to a department
+  async getUnassignedDepartmentsForSupervisor(): Promise<DepartmentResponse[]> {
+    const response = await api.get<DepartmentResponse[]>(
+      '/admin/assignments/departments/unassigned',
+    );
+
+    return response.data;
+  },
+
   async getDepartmentSupervisor(
     departmentId: number,
   ): Promise<SupervisorDepartmentResponse> {
     const response = await api.get<SupervisorDepartmentResponse>(
       `/admin/assignments/departments/${departmentId}/supervisor`,
     );
+
     return response.data;
   },
 
-  // Assign a supervisor to a department
-  async assignSupervisor(
-    departmentId: number,
+  async assignSupervisorToDepartment(
     data: AssignSupervisorRequest,
   ): Promise<SupervisorDepartmentResponse> {
     const response = await api.post<SupervisorDepartmentResponse>(
-      `/admin/assignments/departments/${departmentId}/supervisor`,
+      `/admin/assignments/departments/${data.departmentId}/supervisor`,
       data,
     );
+
     return response.data;
   },
 
-  // Remove the supervisor from a department
   async removeSupervisorFromDepartment(departmentId: number): Promise<void> {
     await api.delete(
       `/admin/assignments/departments/${departmentId}/supervisor`,
     );
   },
 
-  // Get all nurses assigned to a department
-  async getNursesByDepartment(
+  //=======NURSE=======
+  async getAllNurseAssignments(
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'departmentId',
+  ): Promise<Page<NurseDepartmentResponse>> {
+    const response = await api.get<Page<NurseDepartmentResponse>>(
+      '/admin/assignments/departments/nurses',
+      { params: { page, size, sortBy } },
+    );
+
+    return response.data;
+  },
+
+  async getUnassignedDepartmentsForNurses(): Promise<DepartmentResponse[]> {
+    const response = await api.get<DepartmentResponse[]>(
+      '/admin/assignments/departments/nurses/unassigned',
+    );
+
+    return response.data;
+  },
+
+  async getAllNursesByDepartment(
     departmentId: number,
   ): Promise<NurseDepartmentResponse[]> {
     const response = await api.get<NurseDepartmentResponse[]>(
       `/admin/assignments/departments/${departmentId}/nurses`,
     );
+
     return response.data;
   },
 
-  // Assign a nurse to a department
   async assignNurseToDepartment(
     data: AssignNurseRequest,
   ): Promise<NurseDepartmentResponse> {
@@ -67,10 +97,10 @@ export const useAdminAssignmentService = {
       `/admin/assignments/departments/${data.departmentId}/nurses`,
       data,
     );
+
     return response.data;
   },
 
-  // Remove a nurse from a department
   async removeNurseFromDepartment(
     departmentId: number,
     nurseId: number,

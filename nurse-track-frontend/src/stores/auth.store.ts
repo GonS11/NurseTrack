@@ -3,7 +3,6 @@ import { jwtDecode } from 'jwt-decode';
 import { useAuthService } from '../services/shared/auth.service';
 import { UserRole } from '../types/enums/user-role.enum';
 import type {
-  AuthenticationRequest,
   AuthenticationResponse,
   DecodedToken,
   RegisterRequest,
@@ -78,9 +77,12 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAuthenticated: (state) => !!state.token,
-    isAdmin: (state) => state.user?.role === UserRole.ADMIN,
-    isSupervisor: (state) => state.user?.role === UserRole.SUPERVISOR,
-    isNurse: (state) => state.user?.role === UserRole.NURSE,
+    isAdmin: (state) =>
+      state.user?.roles?.some((r) => r.authority === UserRole.ADMIN),
+    isSupervisor: (state) =>
+      state.user?.roles?.some((r) => r.authority === UserRole.SUPERVISOR),
+    isNurse: (state) =>
+      state.user?.roles?.some((r) => r.authority === UserRole.NURSE),
     currentUser: (state) => state.user,
   },
 });

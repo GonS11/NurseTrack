@@ -45,7 +45,6 @@ public class SupervisorDepartmentController {
     }
 
     // ==================== ENFERMERAS DEL DEPARTAMENTO ====================
-
     @GetMapping("/{departmentId}/nurses")
     public ResponseEntity<List<NurseDepartmentResponse>> getDepartmentNurses(
             @PathVariable("departmentId") Long departmentId,
@@ -75,7 +74,6 @@ public class SupervisorDepartmentController {
     }
 
     // ==================== TURNOS DEL DEPARTAMENTO ====================
-
     @GetMapping("/{departmentId}/shifts")
     public ResponseEntity<List<ShiftResponse>> getDepartmentShifts(@PathVariable("departmentId") Long departmentId,
             @AuthenticationPrincipal User supervisor) {

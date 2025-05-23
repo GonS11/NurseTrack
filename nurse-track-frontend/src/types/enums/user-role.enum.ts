@@ -1,7 +1,7 @@
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  SUPERVISOR = 'SUPERVISOR',
-  NURSE = 'NURSE',
+  ADMIN = 'ROLE_ADMIN',
+  SUPERVISOR = 'ROLE_SUPERVISOR',
+  NURSE = 'ROLE_NURSE',
 }
 
 export interface UserRoleConfig {

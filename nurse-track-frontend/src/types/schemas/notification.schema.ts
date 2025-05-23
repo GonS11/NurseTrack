@@ -1,16 +1,12 @@
 import { z } from 'zod';
 import { validation } from '../validation';
-import { NotificationType } from '../enums/notification-type.enum';
 import { UserSchemas } from './user.schema';
-
-// Convertir el enum a Zod schema
-export const NotificationTypeSchema = z.nativeEnum(NotificationType);
 
 export const NotificationSchemas = {
   create: z
     .object({
       userId: validation.requiredId(),
-      type: NotificationTypeSchema,
+      type: validation.notificationType(),
       title: validation.requiredString(1, 100),
       message: validation.requiredString(1, 1000),
     })
@@ -19,7 +15,7 @@ export const NotificationSchemas = {
   response: z.object({
     id: validation.requiredId(),
     user: UserSchemas.simpleResponse,
-    type: NotificationTypeSchema,
+    type: validation.notificationType(),
     title: validation.requiredString(1, 100),
     message: validation.requiredString(1, 1000),
     isRead: z.boolean(),

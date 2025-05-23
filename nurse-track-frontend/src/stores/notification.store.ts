@@ -4,17 +4,32 @@ import type {
   NotificationResponse,
 } from '../types/schemas/notification.schema';
 import { useNotificationService } from '../services/shared/notification.service';
+import type { Page } from '../types/common';
 
 export const useNotificationStore = defineStore('notification', {
   state: () => ({
-    notifications: [] as NotificationResponse[],
+    notifications: {
+      content: [],
+      totalPages: 0,
+      totalElements: 0,
+      number: 0,
+      size: 10,
+    } as Page<NotificationResponse>,
   }),
 
   actions: {
-    async fetchNotifications(userId: number) {
+    async getAllNotifications(
+      userId: number,
+      page: number = 0,
+      size: number = 10,
+      sortBy: string = 'createdAt',
+    ) {
       try {
-        this.notifications = await useNotificationService.getNotifications(
+        this.notifications = await useNotificationService.getAllNotifications(
           userId,
+          page,
+          size,
+          sortBy,
         );
       } catch (error) {
         console.error(
@@ -30,14 +45,15 @@ export const useNotificationStore = defineStore('notification', {
           userId,
           notificationId,
         );
-        const notificationIndex = this.notifications.findIndex(
+
+        const notificationIndex = this.notifications.content.findIndex(
           (notification) => notification.id === notificationId,
         );
 
         if (notificationIndex !== -1) {
-          this.notifications[notificationIndex] = notification;
+          this.notifications.content[notificationIndex] = notification;
         } else {
-          this.notifications.push(notification);
+          this.notifications.content.push(notification);
         }
       } catch (error) {
         console.error(
@@ -56,7 +72,8 @@ export const useNotificationStore = defineStore('notification', {
           userId,
           request,
         );
-        this.notifications.push(newNotification);
+
+        this.notifications.content.push(newNotification);
       } catch (error) {
         console.error(
           `Error creating notification for user ID ${userId}:`,
@@ -68,12 +85,12 @@ export const useNotificationStore = defineStore('notification', {
     async markAsRead(userId: number, notificationId: number) {
       try {
         await useNotificationService.markAsRead(userId, notificationId);
-        const notificationIndex = this.notifications.findIndex(
+        const notificationIndex = this.notifications.content.findIndex(
           (notification) => notification.id === notificationId,
         );
 
         if (notificationIndex !== -1) {
-          this.notifications[notificationIndex].isRead = true;
+          this.notifications.content[notificationIndex].isRead = true;
         }
       } catch (error) {
         console.error(
@@ -86,7 +103,8 @@ export const useNotificationStore = defineStore('notification', {
     async deleteNotification(userId: number, notificationId: number) {
       try {
         await useNotificationService.deleteNotification(userId, notificationId);
-        this.notifications = this.notifications.filter(
+
+        this.notifications.content = this.notifications.content.filter(
           (notification) => notification.id !== notificationId,
         );
       } catch (error) {

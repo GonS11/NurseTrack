@@ -18,34 +18,64 @@ import type {
 import { useAdminUserService } from '../services/admin/adminUser.service';
 import { useAdminDepartmentService } from '../services/admin/adminDepartment.service';
 import { useAdminAssignmentService } from '../services/admin/adminAssignment.service';
+import type { Page } from '../types/common';
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
-    users: [] as UserResponse[],
-    departments: [] as DepartmentResponse[],
-    nurseAssignments: [] as NurseDepartmentResponse[],
-    supervisorAssignments: [] as SupervisorDepartmentResponse[],
+    users: {
+      content: [],
+      totalPages: 0,
+      totalElements: 0,
+      number: 0,
+      size: 10,
+    } as Page<UserResponse>,
+
+    departments: {
+      content: [],
+      totalPages: 0,
+      totalElements: 0,
+      number: 0,
+      size: 10,
+    } as Page<DepartmentResponse>,
+
+    nurseAssignments: {
+      content: [],
+      totalPages: 0,
+      totalElements: 0,
+      number: 0,
+      size: 10,
+    } as Page<NurseDepartmentResponse>,
+
+    supervisorAssignments: {
+      content: [],
+      totalPages: 0,
+      totalElements: 0,
+      number: 0,
+      size: 10,
+    } as Page<SupervisorDepartmentResponse>,
   }),
 
   actions: {
     // ==================== USER ACTIONS ====================
-    async fetchUsers() {
+    async getUsers(page: number = 0, size: number = 10, sortBy: string = 'id') {
       try {
-        this.users = await useAdminUserService.getUsers();
+        this.users = await useAdminUserService.getUsers(page, size, sortBy);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     },
 
-    async fetchUserById(userId: number) {
+    async getUserById(userId: number) {
       try {
         const user = await useAdminUserService.getUserById(userId);
-        const userIndex = this.users.findIndex((user) => user.id === userId);
+        const userIndex = this.users.content.findIndex(
+          (user) => user.id === userId,
+        );
 
         if (userIndex !== -1) {
-          this.users[userIndex] = user;
+          this.users.content[userIndex] = user;
         } else {
-          this.users.push(user);
+          this.users.content.push(user);
         }
       } catch (error) {
         console.error(`Error fetching user with ID ${userId}:`, error);
@@ -55,7 +85,8 @@ export const useAdminStore = defineStore('admin', {
     async createUser(user: CreateUserRequest) {
       try {
         const newUser = await useAdminUserService.createUser(user);
-        this.users.push(newUser);
+
+        this.users.content.push(newUser);
       } catch (error) {
         console.error('Error creating user:', error);
       }
@@ -64,10 +95,12 @@ export const useAdminStore = defineStore('admin', {
     async updateUser(userId: number, user: UpdateUserRequest) {
       try {
         const updatedUser = await useAdminUserService.updateUser(userId, user);
-        const oldUserIndex = this.users.findIndex((user) => user.id === userId);
+        const oldUserIndex = this.users.content.findIndex(
+          (user) => user.id === userId,
+        );
 
         if (oldUserIndex !== -1) {
-          this.users[oldUserIndex] = updatedUser;
+          this.users.content[oldUserIndex] = updatedUser;
         }
       } catch (error) {
         console.error(`Error updating user with ID ${userId}:`, error);
@@ -77,23 +110,27 @@ export const useAdminStore = defineStore('admin', {
     async activeUser(userId: number) {
       try {
         await useAdminUserService.activateUser(userId);
-        const userIndex = this.users.findIndex((user) => user.id === userId);
+        const userIndex = this.users.content.findIndex(
+          (user) => user.id === userId,
+        );
 
         if (userIndex !== -1) {
-          this.users[userIndex].isActive = true;
+          this.users.content[userIndex].isActive = true;
         }
       } catch (error) {
         console.error(`Error activating user with ID ${userId}:`, error);
       }
     },
 
-    async deactivateUser(userId: number) {
+    async desactivateUser(userId: number) {
       try {
-        await useAdminUserService.deactivateUser(userId);
-        const userIndex = this.users.findIndex((user) => user.id === userId);
+        await useAdminUserService.desactivateUser(userId);
+        const userIndex = this.users.content.findIndex(
+          (user) => user.id === userId,
+        );
 
         if (userIndex !== -1) {
-          this.users[userIndex].isActive = false;
+          this.users.content[userIndex].isActive = false;
         }
       } catch (error) {
         console.error(`Error deactivating user with ID ${userId}:`, error);
@@ -103,43 +140,53 @@ export const useAdminStore = defineStore('admin', {
     async deleteUser(userId: number) {
       try {
         await useAdminUserService.deleteUser(userId);
-        this.users = this.users.filter((user) => user.id !== userId);
+        this.users.content = this.users.content.filter(
+          (user) => user.id !== userId,
+        );
       } catch (error) {
         console.error(`Error deleting user with ID ${userId}:`, error);
       }
     },
 
     // ==================== DEPARTMENT ACTIONS ====================
-    async fetchDepartments() {
+    async getAllDepartments(
+      page: number = 0,
+      size: number = 10,
+      sortBy: string = 'id',
+    ) {
       try {
-        this.departments = await useAdminDepartmentService.getAllDepartments();
+        this.departments = await useAdminDepartmentService.getAllDepartments(
+          page,
+          size,
+          sortBy,
+        );
       } catch (error) {
         console.error('Error fetching departments:', error);
       }
     },
 
-    async fetchActiveDepartments() {
+    async getAllActiveDepartments() {
       try {
-        this.departments =
+        this.departments.content =
           await useAdminDepartmentService.getAllActiveDepartments();
       } catch (error) {
         console.error('Error fetching active departments:', error);
       }
     },
 
-    async fetchDepartmentById(departmentId: number) {
+    async getDepartmentById(departmentId: number) {
       try {
         const department = await useAdminDepartmentService.getDepartmentById(
           departmentId,
         );
-        const departmentIndex = this.departments.findIndex(
+        const departmentIndex = this.departments.content.findIndex(
           (department) => department.id === departmentId,
         );
 
         if (departmentIndex !== -1) {
-          this.departments[departmentIndex] = department;
+          this.departments.content[departmentIndex] = department;
         } else {
-          this.departments.push(department);
+          this.departments.content.push(department);
         }
       } catch (error) {
         console.error(
@@ -154,7 +201,7 @@ export const useAdminStore = defineStore('admin', {
         const newDepartment = await useAdminDepartmentService.createDepartment(
           department,
         );
-        this.departments.push(newDepartment);
+        this.departments.content.push(newDepartment);
       } catch (error) {
         console.error('Error creating department:', error);
       }
@@ -170,12 +217,12 @@ export const useAdminStore = defineStore('admin', {
             departmentId,
             department,
           );
-        const oldDepartmentIndex = this.departments.findIndex(
+        const oldDepartmentIndex = this.departments.content.findIndex(
           (department) => department.id === departmentId,
         );
 
         if (oldDepartmentIndex !== -1) {
-          this.departments[oldDepartmentIndex] = updatedDepartment;
+          this.departments.content[oldDepartmentIndex] = updatedDepartment;
         }
       } catch (error) {
         console.error(
@@ -188,12 +235,12 @@ export const useAdminStore = defineStore('admin', {
     async activeDepartment(departmentId: number) {
       try {
         await useAdminDepartmentService.activateDepartment(departmentId);
-        const departmentIndex = this.departments.findIndex(
+        const departmentIndex = this.departments.content.findIndex(
           (department) => department.id === departmentId,
         );
 
         if (departmentIndex !== -1) {
-          this.departments[departmentIndex].isActive = true;
+          this.departments.content[departmentIndex].isActive = true;
         }
       } catch (error) {
         console.error(
@@ -203,15 +250,15 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async deactivateDepartment(departmentId: number) {
+    async desactivateDepartment(departmentId: number) {
       try {
-        await useAdminDepartmentService.deactivateDepartment(departmentId);
-        const departmentIndex = this.departments.findIndex(
+        await useAdminDepartmentService.desactivateDepartment(departmentId);
+        const departmentIndex = this.departments.content.findIndex(
           (department) => department.id === departmentId,
         );
 
         if (departmentIndex !== -1) {
-          this.departments[departmentIndex].isActive = false;
+          this.departments.content[departmentIndex].isActive = false;
         }
       } catch (error) {
         console.error(
@@ -224,7 +271,7 @@ export const useAdminStore = defineStore('admin', {
     async deleteDepartment(departmentId: number) {
       try {
         await useAdminDepartmentService.deleteDepartment(departmentId);
-        this.departments = this.departments.filter(
+        this.departments.content = this.departments.content.filter(
           (department) => department.id !== departmentId,
         );
       } catch (error) {
@@ -235,19 +282,49 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    // ==================== ASSIGNMENT ACTIONS ====================
-    async fetchSupervisorByDepartment(departmentId: number) {
+    // ==================== SUPERVISOR ASSIGNMENT ACTIONS ====================
+    async getAllSupervisorAssignments(
+      page: number = 0,
+      size: number = 10,
+      sortBy: string = 'id',
+    ) {
+      try {
+        this.supervisorAssignments =
+          await useAdminAssignmentService.getAllSupervisorAssignments(
+            page,
+            size,
+            sortBy,
+          );
+      } catch (error) {
+        console.error('Error fetching supervisor asignments:', error);
+      }
+    },
+
+    async getUnassignedDepartmentsForSupervisor() {
+      try {
+        this.departments.content =
+          await useAdminAssignmentService.getUnassignedDepartmentsForSupervisor();
+      } catch (error) {
+        console.error(
+          'Error fetching unassigned departments for supervisors:',
+          error,
+        );
+      }
+    },
+
+    async getSupervisorByDepartment(departmentId: number) {
       try {
         const supervisorAssignment =
           await useAdminAssignmentService.getDepartmentSupervisor(departmentId);
-        const existingIndex = this.supervisorAssignments.findIndex(
+        const existingIndex = this.supervisorAssignments.content.findIndex(
           (assignment) => assignment.department.id === departmentId,
         );
 
         if (existingIndex !== -1) {
-          this.supervisorAssignments[existingIndex] = supervisorAssignment;
+          this.supervisorAssignments.content[existingIndex] =
+            supervisorAssignment;
         } else {
-          this.supervisorAssignments.push(supervisorAssignment);
+          this.supervisorAssignments.content.push(supervisorAssignment);
         }
       } catch (error) {
         console.error(
@@ -257,19 +334,25 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async assignSupervisorToDepartment(request: AssignSupervisorRequest) {
+    async assignSupervisorToDepartment(
+      departmentId: number,
+      request: AssignSupervisorRequest,
+    ) {
       try {
-        const newAssignment = await useAdminAssignmentService.assignSupervisor(
-          request,
-        );
-        const existingIndex = this.supervisorAssignments.findIndex(
+        const newAssignment =
+          await useAdminAssignmentService.assignSupervisorToDepartment(
+            departmentId,
+            request,
+          );
+
+        const existingIndex = this.supervisorAssignments.content.findIndex(
           (assignment) => assignment.department.id === request.departmentId,
         );
 
         if (existingIndex !== -1) {
-          this.supervisorAssignments[existingIndex] = newAssignment;
+          this.supervisorAssignments.content[existingIndex] = newAssignment;
         } else {
-          this.supervisorAssignments.push(newAssignment);
+          this.supervisorAssignments.content.push(newAssignment);
         }
       } catch (error) {
         console.error('Error assigning supervisor to department:', error);
@@ -281,9 +364,10 @@ export const useAdminStore = defineStore('admin', {
         await useAdminAssignmentService.removeSupervisorFromDepartment(
           departmentId,
         );
-        this.supervisorAssignments = this.supervisorAssignments.filter(
-          (assignment) => assignment.department.id !== departmentId,
-        );
+        this.supervisorAssignments.content =
+          this.supervisorAssignments.content.filter(
+            (assignment) => assignment.department.id !== departmentId,
+          );
       } catch (error) {
         console.error(
           `Error removing supervisor from department ID ${departmentId}:`,
@@ -292,10 +376,42 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async fetchNursesByDepartment(departmentId: number) {
+    // ==================== NURSE ASSIGNMENT ACTIONS ====================
+    async getAllNurseAssignments(
+      page: number = 0,
+      size: number = 10,
+      sortBy: string = 'id',
+    ) {
       try {
         this.nurseAssignments =
-          await useAdminAssignmentService.getNursesByDepartment(departmentId);
+          await useAdminAssignmentService.getAllNurseAssignments(
+            page,
+            size,
+            sortBy,
+          );
+      } catch (error) {
+        console.error('Error fetching supervisor asignments:', error);
+      }
+    },
+
+    async getUnassignedDepartmentsForNurses() {
+      try {
+        this.departments.content =
+          await useAdminAssignmentService.getUnassignedDepartmentsForNurses();
+      } catch (error) {
+        console.error(
+          'Error fetching unassigned departments for nurses:',
+          error,
+        );
+      }
+    },
+
+    async getAllNursesByDepartment(departmentId: number) {
+      try {
+        this.nurseAssignments.content =
+          await useAdminAssignmentService.getAllNursesByDepartment(
+            departmentId,
+          );
       } catch (error) {
         console.error(
           `Error fetching nurses for department ID ${departmentId}:`,
@@ -308,7 +424,7 @@ export const useAdminStore = defineStore('admin', {
       try {
         const newAssignment =
           await useAdminAssignmentService.assignNurseToDepartment(request);
-        this.nurseAssignments.push(newAssignment);
+        this.nurseAssignments.content.push(newAssignment);
       } catch (error) {
         console.error('Error assigning nurse to department:', error);
       }
@@ -320,7 +436,7 @@ export const useAdminStore = defineStore('admin', {
           departmentId,
           nurseId,
         );
-        this.nurseAssignments = this.nurseAssignments.filter(
+        this.nurseAssignments.content = this.nurseAssignments.content.filter(
           (assignment) =>
             assignment.department.id !== departmentId ||
             assignment.nurse.id !== nurseId,

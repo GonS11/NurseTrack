@@ -42,9 +42,6 @@ public class AdminAssignmentController {
         return ResponseEntity.ok(supervisorDepartmentService.getAllUnassignedDepartments());
     }
 
-    /**
-     * Obtener el supervisor asignado a un departamento.
-     */
     @GetMapping("/{departmentId}/supervisor")
     public ResponseEntity<SupervisorDepartmentResponse> getDepartmentSupervisor(
             @PathVariable("departmentId") Long departmentId) {
@@ -81,7 +78,7 @@ public class AdminAssignmentController {
         return ResponseEntity.ok(nurseDepartmentService.getAllAssignments(page, size, sortBy));
     }
 
-    @GetMapping("/nurses/unassigned") // Corregido el path (faltaba /)
+    @GetMapping("/nurses/unassigned")
     public ResponseEntity<List<DepartmentResponse>> getUnassignedDepartmentsForNurses() {
         return ResponseEntity.ok(nurseDepartmentService.getAllUnassignedDepartments());
     }

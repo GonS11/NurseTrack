@@ -1,5 +1,4 @@
 import api from '../../api/axios';
-import { Status } from '../../types/enums/status.enum';
 import type {
   ShiftChangeResponse,
   UpdateShiftChangeRequest,
@@ -9,8 +8,6 @@ import type {
 
 export const useSupervisorRequestService = {
   // ==================== VACATION REQUESTS ====================
-
-  // Get all pending vacation requests for the supervisor's department
   async getPendingVacationRequests(
     departmentId: number,
   ): Promise<VacationRequestResponse[]> {
@@ -20,7 +17,6 @@ export const useSupervisorRequestService = {
     return response.data;
   },
 
-  // Get all vacation requests for the supervisor's department
   async getAllVacationRequests(
     departmentId: number,
   ): Promise<VacationRequestResponse[]> {
@@ -30,35 +26,31 @@ export const useSupervisorRequestService = {
     return response.data;
   },
 
-  // Approve a vacation request
   async approveVacationRequest(
+    departmentId: number,
     requestId: number,
     data: UpdateVacationRequest,
   ): Promise<VacationRequestResponse> {
-    data.status = Status.APPROVED; // Set status to approved
     const response = await api.put<VacationRequestResponse>(
-      `/supervisor/departments/requests/vacations/${requestId}/approve`,
+      `/supervisor/departments/${departmentId}/requests/vacations/${requestId}/approve`,
       data,
     );
     return response.data;
   },
 
-  // Reject a vacation request
   async rejectVacationRequest(
+    departmentId: number,
     requestId: number,
     data: UpdateVacationRequest,
   ): Promise<VacationRequestResponse> {
-    data.status = Status.REJECTED; // Set status to rejected
     const response = await api.put<VacationRequestResponse>(
-      `/supervisor/departments/requests/vacations/${requestId}/reject`,
+      `/supervisor/departments/${departmentId}/requests/vacations/${requestId}/reject`,
       data,
     );
     return response.data;
   },
 
   // ==================== SHIFT CHANGE REQUESTS ====================
-
-  // Get all pending shift change requests for the supervisor's department
   async getPendingShiftChangeRequests(
     departmentId: number,
   ): Promise<ShiftChangeResponse[]> {
@@ -68,7 +60,6 @@ export const useSupervisorRequestService = {
     return response.data;
   },
 
-  // Get all shift change requests for the supervisor's department
   async getAllShiftChangeRequests(
     departmentId: number,
   ): Promise<ShiftChangeResponse[]> {
@@ -78,29 +69,29 @@ export const useSupervisorRequestService = {
     return response.data;
   },
 
-  // Approve a shift change request
   async approveShiftChangeRequest(
+    departmentId: number,
     requestId: number,
     data: UpdateShiftChangeRequest,
   ): Promise<ShiftChangeResponse> {
-    data.status = Status.REJECTED; // Set status to approved
     const response = await api.put<ShiftChangeResponse>(
-      `/supervisor/departments/requests/shift-changes/${requestId}/approve`,
+      `/supervisor/departments/${departmentId}/requests/shift-changes/${requestId}/approve`,
       data,
     );
+
     return response.data;
   },
 
-  // Reject a shift change request
   async rejectShiftChangeRequest(
+    departmentId: number,
     requestId: number,
     data: UpdateShiftChangeRequest,
   ): Promise<ShiftChangeResponse> {
-    data.status = Status.REJECTED; // Set status to rejected
     const response = await api.put<ShiftChangeResponse>(
-      `/supervisor/departments/requests/shift-changes/${requestId}/reject`,
+      `/supervisor/departments/${departmentId}/requests/shift-changes/${requestId}/reject`,
       data,
     );
+
     return response.data;
   },
 };

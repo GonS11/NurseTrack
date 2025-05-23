@@ -18,8 +18,7 @@ import java.util.List;
 @RequestMapping("/api/admin/departments")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminDepartmentController
-{
+public class AdminDepartmentController {
     private final DepartmentService departmentService;
 
     @GetMapping
@@ -30,55 +29,46 @@ public class AdminDepartmentController
         return ResponseEntity.ok(departmentService.getAllDepartments(page, size, sortBy));
     }
 
-
     @GetMapping("/active")
-    public ResponseEntity<List<DepartmentResponse>> getAllActiveDepartments()
-    {
+    public ResponseEntity<List<DepartmentResponse>> getAllActiveDepartments() {
         return ResponseEntity.ok(departmentService.getAllActiveDepartments());
     }
 
     @GetMapping("/inactive")
-    public ResponseEntity<List<DepartmentResponse>> getAllInactiveDepartments()
-    {
+    public ResponseEntity<List<DepartmentResponse>> getAllInactiveDepartments() {
         return ResponseEntity.ok(departmentService.getAllInactiveDepartments());
     }
 
     @GetMapping("/{departmentId}")
-    public ResponseEntity<DepartmentResponse> getDepartmentById(@PathVariable("departmentId") Long departmentId)
-    {
+    public ResponseEntity<DepartmentResponse> getDepartmentById(@PathVariable("departmentId") Long departmentId) {
         return ResponseEntity.ok(departmentService.getDepartmentById(departmentId));
     }
 
     @PostMapping
-    public ResponseEntity<DepartmentResponse> createDepartment(@Valid @RequestBody CreateDepartmentRequest request)
-    {
+    public ResponseEntity<DepartmentResponse> createDepartment(@Valid @RequestBody CreateDepartmentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(departmentService.createDepartment(request));
     }
 
     @PutMapping("/{departmentId}")
     public ResponseEntity<DepartmentResponse> updateDepartment(@PathVariable("departmentId") Long departmentId,
-                                                               @Valid @RequestBody UpdateDepartmentRequest request)
-    {
+            @Valid @RequestBody UpdateDepartmentRequest request) {
         return ResponseEntity.ok(departmentService.updateDepartment(departmentId, request));
     }
 
     @DeleteMapping("/{departmentId}")
-    public ResponseEntity<Void> deleteDepartment(@PathVariable("departmentId") Long departmentId)
-    {
+    public ResponseEntity<Void> deleteDepartment(@PathVariable("departmentId") Long departmentId) {
         departmentService.deleteDepartment(departmentId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{departmentId}/desactivate")
-    public ResponseEntity<Void> deactivateDepartment(@PathVariable("departmentId") Long departmentId)
-    {
+    public ResponseEntity<Void> desactivateDepartment(@PathVariable("departmentId") Long departmentId) {
         departmentService.desactivateDepartment(departmentId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{departmentId}/activate")
-    public ResponseEntity<Void> activateDepartment(@PathVariable("departmentId") Long departmentId)
-    {
+    public ResponseEntity<Void> activateDepartment(@PathVariable("departmentId") Long departmentId) {
         departmentService.activateDepartment(departmentId);
         return ResponseEntity.noContent().build();
     }

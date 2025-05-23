@@ -4,6 +4,7 @@ import { UserRole } from './enums/user-role.enum';
 import { ShiftStatus } from './enums/shift-status.enum';
 import { ShiftType } from './enums/shift-types.enum';
 import { RequestStatus } from './enums/status.enum';
+import { NotificationType } from './enums/notification-type.enum';
 
 export const validation = {
   //RequiredId
@@ -133,6 +134,13 @@ export const validation = {
   requestStatus: () => {
     return z.nativeEnum(RequestStatus, {
       errorMap: () => ({ message: 'Invalid request status' }),
+    });
+  },
+
+  // Notification type
+  notificationType: () => {
+    return z.nativeEnum(NotificationType, {
+      errorMap: () => ({ message: 'Invalid notification type' }),
     });
   },
 
