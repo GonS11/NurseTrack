@@ -11,7 +11,6 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-// Watcher reactivo mejorado
 watchEffect(async () => {
   const isPublic = route.meta.public;
   const currentName = route.name;

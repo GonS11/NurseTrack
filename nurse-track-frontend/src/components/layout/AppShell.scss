@@ -1,0 +1,49 @@
+@use 'sass:color';
+@use '@/styles/main.scss' as *;
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: $background;
+  position: relative;
+
+  main {
+    flex: 1;
+    padding: $spacer * 2;
+    transition: padding-left $transition;
+    min-width: 0; // Permite que el contenido se comprima
+
+    // Desktop behavior
+    @include responsive(desktop-up) {
+      padding-left: 4.5rem;
+
+      &.is-collapsed {
+        padding-left: 16rem;
+      }
+    }
+
+    // Tablet behavior
+    @include responsive(tablet) {
+      padding-left: 4.5rem;
+      transition: transform $transition;
+
+      &.is-collapsed {
+        padding-left: 4.5rem;
+      }
+    }
+
+    // Mobile behavior
+    @include responsive(phone) {
+      padding: 1rem;
+      padding-left: 0;
+      margin-left: 0;
+      transform: none;
+
+      // Cuando sidebar está abierto
+      .sidebar-open & {
+        transform: translateX(16rem);
+        padding-left: 1rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,135 @@
+@use 'sass:color';
+@use '@/styles/main.scss' as *;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  @include flex-center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal {
+  background: $white;
+  border-radius: 0.75rem;
+  box-shadow: $card-shadow;
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  h2 {
+    color: $text-primary;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $gray-700;
+    font-weight: 500;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid $gray-300;
+    border-radius: 0.5rem;
+    background: $white;
+    transition: border-color 0.2s ease;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px $input-focus-glow;
+    }
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+  }
+
+  .error {
+    color: $error;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.form-actions {
+  margin-top: 2rem;
+  @include flex-center(row);
+  gap: 1rem;
+  justify-content: flex-end;
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border-radius: $btn-border-radius;
+    font-weight: 500;
+    transition: $transition;
+    cursor: pointer;
+
+    &[type='button'] {
+      background: $gray-200;
+      color: $gray-700;
+
+      &:hover {
+        background: $gray-300;
+      }
+    }
+
+    &[type='submit'] {
+      background: $primary;
+      color: $white;
+      border: none;
+
+      &:hover {
+        background: $primary-hover;
+      }
+    }
+  }
+}
+
+// Responsive
+@include responsive(phone) {
+  .modal-overlay {
+    padding: 1rem;
+  }
+
+  .modal {
+    padding: 1.5rem;
+
+    h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+
+    button {
+      width: 100%;
+    }
+  }
+}

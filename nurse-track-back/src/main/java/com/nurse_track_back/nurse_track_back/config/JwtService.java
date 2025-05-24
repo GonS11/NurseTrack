@@ -38,6 +38,7 @@ public class JwtService {
         User user = (User) userDetails; // Cast a tu clase User
 
         claims.put("roles", userDetails.getAuthorities());
+        claims.put("id", user.getId());
         claims.put("username", user.getUsername());
         claims.put("email", user.getEmail());
         claims.put("firstname", user.getFirstname());

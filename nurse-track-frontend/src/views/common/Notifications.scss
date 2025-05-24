@@ -1,0 +1,198 @@
+@use '@/styles/main.scss' as *;
+
+.notifications-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.notifications-header {
+  @include flex-center(row);
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid $gray-200;
+
+  h1 {
+    @include flex-center(row);
+    gap: 1rem;
+    font-size: 1.5rem;
+    color: $text-primary;
+  }
+
+  .badge {
+    background: $primary;
+    color: $white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .mark-all-read {
+    background: rgba($primary, 0.1);
+    color: $primary;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.loading-spinner {
+  @include flex-center;
+  padding: 3rem;
+
+  .spin {
+    animation: spin 1s linear infinite;
+    font-size: 2rem;
+    color: $primary;
+  }
+}
+
+.empty-state {
+  @include flex-center(column);
+  gap: 1rem;
+  padding: 3rem;
+  text-align: center;
+  color: $gray-600;
+
+  .material-icons {
+    font-size: 3rem;
+    opacity: 0.5;
+  }
+}
+
+.notifications-list {
+  background: $white;
+  border-radius: 0.5rem;
+  @include box-shadow(1);
+}
+
+.notification-item {
+  @include flex-center(row);
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid $gray-100;
+  transition: background 0.2s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: $gray-100;
+  }
+
+  &.unread {
+    background: rgba($primary, 0.05);
+    border-left: 4px solid $primary;
+  }
+}
+
+.notification-icon {
+  @include flex-center;
+  background: rgba($primary, 0.1);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+
+  .material-icons {
+    color: $primary;
+  }
+}
+
+.notification-content {
+  flex: 1;
+
+  h3 {
+    color: $text-primary;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: $gray-600;
+    margin-bottom: 0.25rem;
+  }
+
+  time {
+    font-size: 0.875rem;
+    color: $gray-500;
+  }
+}
+
+.notification-actions {
+  @include flex-center(row);
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  .notification-item:hover & {
+    opacity: 1;
+  }
+
+  button {
+    @include flex-center;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+
+    &.mark-read {
+      color: $primary;
+
+      &:hover {
+        background: rgba($primary, 0.1);
+      }
+    }
+
+    &.delete {
+      color: $error;
+
+      &:hover {
+        background: rgba($error, 0.1);
+      }
+    }
+  }
+}
+
+.pagination-controls {
+  @include flex-center(row);
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: $white;
+  border-radius: 0.5rem;
+  @include box-shadow(1);
+
+  button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba($primary, 0.1);
+    color: $primary;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.2);
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -65,40 +65,37 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-
 import {
   ExclamationCircleIcon,
   EnvelopeIcon,
   LockClosedIcon,
 } from '@heroicons/vue/24/outline';
-import { useAuthStore } from '../../stores/auth.store';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../services';
 
-const authStore = useAuthStore();
+const auth = useAuthStore();
+const router = useRouter();
 const username = ref('');
 const password = ref('');
 const isLoading = ref(false);
 const error = ref<string | null>(null);
-const router = useRouter();
 
 const handleSubmit = async () => {
+  isLoading.value = true;
+  error.value = null;
   try {
-    await authStore.login(username.value, password.value);
-
-    // Redirección segura con catch
+    await auth.login(username.value, password.value);
     await router.push({ name: 'dashboard' });
   } catch (err: any) {
-    // Mejorar manejo de errores
-    if (err instanceof Error) {
-      error.value = err.message;
-    }
-    console.error('Login error:', err);
+    error.value = err instanceof Error ? err.message : 'Error desconocido';
+  } finally {
+    isLoading.value = false;
   }
 };
 
-const setDemoAccount = (demoUsername: string, demoPassword: string) => {
-  username.value = demoUsername;
-  password.value = demoPassword;
+const setDemoAccount = (u: string, p: string) => {
+  username.value = u;
+  password.value = p;
 };
 </script>
 

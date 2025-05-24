@@ -6,6 +6,7 @@ import {
 import AppShell from '../components/layout/AppShell.vue';
 import { useAuthStore } from '../services';
 import { UserRole } from '../types/enums/user-role.enum';
+import About from '../components/layout/About.vue';
 
 // Lazy-loaded views
 const LoginPage = () => import('../views/auth/LoginPage.vue');
@@ -15,7 +16,7 @@ const AdminDashboard = () => import('../views/dashboard/AdminDashboard.vue');
 const UsersManagement = () => import('../views/admin/UsersManagement.vue');
 const DepartmentsManagement = () =>
   import('../views/admin/DepartmentsManagement.vue');
-const ShiftTemplates = () => import('../views/admin/ShiftTemplates.vue');
+const ShiftManagement = () => import('../views/admin/ShiftManagement.vue');
 
 // Supervisor
 const SupervisorDashboard = () =>
@@ -69,9 +70,9 @@ const routes: RouteRecordRaw[] = [
           switch (mainRole) {
             case UserRole.ADMIN:
               return { name: 'admin-dashboard' };
-            case UserRole.ADMIN:
+            case UserRole.SUPERVISOR:
               return { name: 'supervisor-dashboard' };
-            case UserRole.ADMIN:
+            case UserRole.NURSE:
               return { name: 'nurse-dashboard' };
             default:
               return { name: 'login' };
@@ -110,7 +111,7 @@ const routes: RouteRecordRaw[] = [
             name: 'admin-departments',
             component: DepartmentsManagement,
           },
-          { path: 'shifts', name: 'admin-shifts', component: ShiftTemplates },
+          { path: 'shifts', name: 'admin-shifts', component: ShiftManagement },
         ],
       },
 
@@ -174,6 +175,7 @@ const routes: RouteRecordRaw[] = [
         component: Notifications,
       },
       { path: 'settings', name: 'settings', component: Settings },
+      { path: 'about', name: 'about', component: About },
 
       // 404 inside shell
       { path: ':pathMatch(.*)*', name: 'not-found', component: NotFound },

@@ -33,6 +33,7 @@ export const UserSchemas = {
       username: validation.requiredString(),
       email: validation.email(),
       role: validation.userRole(),
+      licenseNumber: z.string().optional(),
       isActive: z.boolean(),
       createdAt: validation.dateTime(),
     })

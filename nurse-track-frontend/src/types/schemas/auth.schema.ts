@@ -30,6 +30,7 @@ export const AuthSchemas = {
         authority: validation.userRole(),
       }),
     ),
+    id: validation.requiredId(),
     username: validation.requiredString(),
     email: validation.requiredString(),
     firstname: validation.requiredString(),

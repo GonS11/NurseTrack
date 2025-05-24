@@ -1,0 +1,71 @@
+@use 'sass:color';
+@use '@/styles/main.scss' as *;
+
+:deep(.table-header) {
+  // Botón personalizado en header-actions
+  .btn-primary {
+    @include flex-center(row);
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: $primary;
+    color: $white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    .material-icons {
+      font-size: 1.1rem;
+    }
+
+    &:hover {
+      background: color.adjust($primary, $lightness: -8%);
+    }
+
+    @include responsive(tablet) {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Ajustes específicos para la tabla de usuarios
+:deep(table) {
+  th:nth-child(1),
+  td:nth-child(1) {
+    min-width: 200px;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    min-width: 120px;
+  }
+
+  @include responsive(phone) {
+    min-width: 100%;
+
+    th,
+    td {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .actions-wrapper {
+      gap: 0.25rem;
+    }
+  }
+}
+
+// Ajustes de paginación específicos
+:deep(.pagination-controls) {
+  @include responsive(phone) {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+
+    .pagination-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}

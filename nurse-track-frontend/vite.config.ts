@@ -9,4 +9,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @use "sass:color";
+          @use 'sass:map';
+          @use "@/styles/main.scss" as *;
+        `,
+      },
+    },
+  },
 });

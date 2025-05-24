@@ -7,6 +7,7 @@ import type {
   DecodedToken,
   RegisterRequest,
 } from '../types/schemas/auth.schema';
+import api from '../api/axios';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -15,19 +16,21 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    async login(
-      username: string,
-      password: string,
-    ): Promise<AuthenticationResponse> {
+    async login(username: string, password: string) {
       try {
         const response = await useAuthService.authenticate({
           username,
           password,
         });
 
+        // 1) guarda token
         this.token = response.token;
         localStorage.setItem('authToken', response.token);
 
+        // 2) hidrata el header
+        api.defaults.headers.common.Authorization = `Bearer ${response.token}`;
+
+        // 3) decodifica usuario
         this.user = jwtDecode<DecodedToken>(response.token);
         console.log('Authenticated user: ', this.user);
 
@@ -54,7 +57,8 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.token = null;
       this.user = null;
-      localStorage.removeItem('authToken'); // Key corregida
+      localStorage.removeItem('authToken');
+      delete api.defaults.headers.common.Authorization;
     },
 
     async getCurrentUser() {

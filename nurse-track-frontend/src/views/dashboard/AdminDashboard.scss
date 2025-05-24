@@ -1,0 +1,72 @@
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/main.scss' as *;
+
+.admin-dashboard {
+  padding: 2rem;
+  background: $background;
+}
+
+.dashboard-title {
+  color: $primary;
+  margin-bottom: map.get($spacers, 4);
+  font-size: 2.5rem;
+}
+
+.dashboard-nav {
+  display: flex;
+  gap: map.get($spacers, 3);
+  margin-bottom: map.get($spacers, 4);
+  padding: map.get($spacers, 2) 0;
+  border-bottom: 1px solid $gray-200;
+
+  .nav-link {
+    color: $gray-600;
+    text-decoration: none;
+    padding: map.get($spacers, 2) map.get($spacers, 3);
+    border-radius: $btn-border-radius;
+    transition: $transition;
+
+    &:hover {
+      background: $gray-100;
+      color: $primary-hover;
+    }
+
+    &.router-link-exact-active {
+      background: $primary;
+      color: $white;
+      box-shadow: $card-shadow;
+    }
+  }
+}
+
+.cards {
+  display: flex;
+  gap: map.get($spacers, 3);
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1 1 200px;
+  background: $white;
+  padding: map.get($spacers, 3);
+  border-radius: 8px;
+  box-shadow: $card-shadow;
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &-title {
+    color: $gray-600;
+    font-size: $font-size-base;
+    margin-bottom: map.get($spacers, 2);
+  }
+
+  &-value {
+    color: $primary;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+}

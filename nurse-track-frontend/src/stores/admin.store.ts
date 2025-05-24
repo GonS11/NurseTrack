@@ -57,11 +57,7 @@ export const useAdminStore = defineStore('admin', {
 
   actions: {
     // ==================== USER ACTIONS ====================
-    async getAllUsers(
-      page: number = 0,
-      size: number = 10,
-      sortBy: string = 'id',
-    ) {
+    async getAllUsers(page?: number, size?: number, sortBy?: string) {
       try {
         this.users = await useAdminUserService.getAllUsers(page, size, sortBy);
       } catch (error) {
@@ -153,11 +149,7 @@ export const useAdminStore = defineStore('admin', {
     },
 
     // ==================== DEPARTMENT ACTIONS ====================
-    async getAllDepartments(
-      page: number = 0,
-      size: number = 10,
-      sortBy: string = 'id',
-    ) {
+    async getAllDepartments(page?: number, size?: number, sortBy?: string) {
       try {
         this.departments = await useAdminDepartmentService.getAllDepartments(
           page,
@@ -297,9 +289,9 @@ export const useAdminStore = defineStore('admin', {
 
     // ==================== SUPERVISOR ASSIGNMENT ACTIONS ====================
     async getAllSupervisorAssignments(
-      page: number = 0,
-      size: number = 10,
-      sortBy: string = 'id',
+      page?: number,
+      size?: number,
+      sortBy?: string,
     ) {
       try {
         this.supervisorAssignments =
@@ -388,9 +380,9 @@ export const useAdminStore = defineStore('admin', {
 
     // ==================== NURSE ASSIGNMENT ACTIONS ====================
     async getAllNurseAssignments(
-      page: number = 0,
-      size: number = 10,
-      sortBy: string = 'id',
+      page?: number,
+      size?: number,
+      sortBy?: string,
     ) {
       try {
         this.nurseAssignments =

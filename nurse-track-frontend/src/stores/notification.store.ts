@@ -20,9 +20,9 @@ export const useNotificationStore = defineStore('notification', {
   actions: {
     async getAllNotifications(
       userId: number,
-      page: number = 0,
-      size: number = 10,
-      sortBy: string = 'createdAt',
+      page?: number,
+      size?: number,
+      sortBy?: string,
     ) {
       try {
         this.notifications = await useNotificationService.getAllNotifications(
@@ -31,11 +31,14 @@ export const useNotificationStore = defineStore('notification', {
           size,
           sortBy,
         );
-      } catch (error) {
-        console.error(
-          `Error fetching notifications for user ID ${userId}:`,
-          error,
-        );
+      } catch (error: any) {
+        console.error('Detalles del error:', {
+          userId,
+          page,
+          size,
+          sortBy,
+        });
+        throw error;
       }
     },
 
@@ -114,5 +117,10 @@ export const useNotificationStore = defineStore('notification', {
         );
       }
     },
+  },
+  getters: {
+    unreadNotifications: (state) =>
+      state.notifications.content.filter((notification) => !notification.isRead)
+        .length,
   },
 });

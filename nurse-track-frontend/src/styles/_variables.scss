@@ -1,11 +1,14 @@
+// src/styles/_variables.scss
+@use 'sass:color';
+
 // Colores
-$primary: #2a7f8b; // Azul sanitario profesional
-$primary-hover: #1e5e69; // Variante oscura
-$secondary: #6c757d; // Gris neutral
-$success: #4caf50; // Verde para confirmaciones
-$error: #e53935; // Rojo sanitario estándar
-$background: #f8fbfd; // Fondo claro profesional
-$text-primary: #2d3748; // Texto de alto contraste
+$primary: #2a7f8b;
+$primary-hover: #1e5e69;
+$secondary: #6c757d;
+$success: #4caf50;
+$error: #e53935;
+$background: #f8fbfd;
+$text-primary: #2d3748;
 
 // Nuevas variables para el login
 $input-focus-glow: rgba(42, 127, 139, 0.2);
@@ -23,9 +26,9 @@ $gray-700: #495057;
 $gray-800: #343a40;
 $gray-900: #212529;
 
-// Colores contextuales
-$error-bg: adjust-color($error, $lightness: 35%);
-$error-text: adjust-color($error, $lightness: -25%);
+// Colores contextuales utilizando color.adjust
+$error-bg: color.adjust($error, $lightness: 35%);
+$error-text: color.adjust($error, $lightness: -25%);
 
 // Espaciado
 $spacer: 1rem;
@@ -57,4 +60,11 @@ $btn-padding-x: 1.5rem;
 $btn-border-radius: 0.5rem;
 
 // Transiciones
-$transition-base: all 0.3s ease-in-out;
+$transition: all 0.3s ease-in-out;
+
+// Puntos de ruptura para diseño responsivo
+$breakpoints: (
+  phone: 600px,
+  tablet: 900px,
+  desktop: 1200px,
+);
