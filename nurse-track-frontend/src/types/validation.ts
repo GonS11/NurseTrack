@@ -28,7 +28,12 @@ export const validation = {
 
   // Validador para string opcionales
   optionalString: (min = 1, max = 255) => {
-    return z.string().min(min).max(max).trim().optional().or(z.literal('')); // Permite strings vacíos
+    return z
+      .string()
+      .min(min, `Should have at least ${min} characters`) // Si no está vacío, debe cumplir el min
+      .max(max, `Cannot exceed ${max} characters`)
+      .trim()
+      .optional();
   },
 
   // Username

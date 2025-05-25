@@ -1,9 +1,9 @@
 @use 'sass:color';
 @use 'sass:map';
-@use '@/styles/main.scss' as *;
+@use '../../styles/main.scss' as *;
 
 .admin-dashboard {
-  padding: 2rem;
+  padding: map.get($spacers, 4);
   background: $background;
 }
 
@@ -15,17 +15,24 @@
 
 .dashboard-nav {
   display: flex;
-  gap: $spacer * 1.5;
+  gap: map.get($spacers, 4);
   margin-bottom: map.get($spacers, 4);
   padding: map.get($spacers, 2) 0;
   border-bottom: 1px solid $gray-200;
 
+  @include responsive(tablet) {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: map.get($spacers, 2);
+  }
+
   .nav-link {
     color: $gray-600;
     text-decoration: none;
-    padding: map.get($spacers, 2) $spacer * 1.5;
+    padding: map.get($spacers, 2) map.get($spacers, 4);
     border-radius: $btn-border-radius;
     transition: $transition;
+    white-space: nowrap;
 
     &:hover {
       background: $gray-100;
@@ -42,15 +49,16 @@
 
 .cards {
   display: flex;
-  gap: $spacer * 1.5;
+  gap: map.get($spacers, 4);
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .card {
   flex: 1 1 200px;
   background: $white;
-  padding: $spacer * 1.5;
-  border-radius: 8px;
+  padding: map.get($spacers, 4);
+  border-radius: $btn-border-radius;
   box-shadow: $card-shadow;
   transition: $transition;
 

@@ -11,11 +11,11 @@ export const DepartmentSchemas = {
 
   update: z
     .object({
-      name: validation.optionalString(2, 100),
-      location: validation.optionalString(2, 100),
+      name: validation.requiredString(2, 100).optional(),
+      location: validation.requiredString(2, 100).optional(),
       isActive: z.boolean().optional(),
     })
-    .strict(),
+    .partial(),
 
   response: z
     .object({

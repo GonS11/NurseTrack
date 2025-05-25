@@ -5,7 +5,7 @@
     <div class="cards">
       <div class="card">
         <h2>Usuarios</h2>
-        <p>{{ usersPage.totalElements }}</p>
+        <p>{{ users.totalElements }}</p>
       </div>
       <div class="card">
         <h2>Departamentos</h2>
@@ -31,7 +31,7 @@ import { useAdminStore } from '../../stores/admin.store';
 const admin = useAdminStore();
 
 // Extrae refs reactivas
-const { usersPage, departments, nurseAssignments, supervisorAssignments } =
+const { users, departments, nurseAssignments, supervisorAssignments } =
   storeToRefs(admin);
 
 onMounted(async () => {

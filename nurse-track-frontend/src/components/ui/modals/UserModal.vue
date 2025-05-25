@@ -1,7 +1,7 @@
 <template>
   <div v-if="isOpen" class="modal-overlay">
     <div class="modal">
-      <h2>{{ createUserMode ? 'New User' : 'Edit User' }}</h2>
+      <h2>{{ item ? 'Edit User' : 'New User' }}</h2>
       <form @submit.prevent="submitForm">
         <div class="form-group">
           <label>First Name</label>
@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <template v-if="createUserMode">
+        <template v-if="!item">
           <div class="form-group">
             <label>Username</label>
             <input v-model="formData.username" />
@@ -73,7 +73,7 @@
           </div>
         </div>
 
-        <div v-if="!createUserMode" class="form-group">
+        <div v-if="item" class="form-group">
           <label>Status</label>
           <select v-model="formData.isActive">
             <option :value="true">Active</option>
@@ -87,7 +87,7 @@
         <div class="form-actions">
           <button type="button" @click="close">Cancel</button>
           <button type="submit">
-            {{ createUserMode ? 'Create' : 'Update' }}
+            {{ item ? 'Update' : 'Create' }}
           </button>
         </div>
       </form>
@@ -96,25 +96,26 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, computed } from 'vue';
+import { reactive, watch } from 'vue';
 import {
-  UserSchemas, // <--- Make sure this import is present!
+  UserSchemas,
   type CreateUserRequest,
   type UpdateUserRequest,
   type UserResponse,
 } from '../../../types/schemas/user.schema';
 import { UserRole, UserRoleData } from '../../../types/enums/user-role.enum';
 
+//item es user
 const props = defineProps<{
   isOpen: boolean;
-  user: UserResponse | null;
+  item: UserResponse | null;
 }>();
 
 const emit = defineEmits(['close', 'submit']);
 
-const formData = reactive<
-  Omit<CreateUserRequest, 'id' | 'createdAt'> & Partial<UpdateUserRequest>
->({
+// Define el estado inicial del formulario con valores por defecto
+const initialFormData: Omit<CreateUserRequest, 'id' | 'createdAt'> &
+  Partial<UpdateUserRequest> = {
   firstname: '',
   lastname: '',
   role: UserRole.NURSE,
@@ -122,81 +123,85 @@ const formData = reactive<
   username: '',
   email: '',
   password: '',
-  isActive: true,
-});
+  isActive: true, // Por defecto activo para nuevas creaciones
+};
 
+const formData = reactive<typeof initialFormData>({ ...initialFormData });
 const errors = reactive<Record<string, string[]>>({});
-const createUserMode = computed(() => !props.user);
+
+// createUserMode ya no es necesario, puedes usar `!props.item` directamente
+// const createUserMode = computed(() => !props.item);
 
 const resetForm = () => {
-  Object.assign(formData, {
-    firstname: '',
-    lastname: '',
-    role: UserRole.NURSE,
-    licenseNumber: undefined,
-    username: '',
-    email: '',
-    password: '',
-    isActive: true,
-  });
-  Object.keys(errors).forEach((k) => delete errors[k]);
+  Object.assign(formData, initialFormData); // Restablece a los valores iniciales
+  Object.keys(errors).forEach((k) => delete errors[k]); // Limpia errores
 };
 
 watch(
-  () => props.user,
-  (user) => {
-    if (user) {
+  () => props.item, // <--- Cambiado de 'user' a 'item'
+  (newItem) => {
+    if (newItem) {
+      // Si hay un item, estamos editando, poblar el formulario
       Object.assign(formData, {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        role: user.role,
-        licenseNumber: user.licenseNumber || undefined,
-        username: user.username,
-        email: user.email,
-        password: '',
-        isActive: user.isActive,
+        firstname: newItem.firstname,
+        lastname: newItem.lastname,
+        role: newItem.role,
+        licenseNumber: newItem.licenseNumber || undefined, // Asegúrate de que undefined si es null
+        username: newItem.username, // Solo para visualización o si se permitiera editar
+        email: newItem.email, // Solo para visualización o si se permitiera editar
+        password: '', // Nunca precargues la contraseña
+        isActive: newItem.isActive,
       });
+      // Para un junior, podrías simplificar quitando username y email si no se editan en el update
+      // o dejándolos en el formulario como deshabilitados si solo son de lectura en modo edición.
+      // Aquí los he dejado, pero la validación Zod se encargará de si son obligatorios o no en cada modo.
     } else {
+      // Si no hay item, es una creación, resetear el formulario
       resetForm();
     }
   },
-  { immediate: true },
+  { immediate: true }, // Ejecutar al montar el componente
 );
 
 watch(
   () => props.isOpen,
   (newVal) => {
     if (!newVal) {
+      // Si el modal se cierra, resetea el formulario y los errores
       resetForm();
     }
   },
 );
 
 const submitForm = () => {
-  Object.keys(errors).forEach((k) => delete errors[k]); // Clear previous errors
+  Object.keys(errors).forEach((k) => delete errors[k]); // Limpiar errores anteriores
 
-  // Clean empty fields before validation (crucial for partial updates)
+  // Preparar los datos para la validación/envío
   const cleanData: any = { ...formData };
-  // Only remove empty strings if they are not required by the current schema.
-  // For Zod's .partial() and .optional(), it handles undefined correctly.
-  // If a field is empty string, it should ideally be explicitly `undefined` for partials
-  // or validated as an empty string if required.
-  // Given your schemas, let's convert empty strings for optional fields to undefined.
+  // Eliminar campos que solo aplican a 'crear' cuando estamos 'editando'
+  // o campos vacíos que Zod debería tratar como `undefined` para `partial()`
+  if (props.item) {
+    // Si estamos editando
+    delete cleanData.username;
+    delete cleanData.email;
+    delete cleanData.password;
+  }
+  // Convertir campos vacíos a undefined para Zod.optional() o Zod.partial()
   for (const key in cleanData) {
     if (cleanData[key] === '') {
-      cleanData[key] = undefined; // Convert empty strings to undefined for optional fields
+      cleanData[key] = undefined;
     }
   }
 
-  // Determine which Zod schema to use (create or update)
-  const schema = createUserMode.value ? UserSchemas.create : UserSchemas.update;
-  const result = schema.safeParse(cleanData); // Validate the cleaned data
+  // Determinar qué esquema Zod usar (crear o actualizar)
+  const schema = props.item ? UserSchemas.update : UserSchemas.create;
+  const result = schema.safeParse(cleanData); // Validar los datos
 
   if (result.success) {
-    // If validation passes, emit the 'submit' event with the parsed data
+    // Si la validación es exitosa, emitir el evento 'submit' con los datos validados
     emit('submit', result.data);
   } else {
-    // If validation fails, populate the errors object for display
+    // Si la validación falla, poblar el objeto de errores para mostrarlos en el formulario
     const flattened = result.error.flatten();
     Object.assign(errors, flattened.fieldErrors);
     console.error('Validation errors:', flattened.fieldErrors);
@@ -209,5 +214,5 @@ const close = () => {
 </script>
 
 <style lang="scss" scoped>
-@use 'Modal.scss';
+@use 'Modal.scss'; // Mantén tu importación de estilos
 </style>

@@ -1,6 +1,6 @@
 @use 'sass:color';
 @use 'sass:map';
-@use '@/styles/main.scss' as *;
+@use '../../styles/main.scss' as *;
 
 .login-page {
   @include flex-center(column);
@@ -70,7 +70,7 @@
 
             &:focus-within {
               border-color: $primary;
-              @include box-shadow(1);
+              box-shadow: 0 0 0 3px $input-focus-glow;
             }
 
             .icon {
@@ -99,22 +99,7 @@
 
         .btn-primary {
           width: 100%;
-          padding: $btn-padding-y $btn-padding-x;
-          background: $primary;
-          color: $white;
-          border: none;
-          border-radius: $btn-border-radius;
-          font-weight: 600;
-          transition: $transition;
-
-          &:hover {
-            background: color.adjust($primary, $lightness: -25%);
-          }
-
-          &:disabled {
-            background: $gray-400;
-            cursor: not-allowed;
-          }
+          @include button-primary;
         }
       }
 
@@ -129,19 +114,7 @@
 
           button {
             flex: 1;
-            padding: map.get($spacers, 2);
-            background: $white;
-            border: 1px solid $gray-300;
-            border-radius: $btn-border-radius;
-            color: $gray-700;
-            font-weight: 500;
-            transition: $transition;
-
-            &:hover {
-              background: $gray-100;
-              border-color: $primary;
-              color: $primary;
-            }
+            @include button-outline;
           }
         }
       }

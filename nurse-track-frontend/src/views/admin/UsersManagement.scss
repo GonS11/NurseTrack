@@ -1,82 +1,22 @@
-@use 'sass:color'; // Import Sass color module for color manipulation
-@use 'sass:map'; // Import Sass map module (not used here but good to keep if needed)
-@use '@/styles/main.scss' as *; // Import global styles and utilities
+@use 'sass:color';
+@use 'sass:map';
+@use '../../styles/main.scss' as *;
 
-// Styles targeting elements within the Table component (due to :deep)
-// This allows styling components that are passed through slots or are child components.
-:deep(.table-header) {
-  // Styling for the "New User" button in the table header
-  .btn-primary {
-    @include flex-center(row); // Use a mixin for centering content
-    gap: 0.5rem; // Space between icon and text
-    padding: 0.75rem 1.5rem; // Padding inside the button
-    background: $primary; // Use a global primary color variable
-    color: $white; // Use a global white color variable
-    border: none; // No border
-    border-radius: 0.5rem; // Rounded corners
-    cursor: pointer; // Indicate it's clickable
-    transition: background 0.2s ease; // Smooth transition on hover
-
-    .material-icons {
-      font-size: 1.1rem; // Adjust icon size
-    }
-
-    &:hover {
-      background: color.adjust(
-        $primary,
-        $lightness: -8%
-      ); // Darken primary color on hover
-    }
-
-    // Responsive adjustments for tablets
-    @include responsive(tablet) {
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-    }
-  }
+:deep(td.status-active) {
+  color: $success;
+  font-weight: bold;
 }
 
-// Specific table layout adjustments for user data
-:deep(table) {
-  // Minimum width for the first column (Name)
-  th:nth-child(1),
-  td:nth-child(1) {
-    min-width: 200px;
-  }
-
-  // Minimum width for the third column (Role)
-  th:nth-child(3),
-  td:nth-child(3) {
-    min-width: 120px;
-  }
-
-  // Responsive adjustments for phones
-  @include responsive(phone) {
-    min-width: 100%; // Table takes full width on small screens
-
-    th,
-    td {
-      padding: 0.75rem; // Adjust cell padding
-      font-size: 0.9rem; // Adjust font size
-    }
-
-    .actions-wrapper {
-      gap: 0.25rem; // Reduce gap between action buttons
-    }
-  }
+:deep(td.status-inactive) {
+  color: $error;
+  font-weight: bold;
 }
 
-// Specific pagination control adjustments
-:deep(.pagination-controls) {
-  // Responsive adjustments for phones
-  @include responsive(phone) {
-    flex-direction: column; // Stack elements vertically
-    gap: 1rem; // Add space between stacked elements
-    align-items: flex-start; // Align to the start
-
-    .pagination-buttons {
-      width: 100%; // Buttons take full width
-      justify-content: space-between; // Distribute buttons horizontally
-    }
-  }
+:deep(span.status-text-active) {
+  color: $success;
+  font-weight: bold;
+}
+:deep(span.status-text-inactive) {
+  color: $error;
+  font-weight: bold;
 }

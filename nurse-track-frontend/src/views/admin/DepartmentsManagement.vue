@@ -1,87 +1,118 @@
 <template>
-  <div>
-    <h1>Gestión de Departamentos</h1>
-
-    <form @submit.prevent="create" class="inline-form">
-      <input v-model="newName" placeholder="Nombre de departamento" required />
-      <button type="submit">➕ Crear</button>
-    </form>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Activo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="d in departments.content" :key="d.id">
-          <td>{{ d.name }}</td>
-          <td>{{ d.isActive ? 'Sí' : 'No' }}</td>
-          <td>
-            <button @click="toggle(d)">
-              {{ d.isActive ? 'Desactivar' : 'Activar' }}
-            </button>
-            <button @click="del(d.id)">🗑️</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <ManagamentComponent
+    title="Departments Management"
+    :headers="departmentHeaders"
+    :data="departments"
+    :actions="departmentActions"
+    :modal-component="DepartmentModal"
+    create-button-label="New Department"
+    :fetch-data="getAllDepartments"
+    :create-item="createDepartment"
+    :update-item="updateDepartment"
+    item-id-key="id"
+    ref="managamentComponentRef"
+  >
+  </ManagamentComponent>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import ManagamentComponent from '../../components/common/ManagamentComponent.vue';
+import { type TableAction } from '../../components/ui/Table.vue';
+import { useAuthStore } from '../../services';
 import { useAdminStore } from '../../stores/admin.store';
-import type { CreateDepartmentRequest } from '../../types/schemas/department.schema';
+import type {
+  CreateDepartmentRequest,
+  DepartmentResponse,
+  UpdateDepartmentRequest,
+} from '../../types/schemas/department.schema';
+import DepartmentModal from '../../components/ui/modals/DepartmentModal.vue';
 
-const admin = useAdminStore();
-const departments = admin.departments;
+// --- Stores y estado reactivo ---
+const authStore = useAuthStore();
+const adminStore = useAdminStore();
 
-const newName = ref<string>('');
+// componente ManagementComponen (Para llamar a sus funciones)
+const managamentComponentRef = ref<InstanceType<
+  typeof ManagamentComponent
+> | null>(null);
 
+// Datos de la tabla
+const departments = computed(() => adminStore.departments);
+
+const departmentHeaders = [
+  { key: 'name', label: 'Name' },
+  { key: 'location', label: 'Location' },
+];
+
+const departmentActions = computed(
+  () =>
+    [
+      {
+        label: 'Edit',
+        icon: 'edit',
+        class: 'edit',
+        handler: (department: DepartmentResponse) => {
+          // Llama a la función expuesta de EntityManagement
+          managamentComponentRef.value?.openUpdateModal(department);
+        },
+      },
+      {
+        label: 'Toggle State',
+        icon: (department: DepartmentResponse) =>
+          department.isActive ? 'lock' : 'lock_open',
+        handler: async (department: DepartmentResponse) => {
+          if (department.isActive) {
+            await adminStore.desactivateDepartment(department.id);
+          } else {
+            await adminStore.activeDepartment(department.id);
+          }
+
+          await getAllDepartments(departments.value.number);
+        },
+        condition: () => authStore.isAdmin,
+      },
+      {
+        label: 'Delete',
+        icon: 'delete',
+        class: 'danger',
+        handler: async (department: DepartmentResponse) => {
+          if (
+            confirm(
+              `Are you sure you want to delete user "${department.name}"?`,
+            )
+          ) {
+            await adminStore.deleteDepartment(department.id);
+            await getAllDepartments(departments.value.number); // Refresca la tabla después de borrar
+          }
+        },
+        condition: () => authStore.isAdmin,
+      },
+    ] as TableAction<DepartmentResponse>[],
+);
+
+// Metodos de CRUD para pasarle al componente
+const getAllDepartments = async (page: number) => {
+  await adminStore.getAllDepartments(page);
+};
+
+const createDepartment = async (formData: CreateDepartmentRequest) => {
+  await adminStore.createDepartment(formData);
+};
+
+const updateDepartment = async (
+  id: number,
+  formData: UpdateDepartmentRequest,
+) => {
+  // Asegúrate de que el ID sea string aquí también
+  await adminStore.updateDepartment(id, formData);
+};
+//Hook de ciclo de vida
 onMounted(() => {
-  admin.getAllDepartments();
+  getAllDepartments(0); //Cargar la primera pagina al montar
 });
-
-async function create() {
-  const payload: CreateDepartmentRequest = {
-    name: newName.value,
-    location: newName.value,
-  };
-  await admin.createDepartment(payload);
-  newName.value = '';
-}
-
-function toggle(dep: { id: number; isActive: boolean }) {
-  if (dep.isActive) {
-    admin.desactivateDepartment(dep.id);
-  } else {
-    admin.activeDepartment(dep.id);
-  }
-}
-
-function del(id: number) {
-  if (confirm('Eliminar departamento?')) {
-    admin.deleteDepartment(id);
-  }
-}
 </script>
 
-<style scoped>
-.inline-form {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th,
-td {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-}
+<style lang="scss" scoped>
+@use 'DepartmentsManagement.scss';
 </style>

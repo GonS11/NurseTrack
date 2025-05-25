@@ -1,6 +1,6 @@
 @use 'sass:color';
 @use 'sass:map';
-@use '@/styles/main.scss' as *;
+@use '../../styles/main.scss' as *;
 
 .app-shell {
   display: flex;
@@ -9,40 +9,43 @@
   min-height: 100vh;
 
   .overlay {
-    display: none; // Por defecto oculto
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
     z-index: 900;
     transition: opacity $transition;
-    opacity: 0; // Estado inicial para transición
+    opacity: 0;
 
-    // Se muestra solo cuando el sidebar está abierto y es móvil
     .app-shell.sidebar-open & {
-      display: block;
-      opacity: 1;
+      @include responsive(tablet) {
+        display: block;
+        opacity: 1;
+      }
     }
   }
 
   main {
     flex: 1;
-    margin-left: $sidebar-width !important; // Margen por defecto para sidebar colapsado
+    margin-left: $sidebar-width;
     padding: map.get($spacers, 4);
     transition: margin-left $transition, filter $transition;
 
-    &.sidebar-shifted {
-      margin-left: $expanded-sidebar-width; // Margen para sidebar expandido en desktop
+    .app-shell.sidebar-expanded & {
+      margin-left: $expanded-sidebar-width;
     }
 
-    // Efecto de atenuación cuando el sidebar móvil está abierto
+    @include responsive(tablet) {
+      margin-left: 0;
+      padding: map.get($spacers, 3);
+    }
+
     .app-shell.sidebar-open & {
-      @media (max-width: map.get($breakpoints, tablet)) {
+      @include responsive(tablet) {
         filter: brightness(0.7);
+        pointer-events: none;
       }
-    }
-
-    @media (max-width: map.get($breakpoints, tablet)) {
-      //Cambiar la tabla de direccion o algo o reducir campos para asegurar que se ven todos los campos
     }
   }
 }

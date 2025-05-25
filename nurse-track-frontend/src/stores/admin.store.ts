@@ -22,7 +22,7 @@ import type { Page } from '../types/common';
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
-    usersPage: {
+    users: {
       content: [] as UserResponse[],
       number: 0,
       totalPages: 0,
@@ -60,8 +60,7 @@ export const useAdminStore = defineStore('admin', {
     // ==================== USER ACTIONS ====================
     async getAllUsers(page = 0, size = 10, sortBy = 'id') {
       try {
-        const res = await useAdminUserService.getAllUsers(page, size, sortBy);
-        this.usersPage = res;
+        this.users = await useAdminUserService.getAllUsers(page, size, sortBy);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -71,8 +70,8 @@ export const useAdminStore = defineStore('admin', {
     async createUser(input: CreateUserRequest) {
       try {
         await useAdminUserService.createUser(input);
-        // After creating a user, reload the current page to see the new user and maintain pagination integrity
-        await this.getAllUsers(this.usersPage.number);
+
+        await this.getAllUsers(this.users.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -82,8 +81,8 @@ export const useAdminStore = defineStore('admin', {
     async updateUser(id: number, input: UpdateUserRequest) {
       try {
         await useAdminUserService.updateUser(id, input);
-        // After updating, reload the current page to reflect changes accurately
-        await this.getAllUsers(this.usersPage.number);
+
+        await this.getAllUsers(this.users.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -93,8 +92,8 @@ export const useAdminStore = defineStore('admin', {
     async deleteUser(id: number) {
       try {
         await useAdminUserService.deleteUser(id);
-        // After deleting, reload the current page. This is important as it might affect page count.
-        await this.getAllUsers(this.usersPage.number);
+
+        await this.getAllUsers(this.users.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -104,11 +103,10 @@ export const useAdminStore = defineStore('admin', {
     async activateUser(id: number) {
       try {
         await useAdminUserService.activateUser(id);
-        // Directly update the state to reflect the change immediately
-        const user = this.usersPage.content.find((u) => u.id === id);
-        if (user) {
-          user.isActive = true;
-        }
+
+        const user = this.users.content.find((user) => user.id === id);
+
+        if (user) user.isActive = true;
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -118,8 +116,8 @@ export const useAdminStore = defineStore('admin', {
     async desactivateUser(id: number) {
       try {
         await useAdminUserService.desactivateUser(id);
-        // Directly update the state to reflect the change immediately
-        const user = this.usersPage.content.find((u) => u.id === id);
+
+        const user = this.users.content.find((user) => user.id === id);
 
         if (user) user.isActive = false;
       } catch (e: any) {
@@ -131,7 +129,7 @@ export const useAdminStore = defineStore('admin', {
     // ==================== DEPARTMENT ACTIONS ====================
     async getAllDepartments(page = 0, size = 10, sortBy = 'id') {
       try {
-        const response = await useAdminDepartmentService.getAllDepartments(
+        this.departments = await useAdminDepartmentService.getAllDepartments(
           page,
           size,
           sortBy,
@@ -146,8 +144,15 @@ export const useAdminStore = defineStore('admin', {
       try {
         this.departments.content =
           await useAdminDepartmentService.getAllActiveDepartments();
-      } catch (error) {
-        console.error('Error fetching active departments:', error);
+
+        // Refresca paginacion
+        this.departments.number = 0;
+        this.departments.totalPages = 1;
+        this.departments.size = this.departments.content.length;
+        this.departments.totalElements = this.departments.content.length;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -155,8 +160,14 @@ export const useAdminStore = defineStore('admin', {
       try {
         this.departments.content =
           await useAdminDepartmentService.getAllInactiveDepartments();
-      } catch (error) {
-        console.error('Error fetching active departments:', error);
+
+        this.departments.number = 0;
+        this.departments.totalPages = 1;
+        this.departments.size = this.departments.content.length;
+        this.departments.totalElements = this.departments.content.length;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -174,11 +185,9 @@ export const useAdminStore = defineStore('admin', {
         } else {
           this.departments.content.push(department);
         }
-      } catch (error) {
-        console.error(
-          `Error fetching department with ID ${departmentId}:`,
-          error,
-        );
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -187,9 +196,14 @@ export const useAdminStore = defineStore('admin', {
         const newDepartment = await useAdminDepartmentService.createDepartment(
           department,
         );
+
         this.departments.content.push(newDepartment);
-      } catch (error) {
-        console.error('Error creating department:', error);
+
+        // Recargar todos los departementos para que aparezca el nuevo
+        await this.getAllDepartments(this.departments.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -203,6 +217,7 @@ export const useAdminStore = defineStore('admin', {
             departmentId,
             department,
           );
+
         const oldDepartmentIndex = this.departments.content.findIndex(
           (department) => department.id === departmentId,
         );
@@ -210,47 +225,44 @@ export const useAdminStore = defineStore('admin', {
         if (oldDepartmentIndex !== -1) {
           this.departments.content[oldDepartmentIndex] = updatedDepartment;
         }
-      } catch (error) {
-        console.error(
-          `Error updating department with ID ${departmentId}:`,
-          error,
-        );
+
+        await this.getAllDepartments(this.departments.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
     async activeDepartment(departmentId: number) {
       try {
+        // Al devolver un void no hay que asignarlo
         await useAdminDepartmentService.activateDepartment(departmentId);
-        const departmentIndex = this.departments.content.findIndex(
+
+        const department = this.departments.content.find(
           (department) => department.id === departmentId,
         );
 
-        if (departmentIndex !== -1) {
-          this.departments.content[departmentIndex].isActive = true;
+        if (department) {
+          department.isActive = true;
         }
-      } catch (error) {
-        console.error(
-          `Error activating department with ID ${departmentId}:`,
-          error,
-        );
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
     async desactivateDepartment(departmentId: number) {
       try {
         await useAdminDepartmentService.desactivateDepartment(departmentId);
-        const departmentIndex = this.departments.content.findIndex(
+
+        const department = this.departments.content.find(
           (department) => department.id === departmentId,
         );
 
-        if (departmentIndex !== -1) {
-          this.departments.content[departmentIndex].isActive = false;
-        }
-      } catch (error) {
-        console.error(
-          `Error deactivating department with ID ${departmentId}:`,
-          error,
-        );
+        if (department) department.isActive = false;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -260,11 +272,12 @@ export const useAdminStore = defineStore('admin', {
         this.departments.content = this.departments.content.filter(
           (department) => department.id !== departmentId,
         );
-      } catch (error) {
-        console.error(
-          `Error deleting department with ID ${departmentId}:`,
-          error,
-        );
+
+        // Recargarlos para mostrar cambios
+        await this.getAllDepartments(this.departments.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -281,8 +294,9 @@ export const useAdminStore = defineStore('admin', {
             size,
             sortBy,
           );
-      } catch (error) {
-        console.error('Error fetching supervisor asignments:', error);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -290,11 +304,14 @@ export const useAdminStore = defineStore('admin', {
       try {
         this.departments.content =
           await useAdminAssignmentService.getUnassignedDepartmentsForSupervisor();
-      } catch (error) {
-        console.error(
-          'Error fetching unassigned departments for supervisors:',
-          error,
-        );
+
+        this.departments.number = 0;
+        this.departments.totalPages = 1;
+        this.departments.size = this.departments.content.length;
+        this.departments.totalElements = this.departments.content.length;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -304,6 +321,7 @@ export const useAdminStore = defineStore('admin', {
           await useAdminAssignmentService.getSupervisorByDepartment(
             departmentId,
           );
+
         const existingIndex = this.supervisorAssignments.content.findIndex(
           (assignment) => assignment.department.id === departmentId,
         );
@@ -314,11 +332,9 @@ export const useAdminStore = defineStore('admin', {
         } else {
           this.supervisorAssignments.content.push(supervisorAssignment);
         }
-      } catch (error) {
-        console.error(
-          `Error fetching supervisor for department ID ${departmentId}:`,
-          error,
-        );
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -336,8 +352,13 @@ export const useAdminStore = defineStore('admin', {
         } else {
           this.supervisorAssignments.content.push(newAssignment);
         }
-      } catch (error) {
-        console.error('Error assigning supervisor to department:', error);
+
+        await this.getAllSupervisorAssignments(
+          this.supervisorAssignments.number,
+        );
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -351,14 +372,15 @@ export const useAdminStore = defineStore('admin', {
           this.supervisorAssignments.content.filter(
             (assignment) => assignment.department.id !== departmentId,
           );
-      } catch (error) {
-        console.error(
-          `Error removing supervisor from department ID ${departmentId}:`,
-          error,
+
+        await this.getAllSupervisorAssignments(
+          this.supervisorAssignments.number,
         );
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
-
     // ==================== NURSE ASSIGNMENT ACTIONS ====================
     async getAllNurseAssignments(
       page?: number,
@@ -372,8 +394,9 @@ export const useAdminStore = defineStore('admin', {
             size,
             sortBy,
           );
-      } catch (error) {
-        console.error('Error fetching supervisor asignments:', error);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -381,11 +404,14 @@ export const useAdminStore = defineStore('admin', {
       try {
         this.departments.content =
           await useAdminAssignmentService.getUnassignedDepartmentsForNurses();
-      } catch (error) {
-        console.error(
-          'Error fetching unassigned departments for nurses:',
-          error,
-        );
+
+        this.departments.number = 0;
+        this.departments.totalPages = 1;
+        this.departments.size = this.departments.content.length;
+        this.departments.totalElements = this.departments.content.length;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -395,11 +421,15 @@ export const useAdminStore = defineStore('admin', {
           await useAdminAssignmentService.getAllNursesByDepartment(
             departmentId,
           );
-      } catch (error) {
-        console.error(
-          `Error fetching nurses for department ID ${departmentId}:`,
-          error,
-        );
+
+        this.nurseAssignments.number = 0;
+        this.nurseAssignments.totalPages = 1;
+        this.nurseAssignments.size = this.nurseAssignments.content.length;
+        this.nurseAssignments.totalElements =
+          this.nurseAssignments.content.length;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -407,9 +437,13 @@ export const useAdminStore = defineStore('admin', {
       try {
         const newAssignment =
           await useAdminAssignmentService.assignNurseToDepartment(request);
+
         this.nurseAssignments.content.push(newAssignment);
-      } catch (error) {
-        console.error('Error assigning nurse to department:', error);
+
+        await this.getAllNurseAssignments(this.nurseAssignments.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
@@ -424,11 +458,11 @@ export const useAdminStore = defineStore('admin', {
             assignment.department.id !== departmentId ||
             assignment.nurse.id !== nurseId,
         );
-      } catch (error) {
-        console.error(
-          `Error removing nurse with ID ${nurseId} from department ID ${departmentId}:`,
-          error,
-        );
+
+        await this.getAllNurseAssignments(this.nurseAssignments.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
   },

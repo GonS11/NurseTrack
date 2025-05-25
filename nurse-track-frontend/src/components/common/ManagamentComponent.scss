@@ -1,0 +1,66 @@
+// src/components/common/ManagementComponent.scss
+@use 'sass:color';
+@use 'sass:map';
+@use '../../styles/main.scss' as *; // Importa tus variables y mixins
+
+// Estilos que afectan a los elementos dentro del slot del header de la tabla (via :deep)
+:deep(.table-header) {
+  .btn-primary {
+    @include button-primary; // Usamos el mixin de botón primario
+    @include flex-center(
+      row
+    ); // Combina con flex-center para el contenido interno
+    gap: 0.5rem; // Espacio entre el icono y el texto
+
+    .material-icons {
+      font-size: 1.1rem;
+    }
+
+    @include responsive(tablet) {
+      padding: map.get($spacers, 2) map.get($spacers, 3); // Ajuste de padding
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Ajustes de layout específicos de la tabla (dentro de :deep para afectar a Table.vue)
+:deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    min-width: 200px;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    min-width: 120px;
+  }
+
+  @include responsive(phone) {
+    min-width: 100%; // Asegura que la tabla intente tomar el ancho completo
+    th,
+    td {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .actions-wrapper {
+      gap: 0.25rem;
+    }
+  }
+}
+
+// Ajustes de paginación (dentro de :deep para afectar a Table.vue)
+:deep(.pagination-controls) {
+  @include responsive(phone) {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+
+    .pagination-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}

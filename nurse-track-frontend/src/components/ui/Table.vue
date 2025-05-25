@@ -1,6 +1,5 @@
 <template>
   <div class="data-table">
-    <!-- Header -->
     <div class="table-header">
       <h2 class="title">{{ title }}</h2>
       <div class="header-actions">
@@ -8,7 +7,6 @@
       </div>
     </div>
 
-    <!-- Table -->
     <div class="table-container">
       <table>
         <thead>
@@ -22,9 +20,15 @@
         <tbody>
           <tr v-for="item in data" :key="item.id">
             <td v-for="(header, j) in headers" :key="j">
-              <slot :name="`cell-${header.key}`" :item="item">
-                {{ formatCell(item, header) }}
-              </slot>
+              <template v-if="header.format">
+                {{ header.format(item) }}
+              </template>
+              <template v-else-if="$slots[`cell-${header.key}`]">
+                <slot :name="`cell-${header.key}`" :item="item"></slot>
+              </template>
+              <template v-else>
+                {{ item[header.key] }}
+              </template>
             </td>
             <td v-if="actions.length > 0" class="actions-cell">
               <div class="actions-wrapper">
@@ -57,7 +61,6 @@
       </table>
     </div>
 
-    <!-- Pagination -->
     <div v-if="showPagination" class="pagination-controls">
       <div class="pagination-info">
         {{ rangeStart }} - {{ rangeEnd }} of {{ totalItems }}
@@ -84,12 +87,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, type PropType } from 'vue';
 
 type Header = {
   key: string;
   label: string;
-  format?: (value: any) => string;
+  format?: (item: any) => string; // La función format recibe el 'item' completo
 };
 
 export interface TableAction<Item = any> {
@@ -102,39 +105,24 @@ export interface TableAction<Item = any> {
 }
 
 const props = defineProps({
-  title: String,
+  title: { type: String, required: true },
   headers: {
-    type: Array as () => Header[],
+    type: Array as PropType<Header[]>,
     required: true,
   },
   data: {
-    type: Array as () => any[],
+    type: Array as PropType<any[]>,
     default: () => [],
   },
   actions: {
-    type: Array as () => TableAction<any>[],
+    type: Array as PropType<TableAction<any>[]>,
     default: () => [],
   },
-  showPagination: {
-    type: Boolean,
-    default: false,
-  },
-  currentPage: {
-    type: Number,
-    default: 0,
-  },
-  totalPages: {
-    type: Number,
-    default: 1,
-  },
-  totalItems: {
-    type: Number,
-    default: 0,
-  },
-  pageSize: {
-    type: Number,
-    default: 10,
-  },
+  showPagination: { type: Boolean, default: false },
+  currentPage: { type: Number, default: 0 },
+  totalPages: { type: Number, default: 1 },
+  totalItems: { type: Number, default: 0 },
+  pageSize: { type: Number, default: 10 },
 });
 
 const emit = defineEmits<{
@@ -151,16 +139,14 @@ const resolveIcon = (icon: TableAction['icon'], item: any): string => {
   return typeof icon === 'function' ? icon(item) : icon;
 };
 
-const formatCell = (item: any, header: Header) => {
-  return header.format ? header.format(item[header.key]) : item[header.key];
-};
-
 const showAction = (action: TableAction, item: any) => {
   return !action.condition || action.condition(item);
 };
 
 const handleAction = (action: TableAction, item: any) => {
+  // Emit 'action' event if parent needs to listen to all actions
   emit('action', { action: action.label, item });
+  // Call the specific handler function defined in the action
   action.handler(item);
 };
 
@@ -173,5 +159,5 @@ const changePage = (delta: number) => {
 </script>
 
 <style scoped lang="scss">
-@use 'Table.scss';
+@use 'Table.scss'; // Mantén tu importación de estilos
 </style>

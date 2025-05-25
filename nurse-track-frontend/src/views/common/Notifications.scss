@@ -1,6 +1,6 @@
 @use 'sass:color';
 @use 'sass:map';
-@use '@/styles/main.scss' as *;
+@use '../../styles/main.scss' as *;
 
 .notifications-container {
   max-width: 800px;

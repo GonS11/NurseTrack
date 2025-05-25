@@ -1,10 +1,10 @@
 @use 'sass:color';
 @use 'sass:map';
-@use '@/styles/main.scss' as *;
+@use '../../styles/main.scss' as *;
 
 .data-table {
   background: $white;
-  border-radius: 0.5rem;
+  border-radius: $btn-border-radius;
   @include box-shadow(1);
   overflow: hidden;
 }
@@ -34,7 +34,7 @@ table {
 
   th,
   td {
-    padding: 1rem;
+    padding: map.get($spacers, 3);
     text-align: left;
     vertical-align: middle;
   }
@@ -71,44 +71,18 @@ table {
 
 .actions-wrapper {
   display: flex;
-  gap: 0.5rem;
+  gap: map.get($spacers, 2);
   flex-wrap: nowrap;
 }
 
 .action-button {
-  @include flex-center;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  color: $gray-600;
-  transition: all 0.2s ease;
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba($primary, 0.1);
-    color: $primary;
-  }
-
-  &.danger {
-    color: $error;
-
-    &:hover {
-      background: rgba($error, 0.1);
-    }
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: none !important;
-  }
+  @include button-action-icon;
 }
 
 .empty-state {
   @include flex-center(row);
-  gap: 0.5rem;
-  padding: 2rem;
+  gap: map.get($spacers, 2);
+  padding: map.get($spacers, 4);
   color: $gray-600;
   text-align: center;
   font-style: italic;
@@ -127,18 +101,18 @@ table {
 
   .pagination-buttons {
     @include flex-center(row);
-    gap: 0.5rem;
+    gap: map.get($spacers, 2);
   }
 
   .pagination-button {
     @include flex-center;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    padding: map.get($spacers, 2);
+    border-radius: $btn-border-radius;
     background: rgba($primary, 0.1);
     color: $primary;
     border: none;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: $transition;
 
     &:disabled {
       opacity: 0.5;
@@ -151,9 +125,9 @@ table {
   }
 
   .page-indicator {
-    padding: 0.5rem 1rem;
+    padding: map.get($spacers, 2) map.get($spacers, 3);
     background: $gray-100;
-    border-radius: 0.5rem;
+    border-radius: $btn-border-radius;
     font-weight: 500;
   }
 }

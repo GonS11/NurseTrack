@@ -5,6 +5,7 @@ import com.nurse_track_back.nurse_track_back.domain.models.NurseDepartment;
 import com.nurse_track_back.nurse_track_back.exceptions.AssignmentException;
 import com.nurse_track_back.nurse_track_back.repositories.NurseDepartmentRepository;
 import com.nurse_track_back.nurse_track_back.repositories.SupervisorDepartmentRepository;
+import com.nurse_track_back.nurse_track_back.utils.DepartmentValidator;
 import com.nurse_track_back.nurse_track_back.web.dto.request.department.CreateDepartmentRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.request.department.UpdateDepartmentRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.response.DepartmentResponse;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public class DepartmentService {
     private final SupervisorDepartmentRepository supervisorDepartmentRepository;
     private final DepartmentRepository departmentRepository;
+    private final DepartmentValidator departmentValidator;
     private final DepartmentMapper departmentMapper;
     private final NurseDepartmentRepository nurseDepartmentRepository;
 
@@ -93,6 +95,7 @@ public class DepartmentService {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.create("Department", id));
 
+        departmentValidator.validateNameDepartment(id, request, department);
         departmentMapper.updateModel(request, department);
 
         Department updateDepartment = departmentRepository.save(department);

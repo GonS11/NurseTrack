@@ -12,7 +12,7 @@ import lombok.Setter;
 public class UpdateDepartmentRequest
 {
     @Size(min = 2, max = 100, message = "Department name must be between 2 and 100 characters")
-    @ValidDepartmentName
+    //@ValidDepartmentName Validar duplicado de nombre en service
     private String name;
 
     @Size(min = 2, max = 100, message = "Location must be between 2 and 100 characters")
