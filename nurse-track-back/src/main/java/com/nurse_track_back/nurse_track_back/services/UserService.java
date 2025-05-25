@@ -56,10 +56,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.create("User", id));
 
-        // Actualizar contraseña si se proporciona
+        /*// Actualizar contraseña si se proporciona
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
+        }*/
 
         userMapper.updateModel(request, user);
         return userMapper.toDTO(userRepository.save(user));

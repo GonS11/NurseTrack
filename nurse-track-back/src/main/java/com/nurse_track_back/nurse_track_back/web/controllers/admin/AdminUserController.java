@@ -36,19 +36,19 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
-    @PutMapping("/{userId}")
+    @PatchMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") Long userId,
             @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
-    @PutMapping("/{userId}/activate")
+    @PatchMapping("/{userId}/activate")
     public ResponseEntity<Void> activateUser(@PathVariable("userId") Long userId) {
         userService.toggleUserStatus(userId, true);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{userId}/desactivate")
+    @PatchMapping("/{userId}/desactivate")
     public ResponseEntity<Void> desactivateUser(@PathVariable("userId") Long userId) {
         userService.toggleUserStatus(userId, false);
         return ResponseEntity.noContent().build();

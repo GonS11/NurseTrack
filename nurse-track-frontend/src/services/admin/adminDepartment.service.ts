@@ -7,77 +7,50 @@ import type {
 } from '../../types/schemas/department.schema';
 
 export const useAdminDepartmentService = {
-  async getAllDepartments(
-    page: number = 0,
-    size: number = 10,
-    sortBy: string = 'id',
-  ): Promise<Page<DepartmentResponse>> {
-    const response = await api.get<Page<DepartmentResponse>>(
-      '/admin/departments',
-      {
+  getAllDepartments: (page = 0, size = 10, sortBy = 'id') =>
+    api
+      .get<Page<DepartmentResponse>>('/admin/departments', {
         params: { page, size, sortBy },
-      },
-    );
+      })
+      .then((res) => res.data),
 
-    return response.data;
-  },
+  getAllActiveDepartments: () =>
+    api
+      .get<DepartmentResponse[]>('/admin/departments/active')
+      .then((res) => res.data),
 
-  async getAllActiveDepartments(): Promise<DepartmentResponse[]> {
-    const response = await api.get<DepartmentResponse[]>(
-      '/admin/departments/active',
-    );
+  getAllInactiveDepartments: () =>
+    api
+      .get<DepartmentResponse[]>('/admin/departments/inactive')
+      .then((res) => res.data),
 
-    return response.data;
-  },
+  getDepartmentById: (departmentId: number) =>
+    api
+      .get<DepartmentResponse>(`/admin/departments/${departmentId}`)
+      .then((res) => res.data),
 
-  async getAllInactiveDepartments(): Promise<DepartmentResponse[]> {
-    const response = await api.get<DepartmentResponse[]>(
-      '/admin/departments/inactive',
-    );
+  createDepartment: (data: CreateDepartmentRequest) =>
+    api
+      .post<DepartmentResponse>('/admin/departments', data)
+      .then((res) => res.data),
 
-    return response.data;
-  },
+  updateDepartment: (departmentId: number, data: UpdateDepartmentRequest) =>
+    api
+      .put<DepartmentResponse>(`/admin/departments/${departmentId}`, data)
+      .then((res) => res.data),
 
-  async getDepartmentById(departmentId: number): Promise<DepartmentResponse> {
-    const response = await api.get<DepartmentResponse>(
-      `/admin/departments/${departmentId}`,
-    );
+  activateDepartment: (departmentId: number) =>
+    api
+      .put<void>(`/admin/departments/${departmentId}/activate`)
+      .then((res) => res.data),
 
-    return response.data;
-  },
+  desactivateDepartment: (departmentId: number) =>
+    api
+      .put<void>(`/admin/departments/${departmentId}/desactivate`)
+      .then((res) => res.data),
 
-  async createDepartment(
-    data: CreateDepartmentRequest,
-  ): Promise<DepartmentResponse> {
-    const response = await api.post<DepartmentResponse>(
-      '/admin/departments',
-      data,
-    );
-
-    return response.data;
-  },
-
-  async updateDepartment(
-    departmentId: number,
-    data: UpdateDepartmentRequest,
-  ): Promise<DepartmentResponse> {
-    const response = await api.put<DepartmentResponse>(
-      `/admin/departments/${departmentId}`,
-      data,
-    );
-
-    return response.data;
-  },
-
-  async activateDepartment(departmentId: number): Promise<void> {
-    await api.put(`/admin/departments/${departmentId}/activate`);
-  },
-
-  async desactivateDepartment(departmentId: number): Promise<void> {
-    await api.put(`/admin/departments/${departmentId}/desactivate`);
-  },
-
-  async deleteDepartment(departmentId: number): Promise<void> {
-    await api.delete(`/admin/departments/${departmentId}`);
-  },
+  deleteDepartment: (departmentId: number) =>
+    api
+      .delete<void>(`/admin/departments/${departmentId}`)
+      .then((res) => res.data),
 };

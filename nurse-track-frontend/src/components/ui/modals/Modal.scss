@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use 'sass:map';
 @use '@/styles/main.scss' as *;
 
 .modal-overlay {
@@ -11,7 +12,7 @@
   backdrop-filter: blur(4px);
   @include flex-center;
   z-index: 1000;
-  padding: 2rem;
+  padding: map.get($spacers, 4);
 }
 
 .modal {
@@ -20,21 +21,22 @@
   box-shadow: $card-shadow;
   width: 100%;
   max-width: 500px;
-  padding: 2rem;
+  padding: map.get($spacers, 4);
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
 
   h2 {
     color: $text-primary;
-    margin-bottom: 2rem;
+    margin-bottom: map.get($spacers, 4);
     font-size: 1.5rem;
     font-weight: 600;
   }
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-top: map.get($spacers, 4);
+  gap: map.get($spacers, 3);
 
   label {
     display: block;
@@ -82,7 +84,7 @@
   justify-content: flex-end;
 
   button {
-    padding: 0.75rem 1.5rem;
+    padding: $btn-padding-y $btn-padding-x;
     border-radius: $btn-border-radius;
     font-weight: 500;
     transition: $transition;

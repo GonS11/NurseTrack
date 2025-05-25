@@ -1,4 +1,4 @@
-#version: '3.8'
+version: '3.8'
 
 services:
   backend:
@@ -6,23 +6,23 @@ services:
       context: ./nurse-track-back
       dockerfile: Dockerfile
     container_name: nursetrack-backend
-    restart: always
+    restart: 'no'
     ports:
       - '8080:8080'
     environment:
-      # Spring Boot DataSource
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/nurse-track-back
+      SPRING_DATASOURCE_URL: >-
+        jdbc:mysql://mysql:3306/nurse-track-back ?allowPublicKeyRetrieval=true
+        &useSSL=false &serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: '' # contraseña vacía
+      SPRING_DATASOURCE_PASSWORD: ''
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
       SPRING_JPA_SHOW_SQL: 'true'
     depends_on:
-      mysql:
-        condition: service_healthy
-    # (opcional) Mapea tu src para recarga en caliente con devtools:
+      - mysql
     volumes:
       - ./nurse-track-back/src:/app/src
+    # Si usas wait-for-it.sh, ajusta ENTRYPOINT en Dockerfile en lugar de aquí.
 
   mysql:
     image: mysql:8.0
@@ -31,21 +31,20 @@ services:
     environment:
       MYSQL_DATABASE: nurse-track-back
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      # o bien: MYSQL_ROOT_PASSWORD: root
     ports:
       - '3306:3306'
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 5s
-      timeout: 10s
-      retries: 10
+      interval: 10s
+      timeout: 5s
+      retries: 20
     volumes:
       - mysql_data:/var/lib/mysql
     command:
-      [
-        '--character-set-server=utf8mb4',
-        '--collation-server=utf8mb4_unicode_ci',
-        '--default-authentication-plugin=mysql_native_password',
-      ]
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
 
 volumes:
   mysql_data:

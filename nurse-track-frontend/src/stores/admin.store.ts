@@ -22,11 +22,11 @@ import type { Page } from '../types/common';
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
-    users: {
-      content: [],
+    usersPage: {
+      content: [] as UserResponse[],
+      number: 0,
       totalPages: 0,
       totalElements: 0,
-      number: 0,
       size: 10,
     } as Page<UserResponse>,
 
@@ -53,111 +53,92 @@ export const useAdminStore = defineStore('admin', {
       number: 0,
       size: 10,
     } as Page<SupervisorDepartmentResponse>,
+    error: '' as string,
   }),
 
   actions: {
     // ==================== USER ACTIONS ====================
-    async getAllUsers(page?: number, size?: number, sortBy?: string) {
+    async getAllUsers(page = 0, size = 10, sortBy = 'id') {
       try {
-        this.users = await useAdminUserService.getAllUsers(page, size, sortBy);
-      } catch (error) {
-        console.error('Error fetching users:', error);
+        const res = await useAdminUserService.getAllUsers(page, size, sortBy);
+        this.usersPage = res;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
-    async getUserById(userId: number) {
+    async createUser(input: CreateUserRequest) {
       try {
-        const user = await useAdminUserService.getUserById(userId);
-        const userIndex = this.users.content.findIndex(
-          (user) => user.id === userId,
-        );
+        await useAdminUserService.createUser(input);
+        // After creating a user, reload the current page to see the new user and maintain pagination integrity
+        await this.getAllUsers(this.usersPage.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
+      }
+    },
 
-        if (userIndex !== -1) {
-          this.users.content[userIndex] = user;
-        } else {
-          this.users.content.push(user);
+    async updateUser(id: number, input: UpdateUserRequest) {
+      try {
+        await useAdminUserService.updateUser(id, input);
+        // After updating, reload the current page to reflect changes accurately
+        await this.getAllUsers(this.usersPage.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
+      }
+    },
+
+    async deleteUser(id: number) {
+      try {
+        await useAdminUserService.deleteUser(id);
+        // After deleting, reload the current page. This is important as it might affect page count.
+        await this.getAllUsers(this.usersPage.number);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
+      }
+    },
+
+    async activateUser(id: number) {
+      try {
+        await useAdminUserService.activateUser(id);
+        // Directly update the state to reflect the change immediately
+        const user = this.usersPage.content.find((u) => u.id === id);
+        if (user) {
+          user.isActive = true;
         }
-      } catch (error) {
-        console.error(`Error fetching user with ID ${userId}:`, error);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
-    async createUser(user: CreateUserRequest) {
+    async desactivateUser(id: number) {
       try {
-        const newUser = await useAdminUserService.createUser(user);
+        await useAdminUserService.desactivateUser(id);
+        // Directly update the state to reflect the change immediately
+        const user = this.usersPage.content.find((u) => u.id === id);
 
-        this.users.content.push(newUser);
-      } catch (error) {
-        console.error('Error creating user:', error);
-      }
-    },
-
-    async updateUser(userId: number, user: UpdateUserRequest) {
-      try {
-        const updatedUser = await useAdminUserService.updateUser(userId, user);
-        const oldUserIndex = this.users.content.findIndex(
-          (user) => user.id === userId,
-        );
-
-        if (oldUserIndex !== -1) {
-          this.users.content[oldUserIndex] = updatedUser;
-        }
-      } catch (error) {
-        console.error(`Error updating user with ID ${userId}:`, error);
-      }
-    },
-
-    async activeUser(userId: number) {
-      try {
-        await useAdminUserService.activateUser(userId);
-        const userIndex = this.users.content.findIndex(
-          (user) => user.id === userId,
-        );
-
-        if (userIndex !== -1) {
-          this.users.content[userIndex].isActive = true;
-        }
-      } catch (error) {
-        console.error(`Error activating user with ID ${userId}:`, error);
-      }
-    },
-
-    async desactivateUser(userId: number) {
-      try {
-        await useAdminUserService.desactivateUser(userId);
-        const userIndex = this.users.content.findIndex(
-          (user) => user.id === userId,
-        );
-
-        if (userIndex !== -1) {
-          this.users.content[userIndex].isActive = false;
-        }
-      } catch (error) {
-        console.error(`Error deactivating user with ID ${userId}:`, error);
-      }
-    },
-
-    async deleteUser(userId: number) {
-      try {
-        await useAdminUserService.deleteUser(userId);
-        this.users.content = this.users.content.filter(
-          (user) => user.id !== userId,
-        );
-      } catch (error) {
-        console.error(`Error deleting user with ID ${userId}:`, error);
+        if (user) user.isActive = false;
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 
     // ==================== DEPARTMENT ACTIONS ====================
-    async getAllDepartments(page?: number, size?: number, sortBy?: string) {
+    async getAllDepartments(page = 0, size = 10, sortBy = 'id') {
       try {
-        this.departments = await useAdminDepartmentService.getAllDepartments(
+        const response = await useAdminDepartmentService.getAllDepartments(
           page,
           size,
           sortBy,
         );
-      } catch (error) {
-        console.error('Error fetching departments:', error);
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
       }
     },
 

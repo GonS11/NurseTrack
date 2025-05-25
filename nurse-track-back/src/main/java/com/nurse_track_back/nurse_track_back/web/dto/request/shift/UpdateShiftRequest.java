@@ -21,7 +21,7 @@ public class UpdateShiftRequest
 {
     @NotNull
     @Positive(message = "Nurse ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.NURSE})
+    @ValidUserRole(allowedRoles = {Role.ROLE_NURSE})
     @ValidUserId
     private Long nurseId;
 

@@ -21,7 +21,7 @@ public class CreateShiftRequest
 {
     @NotNull(message = "Nurse ID is required")
     @Positive(message = "Nurse ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.NURSE})
+    @ValidUserRole(allowedRoles = {Role.ROLE_NURSE})
     @ValidUserId
     private Long nurseId;
 
@@ -45,7 +45,7 @@ public class CreateShiftRequest
     private String notes;
 
     @Positive(message = "Created by ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.SUPERVISOR})
+    @ValidUserRole(allowedRoles = {Role.ROLE_SUPERVISOR})
     @ValidUserId
     private Long createdById;
 }

@@ -62,7 +62,8 @@ export const validation = {
       .string()
       .min(8, 'The password should have at least 8 characters')
       .max(255, 'The password cannot exceed 255 characters')
-      .optional();
+      .optional()
+      .or(z.literal(''));
   },
 
   // License number
@@ -78,16 +79,18 @@ export const validation = {
   },
 
   optionalLicenseNumber: () => {
-    return z
-      .string()
-      .max(50, 'License number must not exceed 50 characters')
-      .regex(
-        /^([A-Z]-)?\d{4,8}$/,
-        'Invalid license number format. Expected pattern: A-1234 or 123456',
-      )
-      .trim()
-      .optional()
-      .or(z.literal(''));
+    return z.preprocess(
+      (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val),
+      z
+        .string()
+        .trim()
+        .max(50, 'License number must not exceed 50 characters')
+        .regex(
+          /^([A-Z]-)?\d{4,8}$/,
+          'Invalid license number format. Expected pattern: A-1234 or 123456',
+        )
+        .optional(),
+    );
   },
 
   // Validador para números positivos

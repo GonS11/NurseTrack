@@ -42,8 +42,8 @@ public class User implements UserDetails {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('ADMIN','SUPERVISOR','NURSE') DEFAULT 'NURSE'")
-    private Role role = Role.NURSE;
+    @Column(columnDefinition = "ENUM('ROLE_ADMIN','ROLE_SUPERVISOR','ROLE_NURSE') DEFAULT 'ROLE_NURSE'")
+    private Role role = Role.ROLE_NURSE;
 
     @Column(name = "license_number", unique = true)
     private String licenseNumber;
@@ -94,7 +94,7 @@ public class User implements UserDetails {
     // UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

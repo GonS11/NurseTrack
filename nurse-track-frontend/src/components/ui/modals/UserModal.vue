@@ -3,7 +3,6 @@
     <div class="modal">
       <h2>{{ createUserMode ? 'New User' : 'Edit User' }}</h2>
       <form @submit.prevent="submitForm">
-        <!-- First Name -->
         <div class="form-group">
           <label>First Name</label>
           <input v-model="formData.firstname" />
@@ -12,7 +11,6 @@
           </div>
         </div>
 
-        <!-- Last Name -->
         <div class="form-group">
           <label>Last Name</label>
           <input v-model="formData.lastname" />
@@ -21,7 +19,6 @@
           </div>
         </div>
 
-        <!-- Create-only fields -->
         <template v-if="createUserMode">
           <div class="form-group">
             <label>Username</label>
@@ -48,18 +45,6 @@
           </div>
         </template>
 
-        <!-- Edit-only Status -->
-        <template v-else>
-          <div class="form-group">
-            <label>Status</label>
-            <select v-model="formData.isActive">
-              <option :value="true">Active</option>
-              <option :value="false">Inactive</option>
-            </select>
-          </div>
-        </template>
-
-        <!-- Role -->
         <div class="form-group">
           <label>Role</label>
           <select v-model="formData.role">
@@ -77,13 +62,8 @@
           </div>
         </div>
 
-        <!-- License -->
         <div
-          v-if="
-            createUserMode &&
-            (formData.role === UserRole.NURSE ||
-              formData.role === UserRole.SUPERVISOR)
-          "
+          v-if="[UserRole.NURSE, UserRole.SUPERVISOR].includes(formData.role)"
           class="form-group"
         >
           <label>License Number</label>
@@ -93,7 +73,17 @@
           </div>
         </div>
 
-        <!-- Form actions -->
+        <div v-if="!createUserMode" class="form-group">
+          <label>Status</label>
+          <select v-model="formData.isActive">
+            <option :value="true">Active</option>
+            <option :value="false">Inactive</option>
+          </select>
+          <div v-if="errors.isActive" class="error">
+            {{ errors.isActive[0] }}
+          </div>
+        </div>
+
         <div class="form-actions">
           <button type="button" @click="close">Cancel</button>
           <button type="submit">
@@ -108,86 +98,108 @@
 <script setup lang="ts">
 import { reactive, watch, computed } from 'vue';
 import {
-  UserSchemas,
+  UserSchemas, // <--- Make sure this import is present!
   type CreateUserRequest,
   type UpdateUserRequest,
   type UserResponse,
 } from '../../../types/schemas/user.schema';
 import { UserRole, UserRoleData } from '../../../types/enums/user-role.enum';
-import type { ZodError } from 'zod';
 
 const props = defineProps<{
   isOpen: boolean;
   user: UserResponse | null;
 }>();
+
 const emit = defineEmits(['close', 'submit']);
 
-const createUserMode = computed(() => !props.user);
-
-// Form data
 const formData = reactive<
   Omit<CreateUserRequest, 'id' | 'createdAt'> & Partial<UpdateUserRequest>
 >({
   firstname: '',
   lastname: '',
   role: UserRole.NURSE,
-  licenseNumber: '',
+  licenseNumber: undefined,
   username: '',
   email: '',
   password: '',
   isActive: true,
 });
 
-// Errors object: field -> array of messages
 const errors = reactive<Record<string, string[]>>({});
+const createUserMode = computed(() => !props.user);
 
-// Reset or fill form when prop.user changes
+const resetForm = () => {
+  Object.assign(formData, {
+    firstname: '',
+    lastname: '',
+    role: UserRole.NURSE,
+    licenseNumber: undefined,
+    username: '',
+    email: '',
+    password: '',
+    isActive: true,
+  });
+  Object.keys(errors).forEach((k) => delete errors[k]);
+};
+
 watch(
   () => props.user,
   (user) => {
-    Object.keys(errors).forEach((k) => delete errors[k]);
     if (user) {
       Object.assign(formData, {
         firstname: user.firstname,
         lastname: user.lastname,
         role: user.role,
-        licenseNumber: user.licenseNumber || '',
+        licenseNumber: user.licenseNumber || undefined,
+        username: user.username,
+        email: user.email,
+        password: '',
         isActive: user.isActive,
-        // no update for username/email/password
       });
     } else {
-      Object.assign(formData, {
-        firstname: '',
-        lastname: '',
-        username: '',
-        email: '',
-        password: '',
-        role: UserRole.NURSE,
-        licenseNumber: '',
-        isActive: true,
-      });
+      resetForm();
     }
   },
   { immediate: true },
 );
 
-// On submit, validate and show errors
+watch(
+  () => props.isOpen,
+  (newVal) => {
+    if (!newVal) {
+      resetForm();
+    }
+  },
+);
+
 const submitForm = () => {
-  // Clear previous errors
-  Object.keys(errors).forEach((k) => delete errors[k]);
+  Object.keys(errors).forEach((k) => delete errors[k]); // Clear previous errors
 
-  // Choose schema
+  // Clean empty fields before validation (crucial for partial updates)
+  const cleanData: any = { ...formData };
+  // Only remove empty strings if they are not required by the current schema.
+  // For Zod's .partial() and .optional(), it handles undefined correctly.
+  // If a field is empty string, it should ideally be explicitly `undefined` for partials
+  // or validated as an empty string if required.
+  // Given your schemas, let's convert empty strings for optional fields to undefined.
+  for (const key in cleanData) {
+    if (cleanData[key] === '') {
+      cleanData[key] = undefined; // Convert empty strings to undefined for optional fields
+    }
+  }
+
+  // Determine which Zod schema to use (create or update)
   const schema = createUserMode.value ? UserSchemas.create : UserSchemas.update;
+  const result = schema.safeParse(cleanData); // Validate the cleaned data
 
-  const result = schema.safeParse(formData);
   if (result.success) {
+    // If validation passes, emit the 'submit' event with the parsed data
     emit('submit', result.data);
-    close();
   } else {
-    const err = result.error as ZodError;
-    // Populate errors[field] = [messages...]
-    err.flatten().fieldErrors; // Record<string, string[]>
-    Object.assign(errors, err.flatten().fieldErrors);
+    // If validation fails, populate the errors object for display
+    const flattened = result.error.flatten();
+    Object.assign(errors, flattened.fieldErrors);
+    console.error('Validation errors:', flattened.fieldErrors);
   }
 };
 

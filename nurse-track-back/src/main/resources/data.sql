@@ -2,10 +2,10 @@
 INSERT INTO users (
     firstname, lastname, username, email, password, role, license_number, is_active
 ) VALUES
-    ('Admin',      'Admin',   'admin1',   'admin@example.com', '$2a$10$BallFZIuncRKa2pTbXdlyuJIJBe1E1HgwWFfz644o.PILvXbkpUyC', 'ADMIN',      NULL,   TRUE),
-    ('Supervisor', 'Super',   'super1',   'super@example.com', '$2a$10$mxUbp36Dl3xHRlxS5ERfoud7ogjktmZV85.iMblVUh0vtWZDZAngi', 'SUPERVISOR','12345678', TRUE),
-    ('Nurse',      'Nurse',    'nurse1',   'nurse@example.com', '$2a$10$FwM.zUecoItXHTfrF6qbSeHjEiKtVnXImUAccr3Ob8IBYxiMBVDC2', 'NURSE',     '11111111',TRUE),
-    ('Nurse2',     'Nurse2',   'nurse2',   'nurse2@example.com','$2a$10$4d24W7ELHF02eRMyTHGBreh/DroQv5FeCnEwEtYbp4tYggU/FoZ0G', 'NURSE',     '22222222',TRUE);
+    ('Admin',      'Admin',   'admin1',   'admin@example.com', '$2a$10$BallFZIuncRKa2pTbXdlyuJIJBe1E1HgwWFfz644o.PILvXbkpUyC', 'ROLE_ADMIN',      NULL,   TRUE),
+    ('Supervisor', 'Super',   'super1',   'super@example.com', '$2a$10$mxUbp36Dl3xHRlxS5ERfoud7ogjktmZV85.iMblVUh0vtWZDZAngi', 'ROLE_SUPERVISOR','12345678', TRUE),
+    ('Nurse',      'Nurse',    'nurse1',   'nurse@example.com', '$2a$10$FwM.zUecoItXHTfrF6qbSeHjEiKtVnXImUAccr3Ob8IBYxiMBVDC2', 'ROLE_NURSE',     '11111111',TRUE),
+    ('Nurse2',     'Nurse2',   'nurse2',   'nurse2@example.com','$2a$10$4d24W7ELHF02eRMyTHGBreh/DroQv5FeCnEwEtYbp4tYggU/FoZ0G', 'ROLE_NURSE',     '22222222',TRUE);
 
 -- 2) Departamentos
 INSERT INTO departments (name, location, is_active)

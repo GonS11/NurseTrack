@@ -32,44 +32,45 @@ public class SecurityConfiguration {
         @Bean
         public AuthenticationEntryPoint restAuthenticationEntryPoint() {
                 return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                                authException.getMessage());
+                                                                                authException.getMessage());
         }
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                                // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(AbstractHttpConfigurer::disable)
-                                .httpBasic(AbstractHttpConfigurer::disable)
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
-                                                                "/api/auth/**",
-                                                                "/v3/api-docs/**",
-                                                                "/swagger-ui/**",
-                                                                "/swagger-ui.html")
-                                                .permitAll()
-                                                .anyRequest().authenticated())
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authenticationProvider(authenticationProvider)
-                                .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint()))
-                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // UNCOMMENT THIS LINE
+                        .csrf(AbstractHttpConfigurer::disable)
+                        .httpBasic(AbstractHttpConfigurer::disable)
+                        .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(
+                                        "/api/auth/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html")
+                                .permitAll()
+                                .anyRequest().authenticated())
+                        .sessionManagement(session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .authenticationProvider(authenticationProvider)
+                        .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint()))
+                        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
 
+        // This @Bean remains exactly as you had it, it's correct for localhost
         @Bean
         CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
                 configuration.setAllowedOrigins(List.of(
-                                "http://localhost:5173",
-                                "http://127.0.0.1:5173"));
+                        "http://localhost:5173",
+                        "http://127.0.0.1:5173"));
                 configuration.setAllowedMethods(Arrays.asList(
-                                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                        "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                 configuration.setAllowedHeaders(List.of("*"));
                 configuration.setExposedHeaders(List.of(
-                                "Authorization",
-                                "Content-Disposition"));
+                        "Authorization",
+                        "Content-Disposition"));
                 configuration.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

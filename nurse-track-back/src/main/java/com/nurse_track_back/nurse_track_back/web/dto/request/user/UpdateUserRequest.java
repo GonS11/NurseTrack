@@ -18,7 +18,7 @@ public class UpdateUserRequest {
     private String lastname;
 
     // @ValidPassword
-    private String password;
+    // private String password;
 
     private Role role;
 

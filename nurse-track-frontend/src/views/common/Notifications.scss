@@ -1,3 +1,5 @@
+@use 'sass:color';
+@use 'sass:map';
 @use '@/styles/main.scss' as *;
 
 .notifications-container {
@@ -9,8 +11,8 @@
 .notifications-header {
   @include flex-center(row);
   justify-content: space-between;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: map.get($spacers, 4);
+  padding-bottom: map.get($spacers, 3);
   border-bottom: 2px solid $gray-200;
 
   h1 {
@@ -60,7 +62,7 @@
 .empty-state {
   @include flex-center(column);
   gap: 1rem;
-  padding: 3rem;
+  padding: map.get($spacers, 5);
   text-align: center;
   color: $gray-600;
 
@@ -165,7 +167,7 @@
 .pagination-controls {
   @include flex-center(row);
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: map.get($spacers, 4);
   padding: 1rem;
   background: $white;
   border-radius: 0.5rem;

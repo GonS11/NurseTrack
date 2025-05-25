@@ -1,52 +1,39 @@
 <template>
-  <aside :class="{ 'is-expanded': isExpanded, mobile: isMobile }">
+  <aside :class="{ 'is-open': isOpen, 'is-mobile': isMobile }">
     <div class="logo">
-      <img src="../../assets/img/Nursetrack-logo.png" alt="NurseTrack" />
+      <img src="../../assets/img/Nursetrack-logo.png" alt="Logo" />
     </div>
-
-    <div class="menu-toggle-wrap">
-      <button
-        class="menu-toggle"
-        @click="ToggleMenu"
-        :aria-expanded="isExpanded"
-        aria-controls="sidebar-menu"
-      >
-        <span class="material-icons"> keyboard_double_arrow_right </span>
-      </button>
-    </div>
-
-    <nav id="sidebar-menu" class="menu">
+    <button class="toggle" @click="$emit('toggle')" :aria-expanded="isOpen">
+      <span class="material-icons">
+        {{
+          isOpen ? 'keyboard_double_arrow_left' : 'keyboard_double_arrow_right'
+        }}
+      </span>
+    </button>
+    <nav class="menu">
       <RouterLink
         v-for="route in allowedRoutes"
         :key="route.name"
         :to="{ name: route.name }"
-        class="button"
-        active-class="active"
-        :aria-current="route.name === $route.name ? 'page' : null"
+        class="item"
+        exact-active-class="active"
+        @click="closeSidebarOnMobile"
       >
         <span class="material-icons">{{ route.icon }}</span>
         <span class="text">{{ route.text }}</span>
-
-        <!-- Badge solo para notificaciones -->
         <span
-          v-if="route.name === 'notifications' && unreadCount > 0"
+          v-if="route.name === 'notifications' && unreadCount"
           class="badge"
-          aria-label="Notificaciones no leídas"
+          >{{ unreadCount }}</span
         >
-          {{ unreadCount }}
-        </span>
       </RouterLink>
     </nav>
-
-    <div class="sidebar-footer">
+    <footer class="footer">
       <button @click="handleLogout" :disabled="isLoggingOut">
-        <span v-if="isLoggingOut">Closing...</span>
-        <template v-else>
-          <span class="material-icons">logout</span>
-          <span class="text">Close session</span>
-        </template>
+        <span class="material-icons">logout</span>
+        <span class="text">Salir</span>
       </button>
-    </div>
+    </footer>
   </aside>
 </template>
 
@@ -57,82 +44,99 @@ import { useAuthStore } from '../../services';
 import { UserRole } from '../../types/enums/user-role.enum';
 import { useNotificationStore } from '../../stores/notification.store';
 
+const props = defineProps<{
+  isOpen: boolean; // Renombrada de 'collapsed' a 'isOpen' para mayor claridad
+}>();
+
+const emit = defineEmits(['toggle']);
+
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
-
-// Sidebar state
-const isExpanded = ref(true);
 const isMobile = ref(window.innerWidth < 900);
 const isLoggingOut = ref(false);
 
-// Logout
 const handleLogout = async () => {
   isLoggingOut.value = true;
-  try {
-    await authStore.logout();
-  } finally {
-    isLoggingOut.value = false;
-  }
+  await authStore.logout();
+  isLoggingOut.value = false;
 };
 
-// Toggle sidebar
-const ToggleMenu = () => {
-  isExpanded.value = !isExpanded.value;
-  if (isMobile.value) {
-    document.body.style.overflow = isExpanded.value ? 'hidden' : 'auto';
+const closeSidebarOnMobile = () => {
+  // En móvil, si el sidebar está abierto (expandido), lo cerramos (colapsamos a solo iconos)
+  // Al hacer clic en un enlace.
+  if (isMobile.value && props.isOpen) {
+    emit('toggle');
   }
+  // No necesitamos controlar el overflow aquí, AppShell lo maneja.
 };
 
-// Rutas permitidas
 const allowedRoutes = computed(() => {
-  const role = authStore.user?.roles?.[0]?.authority;
-  const baseRoutes = [
+  const base = [
     { name: 'dashboard', icon: 'home', text: 'Inicio' },
     { name: 'profile', icon: 'person', text: 'Perfil' },
     { name: 'notifications', icon: 'notifications', text: 'Notificaciones' },
     { name: 'settings', icon: 'settings', text: 'Configuración' },
     { name: 'about', icon: 'info', text: 'Acerca de' },
   ];
-
-  if (role === UserRole.NURSE) {
-    baseRoutes.splice(
+  const role = authStore.user?.roles?.[0]?.authority;
+  if (role === UserRole.NURSE)
+    base.splice(
       1,
       0,
       { name: 'nurse-schedule', icon: 'calendar_today', text: 'Mis Turnos' },
       { name: 'nurse-shift-swap', icon: 'swap_horiz', text: 'Cambio de Turno' },
     );
-  }
-
-  if (role === UserRole.ADMIN) {
-    baseRoutes.splice(
+  if (role === UserRole.ADMIN)
+    base.splice(
       1,
       0,
       { name: 'admin-users', icon: 'group', text: 'Usuarios' },
       { name: 'admin-departments', icon: 'business', text: 'Departamentos' },
     );
-  }
-
-  return baseRoutes;
+  return base;
 });
 
-// Computed contador de no-leídas
 const unreadCount = computed(() => notificationStore.unreadNotifications);
 
-// Responsive handler
 const handleResize = () => {
   isMobile.value = window.innerWidth < 900;
-  if (!isMobile.value) isExpanded.value = true;
+  // Cuando se redimensiona a desktop, si el sidebar está abierto,
+  // nos aseguramos de que no tenga overflow oculto en el body
+  // y lo dejamos abierto (expandido) por defecto en desktop.
+  if (!isMobile.value) {
+    emit('toggle'); // Esto forzará el estado a 'isOpen = false' en AppShell si ya estaba abierto,
+    // y luego el onToggle de AppShell lo pondrá en true (expandido)
+    // si ya estaba expandido y pasó a no ser móvil.
+    // Para simplificar, en desktop siempre asumimos que está "expandido"
+    // visualmente, por lo que su estado de 'isOpen' es lo que controla el tamaño.
+  } else {
+    // Si es móvil y el sidebar estaba expandido, lo colapsamos (solo iconos)
+    // para que no ocupe demasiado espacio inicialmente.
+    if (props.isOpen) {
+      emit('toggle');
+    }
+  }
 };
 
-onMounted(async () => {
-  // Carga inicial de notificaciones
-  const user = authStore.currentUser;
-  if (user) {
-    await notificationStore.getAllNotifications(user.id);
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  // Al montar, si es móvil, asegúrate de que el sidebar esté colapsado (solo iconos)
+  // por defecto.
+  if (isMobile.value) {
+    if (props.isOpen) {
+      // Si AppShell lo inició como true, lo colapsamos.
+      emit('toggle');
+    }
+  } else {
+    // En desktop, por defecto debe estar abierto (expandido)
+    if (!props.isOpen) {
+      emit('toggle');
+    }
   }
 
-  window.addEventListener('resize', handleResize);
-  if (isMobile.value) isExpanded.value = false;
+  if (authStore.currentUser) {
+    notificationStore.getAllNotifications(authStore.currentUser.id);
+  }
 });
 
 onBeforeUnmount(() => {

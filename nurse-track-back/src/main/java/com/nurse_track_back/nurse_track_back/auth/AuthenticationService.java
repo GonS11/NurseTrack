@@ -27,7 +27,7 @@ public class AuthenticationService {
                                 .username(request.getUsername())
                                 .email(request.getEmail())
                                 .password(passwordEncoder.encode(request.getPassword()))
-                                .role(Role.NURSE) // Siempre nurse
+                                .role(Role.ROLE_NURSE) // Siempre nurse
                                 .licenseNumber(request.getLicenseNumber())
                                 .isActive(true)
                                 .build();

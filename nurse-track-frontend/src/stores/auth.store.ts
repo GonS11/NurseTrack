@@ -11,11 +11,45 @@ import api from '../api/axios';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as DecodedToken | null,
+    // Initialize token from localStorage if it exists
     token: localStorage.getItem('authToken') || null,
+    // user will be hydrated by the 'initializeAuth' action
+    user: null as DecodedToken | null,
   }),
 
   actions: {
+    // New action to initialize authentication state on app load
+    async initializeAuth() {
+      const storedToken = localStorage.getItem('authToken');
+      if (storedToken) {
+        try {
+          // Attempt to decode the token to get user data
+          const decoded = jwtDecode<DecodedToken>(storedToken);
+
+          // Optional: Check if token is expired (based on 'exp' field)
+          const currentTime = Date.now() / 1000; // current time in seconds
+          if (decoded.exp < currentTime) {
+            console.warn('Stored JWT token is expired. Logging out.');
+            this.logout();
+            return; // Exit if expired
+          }
+
+          // If valid and not expired, set the state
+          this.token = storedToken;
+          this.user = decoded;
+          // Set the Authorization header for Axios here as well
+          api.defaults.headers.common.Authorization = `Bearer ${storedToken}`;
+          console.log('Authentication state rehydrated from localStorage.');
+        } catch (e) {
+          console.error('Failed to decode or validate stored token:', e);
+          this.logout(); // Clear invalid token
+        }
+      } else {
+        // No token in localStorage, ensure state is clear
+        this.logout();
+      }
+    },
+
     async login(username: string, password: string) {
       try {
         const response = await useAuthService.authenticate({
@@ -23,20 +57,19 @@ export const useAuthStore = defineStore('auth', {
           password,
         });
 
-        // 1) guarda token
         this.token = response.token;
         localStorage.setItem('authToken', response.token);
 
-        // 2) hidrata el header
+        // Ensure Axios default header is set
         api.defaults.headers.common.Authorization = `Bearer ${response.token}`;
 
-        // 3) decodifica usuario
         this.user = jwtDecode<DecodedToken>(response.token);
         console.log('Authenticated user: ', this.user);
 
         return response;
       } catch (error) {
         console.error('Login error: ', error);
+        // It's good that you logout here, but ensure it's not double-logged
         this.logout();
         throw error;
       }
@@ -45,7 +78,6 @@ export const useAuthStore = defineStore('auth', {
     async register(request: RegisterRequest): Promise<AuthenticationResponse> {
       try {
         const response = await useAuthService.register(request);
-
         console.log('Correct register: ', response);
         return response;
       } catch (error) {
@@ -58,17 +90,27 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       this.user = null;
       localStorage.removeItem('authToken');
+      // Ensure Axios default header is removed on logout
       delete api.defaults.headers.common.Authorization;
     },
 
+    // getCurrentUser is now mostly handled by initializeAuth on app load,
+    // but useful if you explicitly need to refresh user data from token later.
+    // However, for initial load, initializeAuth is more robust.
     async getCurrentUser() {
       if (!this.token) {
         this.logout();
         throw new Error('No hay token de autenticación');
       }
       try {
-        // jwtDecode lanzará si el token está expirado o mal formado
         const userData = jwtDecode<DecodedToken>(this.token);
+        // Optional: Add expiration check here too if this function is called often
+        const currentTime = Date.now() / 1000;
+        if (userData.exp < currentTime) {
+          console.warn('JWT token is expired in getCurrentUser. Logging out.');
+          this.logout();
+          throw new Error('Token expirado');
+        }
         this.user = userData;
       } catch (e) {
         console.error('Token inválido o expirado:', e);
@@ -79,7 +121,7 @@ export const useAuthStore = defineStore('auth', {
   },
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.token && !!state.user, // Ensure user object is also present
     isAdmin: (state) =>
       state.user?.roles?.some((r) => r.authority === UserRole.ADMIN),
     isSupervisor: (state) =>

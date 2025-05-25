@@ -20,7 +20,7 @@ public class CreateVacationRequest
 {
     @NotNull(message = "Requesting nurse ID is required")
     @Positive(message = "Requesting nurse ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.NURSE}, message = "User must have the role of Nurse")
+    @ValidUserRole(allowedRoles = {Role.ROLE_NURSE}, message = "User must have the role of Nurse")
     @ValidUserId(message = "Invalid nurse ID")
     private Long requestingNurseId;
 
@@ -39,7 +39,7 @@ public class CreateVacationRequest
     private RequestStatus status = RequestStatus.PENDING;
 
     @Positive(message = "Reviewed by ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.SUPERVISOR}, message = "User must have the role of Supervisor")
+    @ValidUserRole(allowedRoles = {Role.ROLE_SUPERVISOR}, message = "User must have the role of Supervisor")
     @ValidUserId(message = "Invalid supervisor ID")
     private Long reviewedById;
 }

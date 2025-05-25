@@ -22,7 +22,7 @@ public class CreateShiftChangeRequest
 {
     @NotNull(message = "Requesting nurse ID is required")
     @Positive(message = "Requesting nurse ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.NURSE})
+    @ValidUserRole(allowedRoles = {Role.ROLE_NURSE})
     @ValidUserId
     private Long requestingNurseId;
 
@@ -33,7 +33,7 @@ public class CreateShiftChangeRequest
 
     @NotNull(message = "Receiving nurse ID is required")
     @Positive(message = "Receiving nurse ID must be a positive number")
-    @ValidUserRole(allowedRoles = {Role.NURSE})
+    @ValidUserRole(allowedRoles = {Role.ROLE_NURSE})
     @ValidUserId
     private Long receivingNurseId;
 

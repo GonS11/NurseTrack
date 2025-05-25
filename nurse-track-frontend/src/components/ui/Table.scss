@@ -1,3 +1,5 @@
+@use 'sass:color';
+@use 'sass:map';
 @use '@/styles/main.scss' as *;
 
 .data-table {
@@ -8,7 +10,7 @@
 }
 
 .table-header {
-  padding: 1.5rem;
+  padding: map.get($spacers, 4);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -115,7 +117,7 @@ table {
 .pagination-controls {
   @include flex-center(row);
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: map.get($spacers, 3) map.get($spacers, 4);
   border-top: 1px solid $gray-200;
 
   .pagination-info {

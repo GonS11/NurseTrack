@@ -23,7 +23,7 @@ public class AssignSupervisorRequest
     private Long departmentId;
 
     @NotNull(message = "Supervisor ID is required")
-    @ValidUserRole(allowedRoles = {Role.SUPERVISOR}, message = "User must have the role of Supervisor")
+    @ValidUserRole(allowedRoles = {Role.ROLE_SUPERVISOR}, message = "User must have the role of Supervisor")
     @ValidUserId(message = "Invalid supervisor ID")
     private Long supervisorId;
 }

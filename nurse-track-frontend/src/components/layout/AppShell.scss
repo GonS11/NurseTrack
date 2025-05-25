@@ -1,49 +1,48 @@
 @use 'sass:color';
+@use 'sass:map';
 @use '@/styles/main.scss' as *;
 
 .app-shell {
   display: flex;
-  min-height: 100vh;
-  background: $background;
   position: relative;
+  background: $background;
+  min-height: 100vh;
+
+  .overlay {
+    display: none; // Por defecto oculto
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 900;
+    transition: opacity $transition;
+    opacity: 0; // Estado inicial para transición
+
+    // Se muestra solo cuando el sidebar está abierto y es móvil
+    .app-shell.sidebar-open & {
+      display: block;
+      opacity: 1;
+    }
+  }
 
   main {
     flex: 1;
-    padding: $spacer * 2;
-    transition: padding-left $transition;
-    min-width: 0; // Permite que el contenido se comprima
+    margin-left: $sidebar-width !important; // Margen por defecto para sidebar colapsado
+    padding: map.get($spacers, 4);
+    transition: margin-left $transition, filter $transition;
 
-    // Desktop behavior
-    @include responsive(desktop-up) {
-      padding-left: 4.5rem;
+    &.sidebar-shifted {
+      margin-left: $expanded-sidebar-width; // Margen para sidebar expandido en desktop
+    }
 
-      &.is-collapsed {
-        padding-left: 16rem;
+    // Efecto de atenuación cuando el sidebar móvil está abierto
+    .app-shell.sidebar-open & {
+      @media (max-width: map.get($breakpoints, tablet)) {
+        filter: brightness(0.7);
       }
     }
 
-    // Tablet behavior
-    @include responsive(tablet) {
-      padding-left: 4.5rem;
-      transition: transform $transition;
-
-      &.is-collapsed {
-        padding-left: 4.5rem;
-      }
-    }
-
-    // Mobile behavior
-    @include responsive(phone) {
-      padding: 1rem;
-      padding-left: 0;
-      margin-left: 0;
-      transform: none;
-
-      // Cuando sidebar está abierto
-      .sidebar-open & {
-        transform: translateX(16rem);
-        padding-left: 1rem;
-      }
+    @media (max-width: map.get($breakpoints, tablet)) {
+      //Cambiar la tabla de direccion o algo o reducir campos para asegurar que se ven todos los campos
     }
   }
 }

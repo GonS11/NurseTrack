@@ -3,50 +3,74 @@
 @use '@/styles/main.scss' as *;
 
 aside {
-  $sidebar-width: 4.5rem;
-  $expanded-width: 16rem;
-  $mobile-breakpoint: map.get($breakpoints, tablet);
-
   display: flex;
   flex-direction: column;
-  width: $sidebar-width;
+  width: $sidebar-width; // Ancho por defecto (colapsado)
   min-height: 100dvh;
-  padding: 1rem 0.5rem;
+  padding: map.get($spacers, 2) map.get($spacers, 1);
   background: $white;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
-  transition: width $transition;
-  position: fixed;
+  transition: width $transition, transform $transition;
+  position: fixed; // Fixed para que no haga scroll con el contenido
   z-index: 1000;
+  overflow: hidden; // Para ocultar el texto de los ítems cuando está colapsado
 
   .logo {
-    padding: 0 0.5rem;
-    margin-bottom: 1.5rem;
+    opacity: 0; // Oculto por defecto
+    padding: 0 map.get($spacers, 1);
+    margin-bottom: map.get($spacers, 3);
     @include flex-center;
+    transition: opacity $transition; // Transición para la visibilidad del logo
 
     img {
-      width: 100%;
       max-width: 2.5rem;
-      transition: filter 0.3s ease;
     }
   }
 
-  .menu-toggle-wrap {
-    position: absolute;
-    top: 1rem;
-    right: -1.75rem;
+  &.is-open {
+    width: $expanded-sidebar-width; // Ancho expandido
+
+    .menu .item .text,
+    footer.footer button .text {
+      opacity: 1;
+      transition-delay: 0.1s;
+    }
+
+    .logo {
+      opacity: 1;
+    }
+  }
+
+  .toggle {
+    position: absolute; // Posición absoluta para el botón de toggle
+    top: map.get($spacers, 2);
+    left: map.get($spacers, 2); // Por defecto a la izquierda para desktop
     background: $white;
     border-radius: 50%;
+    padding: map.get($spacers, 1);
     @include box-shadow(1);
+    transition: $transition;
+    z-index: 1001; // Asegura que esté por encima del overlay
 
-    .menu-toggle {
-      padding: 0.5rem;
-      transform: rotate(0deg);
+    &:hover {
+      background: rgba($primary, 0.1);
+      transform: scale(1.05);
+    }
+
+    .material-icons {
+      color: $primary;
       transition: transform $transition;
+    }
 
-      .material-icons {
-        color: $primary;
-        font-size: 1.5rem;
-      }
+    // El botón de toggle en móvil se queda a la derecha del sidebar colapsado.
+    // Esto es vital: si el sidebar está colapsado, el botón debe estar a su derecha.
+    @media (max-width: map.get($breakpoints, tablet)) {
+      left: auto; // Restablecemos la posición de la izquierda
+      right: map.get(
+        $spacers,
+        2
+      ); // Posicionamos a la derecha para que quede fijo.
+      z-index: 1002; // Mayor z-index para que sea siempre clickeable
     }
   }
 
@@ -54,59 +78,28 @@ aside {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: map.get($spacers, 1);
+    padding: 0 map.get($spacers, 1);
 
-    .button {
+    .item {
       position: relative;
       display: flex;
       align-items: center;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
+      padding: map.get($spacers, 2);
+      border-radius: $btn-border-radius;
       color: $gray-600;
+      transition: $transition;
+      list-style: none;
       text-decoration: none;
-      transition: all 0.2s ease;
 
-      .material-icons {
-        flex-shrink: 0;
-        font-size: 1.5rem;
-        margin-right: 1rem;
-        color: inherit;
-      }
-
-      .text {
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        font-weight: 500;
-      }
-
-      .badge {
-        position: absolute;
-        right: 0.75rem;
-        background: $error;
-        color: $white;
-        font-size: 0.75rem;
-        min-width: 1.25rem;
-        height: 1.25rem;
-        border-radius: 0.625rem;
-        @include flex-center;
-      }
-
-      &:hover:not(.active) {
+      &:hover {
         background: rgba($primary, 0.08);
-        color: $primary;
-      }
-
-      &:focus-visible {
-        outline: 2px solid $primary;
-        outline-offset: -2px;
       }
 
       &.active {
         background: rgba($primary, 0.12);
         color: $primary;
         font-weight: 600;
-        animation: activeFade 0.3s ease;
 
         &::before {
           content: '';
@@ -114,82 +107,140 @@ aside {
           left: 0;
           top: 50%;
           transform: translateY(-50%);
-          height: 60%;
+          height: 50%;
           width: 3px;
           background: $primary;
           border-radius: 0 4px 4px 0;
         }
       }
-    }
-  }
 
-  @keyframes activeFade {
-    0% {
-      background: transparent;
-    }
-    100% {
-      background: rgba($primary, 0.12);
-    }
-  }
-
-  @include responsive(tablet) {
-    transform: translateX(-100%);
-    transition: transform $transition;
-
-    .sidebar-open & {
-      transform: translateX(0);
-      width: $expanded-width;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-
-      + main {
-        transform: translateX(16rem);
+      .material-icons {
+        font-size: 1.5rem;
+        margin-right: map.get($spacers, 2);
       }
-    }
 
-    &.is-expanded {
-      transform: translateX(0);
-      width: $expanded-width;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-    }
+      .text {
+        opacity: 0; // Oculto por defecto
+        transition: opacity 0.2s ease;
+        white-space: nowrap;
+      }
 
-    &.mobile {
-      .menu-toggle-wrap {
-        right: -2.5rem;
+      .badge {
+        position: absolute;
+        right: map.get($spacers, 2);
+        background: $error;
+        color: $white;
+        min-width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.625rem;
+        @include flex-center;
+        font-size: 0.75rem;
       }
     }
   }
 
-  .sidebar-footer {
+  footer.footer {
     margin-top: auto;
     border-top: 1px solid $gray-200;
-    padding-top: 0.5rem;
+    padding: map.get($spacers, 2) map.get($spacers, 1);
+
+    button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: map.get($spacers, 2);
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: $gray-600;
+      transition: $transition;
+      border-radius: $btn-border-radius;
+
+      &:hover:not([disabled]) {
+        background: rgba($primary, 0.08);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .material-icons {
+        font-size: 1.5rem;
+        margin-right: map.get($spacers, 2);
+      }
+      .text {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        white-space: nowrap;
+      }
+    }
   }
 
-  &.is-expanded {
-    width: $expanded-width;
+  // Comportamiento para dispositivos móviles (is-mobile)
+  &.is-mobile {
+    // Cuando es móvil, el sidebar siempre tiene el ancho colapsado por defecto.
+    width: $sidebar-width;
+    // Eliminamos el translateX(-100%) por defecto, el sidebar siempre estará visible.
+    transform: translateX(0);
+    z-index: 1000; // Asegura que esté por encima del contenido principal
 
-    .menu-toggle-wrap .menu-toggle {
-      transform: rotate(180deg);
+    // Solo se "transforma" cuando se expande
+    &.is-open {
+      transform: translateX(0); // Asegura que esté visible
+      width: $expanded-sidebar-width; // Se expande
+      box-shadow: 8px 0 24px rgba(0, 0, 0, 0.15); // Añade sombra al expandir
     }
 
-    .menu .button .text {
+    // En móvil, cuando está expandido, se muestran los textos
+    &.is-open {
+      .menu .item .text,
+      footer.footer button .text {
+        opacity: 1;
+        transition-delay: 0.1s;
+      }
+    }
+
+    // En móvil, cuando está colapsado (no .is-open), los textos están ocultos
+    &:not(.is-open) {
+      .menu .item .text,
+      footer.footer button .text {
+        opacity: 0;
+      }
+    }
+
+    // En móvil, el logo también permanece oculto a menos que el sidebar esté expandido
+    &:not(.is-open) .logo {
+      opacity: 0;
+    }
+    &.is-open .logo {
       opacity: 1;
     }
   }
 
-  @include responsive(tablet) {
-    width: $sidebar-width !important;
-
-    &.is-expanded {
-      width: $expanded-width !important;
-    }
+  // Media queries para ajustes finos si es necesario, pero el is-mobile ya maneja mucho.
+  @media (max-width: map.get($breakpoints, tablet)) {
+    // Si el main tiene que ocupar todo el ancho cuando el sidebar está colapsado,
+    // esto se maneja en AppShell.scss. Aquí solo nos ocupamos del sidebar.
   }
+}
 
-  @media (max-width: 480px) {
-    width: 0 !important;
+// Estilos del overlay, solo para cuando el sidebar móvil esté abierto
+// (en este caso, 'expanded' o 'is-open' en móvil).
+.app-shell .overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 900;
+  transition: opacity $transition;
+  opacity: 0;
 
-    &.is-expanded {
-      width: $expanded-width !important;
+  // El overlay solo se muestra cuando el sidebar móvil está abierto y es móvil
+  .app-shell.sidebar-open & {
+    @media (max-width: map.get($breakpoints, tablet)) {
+      display: block;
+      opacity: 1;
     }
   }
 }

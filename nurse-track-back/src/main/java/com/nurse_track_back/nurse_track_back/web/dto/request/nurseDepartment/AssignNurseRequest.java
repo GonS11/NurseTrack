@@ -23,7 +23,7 @@ public class AssignNurseRequest
     private Long departmentId;
 
     @NotNull(message = "Nurse ID is required")
-    @ValidUserRole(allowedRoles = {Role.NURSE}, message = "User must have the role of Nurse")
+    @ValidUserRole(allowedRoles = {Role.ROLE_NURSE}, message = "User must have the role of Nurse")
     @ValidUserId(message = "Invalid nurse ID")
     private Long nurseId;
 }

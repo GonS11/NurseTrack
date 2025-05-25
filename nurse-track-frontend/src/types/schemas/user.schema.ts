@@ -11,6 +11,7 @@ export const UserSchemas = {
       password: validation.password(),
       role: validation.userRole(),
       licenseNumber: validation.optionalLicenseNumber(),
+      isActive: z.boolean().optional().default(true),
     })
     .strict(),
 
@@ -18,12 +19,11 @@ export const UserSchemas = {
     .object({
       firstname: validation.optionalString(1, 50),
       lastname: validation.optionalString(1, 50),
-      password: validation.optionalPassword(),
       role: validation.userRole().optional(),
       licenseNumber: validation.optionalLicenseNumber(),
       isActive: z.boolean().optional(),
     })
-    .strict(),
+    .partial(),
 
   response: z
     .object({
@@ -33,7 +33,7 @@ export const UserSchemas = {
       username: validation.requiredString(),
       email: validation.email(),
       role: validation.userRole(),
-      licenseNumber: z.string().optional(),
+      licenseNumber: z.string(),
       isActive: z.boolean(),
       createdAt: validation.dateTime(),
     })

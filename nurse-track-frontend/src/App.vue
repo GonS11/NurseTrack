@@ -13,11 +13,10 @@ const authStore = useAuthStore();
 
 watchEffect(async () => {
   const isPublic = route.meta.public;
-  const currentName = route.name;
-
+  // This `isAuthenticated` will now reflect the rehydrated state
   if (!authStore.isAuthenticated && !isPublic) {
     await router.replace({ name: 'login' });
-  } else if (authStore.isAuthenticated && currentName === 'login') {
+  } else if (authStore.isAuthenticated && route.name === 'login') {
     const redirect = route.query.redirect?.toString() || 'dashboard';
     await router.replace({ name: redirect });
   }

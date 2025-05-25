@@ -36,7 +36,7 @@ public class UserCreationValidator implements ConstraintValidator<ValidUserCreat
         }
 
         //License number para supervisor y nurse
-        if((request.getRole() == Role.SUPERVISOR || request.getRole() == Role.NURSE)
+        if((request.getRole() == Role.ROLE_SUPERVISOR || request.getRole() == Role.ROLE_NURSE)
                 && (request.getLicenseNumber() == null || request.getLicenseNumber().isBlank()))
         {
             ValidationUtils.addValidationError(context,"licenseNumber", "License number required");

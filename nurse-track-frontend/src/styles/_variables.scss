@@ -1,5 +1,5 @@
-// src/styles/_variables.scss
 @use 'sass:color';
+@use 'sass:map';
 
 // Colores
 $primary: #2a7f8b;
@@ -7,11 +7,9 @@ $primary-hover: #1e5e69;
 $secondary: #6c757d;
 $success: #4caf50;
 $error: #e53935;
-$background: #f8fbfd;
+$background: #6ca1a8d5;
 $text-primary: #2d3748;
 
-// Nuevas variables para el login
-$input-focus-glow: rgba(42, 127, 139, 0.2);
 $card-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.1);
 
 // Escala de grises
@@ -23,8 +21,7 @@ $gray-400: #ced4da;
 $gray-500: #adb5bd;
 $gray-600: #6c757d;
 $gray-700: #495057;
-$gray-800: #343a40;
-$gray-900: #212529;
+$black: #000000;
 
 // Colores contextuales utilizando color.adjust
 $error-bg: color.adjust($error, $lightness: 35%);
@@ -51,8 +48,11 @@ $container-max-widths: (
   md: 720px,
   lg: 960px,
   xl: 1140px,
-  xxl: 1320px,
 );
+
+//Sidebar
+$sidebar-width: 4.5rem;
+$expanded-sidebar-width: 16.5rem;
 
 // Botones
 $btn-padding-y: 0.75rem;
@@ -68,3 +68,5 @@ $breakpoints: (
   tablet: 900px,
   desktop: 1200px,
 );
+
+$input-focus-glow: rgba($primary, 0.25);

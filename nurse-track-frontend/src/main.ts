@@ -1,18 +1,23 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import api from './api/axios';
 import App from './App.vue';
 import router from './router';
+import { useAuthStore } from './stores/auth.store'; // Import your auth store
 
 const app = createApp(App);
 const pinia = createPinia();
 
-// Si ya hay token guardado al recargar, lo inyectamos
-const existingToken = localStorage.getItem('authToken');
-if (existingToken) {
-  api.defaults.headers.common.Authorization = `Bearer ${existingToken}`;
-}
-
 app.use(pinia);
 app.use(router);
+
+// Initialize auth store AFTER pinia is installed, but BEFORE mounting the app
+// This ensures the store is ready and auth state is rehydrated before any
+// components or routes try to access it.
+const authStore = useAuthStore();
+// Using a promise here if initializeAuth was async, but it can be sync if just decoding.
+// If it has async calls (e.g. to refresh token), you might await it here,
+// though generally you wouldn't block app mount for initial token check.
+// For now, we'll let it run in the background.
+authStore.initializeAuth();
+
 app.mount('#app');
