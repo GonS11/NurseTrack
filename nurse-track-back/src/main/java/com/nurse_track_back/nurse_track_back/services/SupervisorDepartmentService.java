@@ -13,18 +13,21 @@ import com.nurse_track_back.nurse_track_back.web.dto.response.SupervisorDepartme
 import com.nurse_track_back.nurse_track_back.web.mappers.DepartmentMapper;
 import com.nurse_track_back.nurse_track_back.web.mappers.SupervisorDepartmentMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class SupervisorDepartmentService {
     private final SupervisorDepartmentRepository supervisorDepartmentRepository;
     private final DepartmentRepository departmentRepository;
@@ -66,15 +69,30 @@ public class SupervisorDepartmentService {
     }
 
     public void removeSupervisor(Long departmentId) {
-        SupervisorDepartment assignment = supervisorDepartmentRepository.findByDepartmentId(departmentId)
-                .orElseThrow(() -> ResourceNotFoundException.create("Assignment for department", departmentId));
+        log.info("Attempting to delete assignment for department ID: {}", departmentId);
+        SupervisorDepartment assignment = supervisorDepartmentRepository.findByDepartment_Id(departmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found for department ID: " + departmentId));
 
+        log.info("Found assignment with ID {} for department ID {}. Deleting...", assignment.getId(), departmentId);
         supervisorDepartmentRepository.delete(assignment);
+        log.info("Assignment with ID {} for department ID {} successfully deleted.", assignment.getId(), departmentId);
+
+        // --- DIAGNOSTIC CODE START ---
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            log.info("DIAGNOSTIC: Transaction is still active after delete operation.");
+            // You can even try to force a flush here, though delete should trigger it
+            // JpaTransactionManager will auto-flush before commit
+            // entityManager.flush(); // If you have EntityManager injected
+        } else {
+            log.warn("DIAGNOSTIC: No active transaction after delete operation. This is unexpected for a @Transactional method.");
+        }
+        // --- DIAGNOSTIC CODE END ---
     }
 
+
     public void validateSupervisorAccess(Long supervisorId, Long departmentId) {
-        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisorIdAndDepartmentId(supervisorId,
-                departmentId);
+        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisor_IdAndDepartment_Id(supervisorId,
+                                                                                                 departmentId);
 
         if (!hasAccess) {
             throw SecurityException.create("validateSupervisorAccess",

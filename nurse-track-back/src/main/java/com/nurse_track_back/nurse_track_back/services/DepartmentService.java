@@ -65,12 +65,12 @@ public class DepartmentService {
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getAllUserDepartments(Long userId) {
-        return departmentMapper.toDTOList(supervisorDepartmentRepository.findDepartmentsBySupervisorId(userId));
+        return departmentMapper.toDTOList(supervisorDepartmentRepository.findDepartmentsBySupervisor_Id(userId));
     }
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getDepartmentsForNurse(Long nurseId) {
-        List<NurseDepartment> assignments = nurseDepartmentRepository.findAllByNurseId(nurseId);
+        List<NurseDepartment> assignments = nurseDepartmentRepository.findAllByNurse_Id(nurseId);
 
         if (assignments.isEmpty()) {
             throw AssignmentException.create("Nurse", nurseId, assignments.getFirst().getDepartment().getId());

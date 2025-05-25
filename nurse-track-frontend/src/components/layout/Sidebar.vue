@@ -73,10 +73,7 @@ const closeSidebarOnMobile = () => {
 const allowedRoutes = computed(() => {
   const base = [
     { name: 'dashboard', icon: 'home', text: 'Inicio' },
-    { name: 'profile', icon: 'person', text: 'Perfil' },
     { name: 'notifications', icon: 'notifications', text: 'Notificaciones' },
-    { name: 'settings', icon: 'settings', text: 'Configuración' },
-    { name: 'about', icon: 'info', text: 'Acerca de' },
   ];
   const role = authStore.user?.roles?.[0]?.authority;
   if (role === UserRole.NURSE)
@@ -92,6 +89,16 @@ const allowedRoutes = computed(() => {
       0,
       { name: 'admin-users', icon: 'group', text: 'Usuarios' },
       { name: 'admin-departments', icon: 'business', text: 'Departamentos' },
+      {
+        name: 'supervisor-assignment',
+        icon: 'supervised_user_circle',
+        text: 'Supervisor Management',
+      },
+      {
+        name: 'nurse-assignment',
+        icon: 'person_add',
+        text: 'Nurse Management',
+      },
     );
   return base;
 });

@@ -51,12 +51,12 @@ public class NurseDepartmentService {
 
     @Transactional(readOnly = true)
     public List<NurseDepartmentResponse> getByDepartmentId(Long departmentId) {
-        return nurseDepartmentMapper.toDtoList(nurseDepartmentRepository.findAllByDepartmentId(departmentId));
+        return nurseDepartmentMapper.toDtoList(nurseDepartmentRepository.findAllByDepartment_Id(departmentId));
     }
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getDepartmentsByNurseId(Long nurseId) {
-        List<NurseDepartment> nurseDepartments = nurseDepartmentRepository.findAllByNurseId(nurseId);
+        List<NurseDepartment> nurseDepartments = nurseDepartmentRepository.findAllByNurse_Id(nurseId);
 
         return nurseDepartments
                 .stream()
@@ -72,14 +72,14 @@ public class NurseDepartmentService {
     }
 
     public void removeNurseFromDepartment(Long nurseId, Long departmentId) {
-        if (!nurseDepartmentRepository.existsByNurseIdAndDepartmentId(nurseId, departmentId)) {
+        if (!nurseDepartmentRepository.existsByNurse_IdAndDepartment_Id(nurseId, departmentId)) {
             throw AssignmentException.create("Nurse", nurseId, departmentId);
         }
-        nurseDepartmentRepository.deleteByNurseIdAndDepartmentId(nurseId, departmentId);
+        nurseDepartmentRepository.deleteByNurse_IdAndDepartment_Id(nurseId, departmentId);
     }
 
     public void validateNurseAccess(Long nurseId, Long departmentId) {
-        if (!nurseDepartmentRepository.existsByNurseIdAndDepartmentId(nurseId, departmentId)) {
+        if (!nurseDepartmentRepository.existsByNurse_IdAndDepartment_Id(nurseId, departmentId)) {
             throw SecurityException.create("validateNurseAccess",
                     "Nurse with ID " + nurseId + " does not have access to department ID: " + departmentId);
         }
@@ -92,7 +92,7 @@ public class NurseDepartmentService {
     }
 
     public void validateNurseDepartmentAssociation(Long nurseId, Long departmentId) {
-        if (!nurseDepartmentRepository.existsByNurseIdAndDepartmentId(nurseId, departmentId)) {
+        if (!nurseDepartmentRepository.existsByNurse_IdAndDepartment_Id(nurseId, departmentId)) {
             throw AssignmentException.create("Nurse", nurseId, departmentId);
         }
     }

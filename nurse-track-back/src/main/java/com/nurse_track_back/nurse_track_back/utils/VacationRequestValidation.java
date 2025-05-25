@@ -34,7 +34,7 @@ public class VacationRequestValidation
 
     private void validateSupervisor(Long nurseId, Long supervisorId)
     {
-        if(!supervisorDepartmentRepository.existsByNurseIdAndSupervisorId(nurseId, supervisorId))
+        if(!supervisorDepartmentRepository.existsByNurse_IdAndSupervisor_Id(nurseId, supervisorId))
         {
             throw new InvalidRequestException("Supervisor does not belongs to nurse's department");
         }
@@ -61,7 +61,7 @@ public class VacationRequestValidation
     {
         if (newStatus == RequestStatus.APPROVED || newStatus == RequestStatus.REJECTED)
         {
-            boolean isValidSupervisor = supervisorDepartmentRepository.existsByNurseIdAndSupervisorId(
+            boolean isValidSupervisor = supervisorDepartmentRepository.existsByNurse_IdAndSupervisor_Id(
                     request.getRequestingNurse().getId(),
                     currentUserId
             );

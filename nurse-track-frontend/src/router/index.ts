@@ -6,7 +6,7 @@ import {
 import AppShell from '../components/layout/AppShell.vue';
 import { useAuthStore } from '../services';
 import { UserRole } from '../types/enums/user-role.enum';
-import About from '../components/layout/About.vue';
+//import About from '../components/layout/About.vue';
 
 // Lazy-loaded views
 const LoginPage = () => import('../views/auth/LoginPage.vue');
@@ -16,7 +16,9 @@ const AdminDashboard = () => import('../views/dashboard/AdminDashboard.vue');
 const UsersManagement = () => import('../views/admin/UsersManagement.vue');
 const DepartmentsManagement = () =>
   import('../views/admin/DepartmentsManagement.vue');
-const ShiftManagement = () => import('../views/admin/ShiftManagement.vue');
+const SupervisorAssignment = () =>
+  import('../views/admin/SupervisorAssignment.vue');
+const NurseAssignment = () => import('../views/admin/NurseAssignment.vue');
 
 // Supervisor
 const SupervisorDashboard = () =>
@@ -36,9 +38,7 @@ const RequestShiftSwap = () => import('../views/nurse/RequestShiftSwap.vue');
 const RequestVacation = () => import('../views/nurse/RequestVacation.vue');
 
 // Common
-const UserProfile = () => import('../views/common/UserProfile.vue');
 const Notifications = () => import('../views/common/Notifications.vue');
-const Settings = () => import('../views/common/Settings.vue');
 const NotFound = () => import('../views/common/NotFound.vue');
 
 const routes: RouteRecordRaw[] = [
@@ -111,7 +111,16 @@ const routes: RouteRecordRaw[] = [
             name: 'admin-departments',
             component: DepartmentsManagement,
           },
-          { path: 'shifts', name: 'admin-shifts', component: ShiftManagement },
+          {
+            path: 'supervisor-assignment',
+            name: 'supervisor-assignment',
+            component: SupervisorAssignment,
+          },
+          {
+            path: 'nurse-assignment',
+            name: 'nurse-assignment',
+            component: NurseAssignment,
+          },
         ],
       },
 
@@ -168,14 +177,11 @@ const routes: RouteRecordRaw[] = [
       },
 
       // Common routes
-      { path: 'profile', name: 'profile', component: UserProfile },
       {
         path: 'notifications',
         name: 'notifications',
         component: Notifications,
       },
-      { path: 'settings', name: 'settings', component: Settings },
-      { path: 'about', name: 'about', component: About },
 
       // 404 inside shell
       { path: ':pathMatch(.*)*', name: 'not-found', component: NotFound },

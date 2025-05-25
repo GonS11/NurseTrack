@@ -27,7 +27,7 @@ public class ShiftAuthorizationValidator
 
     private void validateCurrentDepartmentAccess(Long supervisorId, Shift shift)
     {
-        if (!supervisorDepartmentRepo.existsBySupervisorIdAndDepartmentId(supervisorId,shift.getDepartment().getId()))
+        if (!supervisorDepartmentRepo.existsBySupervisor_IdAndDepartment_Id(supervisorId, shift.getDepartment().getId()))
         {
             throw SecurityException.forbidden(supervisorId,"actual shift department with id " + shift.getId());
         }
@@ -36,7 +36,7 @@ public class ShiftAuthorizationValidator
     private void validateTargetDepartmentAccess(Long supervisorId, Long targetDepartmentId, Shift shift)
     {
         if (!targetDepartmentId.equals(shift.getDepartment().getId()) &&
-                !supervisorDepartmentRepo.existsBySupervisorIdAndDepartmentId(supervisorId, targetDepartmentId))
+                !supervisorDepartmentRepo.existsBySupervisor_IdAndDepartment_Id(supervisorId, targetDepartmentId))
         {
             throw SecurityException.forbidden(supervisorId, "actual department with id " + targetDepartmentId);
         }

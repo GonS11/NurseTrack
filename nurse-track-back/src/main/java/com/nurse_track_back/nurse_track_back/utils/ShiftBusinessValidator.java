@@ -51,7 +51,7 @@ public class ShiftBusinessValidator
         final Long targetNurseId = resolveTargetNurseId(shift, request);
         final Long targetDepartmentId = resolveTargetDepartmentId(shift, request);
 
-        if (!nurseDepartmentRepo.existsByNurseIdAndDepartmentId(targetNurseId, targetDepartmentId))
+        if (!nurseDepartmentRepo.existsByNurse_IdAndDepartment_Id(targetNurseId, targetDepartmentId))
         {
             throw AssignmentException.create("Nurse", targetNurseId, targetDepartmentId);
         }

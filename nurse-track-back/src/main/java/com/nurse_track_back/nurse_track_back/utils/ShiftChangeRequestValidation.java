@@ -53,7 +53,7 @@ public class ShiftChangeRequestValidation {
 
     private void validateReviewerForApproval(ShiftChangeRequest request, RequestStatus newStatus, Long currentUserId) {
         if (newStatus == RequestStatus.APPROVED || newStatus == RequestStatus.REJECTED) {
-            boolean isValidSupervisor = supervisorDepartmentRepository.existsByNurseIdAndSupervisorId(
+            boolean isValidSupervisor = supervisorDepartmentRepository.existsByNurse_IdAndSupervisor_Id(
                     request.getRequestingNurse().getId(),
                     currentUserId);
 

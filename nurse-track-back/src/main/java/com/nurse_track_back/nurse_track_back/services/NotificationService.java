@@ -30,14 +30,14 @@ public class NotificationService {
         userRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.create("User", id));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
-        Page<Notification> notificationsPage = notificationRepository.findByUserId(id, pageable);
+        Page<Notification> notificationsPage = notificationRepository.findByUser_Id(id, pageable);
 
         return notificationsPage.map(notificationMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
     public NotificationResponse getNotification(Long id, Long userId) {
-        return notificationRepository.findByIdAndUserId(id, userId)
+        return notificationRepository.findByIdAndUser_Id(id, userId)
                 .map(notificationMapper::toDTO)
                 .orElseThrow(() -> ResourceNotFoundException.create("Notification", id));
     }
@@ -56,7 +56,7 @@ public class NotificationService {
 
     @Transactional
     public void deleteNotification(Long id, Long userId) {
-        if (!notificationRepository.existsByIdAndUserId(id, userId))
+        if (!notificationRepository.existsByIdAndUser_Id(id, userId))
             throw ResourceNotFoundException.create("Notification", id);
 
         notificationRepository.deleteById(id);

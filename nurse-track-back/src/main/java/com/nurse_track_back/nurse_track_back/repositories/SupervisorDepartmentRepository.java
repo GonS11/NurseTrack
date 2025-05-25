@@ -14,10 +14,10 @@ import java.util.Optional;
 public interface SupervisorDepartmentRepository extends JpaRepository<SupervisorDepartment, Long> {
     Optional<SupervisorDepartment> findByDepartmentId(Long departmentId);
 
-    boolean existsBySupervisorIdAndDepartmentId(Long supervisorId, Long departmentId);
+    boolean existsBySupervisor_IdAndDepartment_Id(Long supervisorId, Long departmentId);
 
     @Query("SELECT sd.department FROM SupervisorDepartment sd WHERE sd.supervisor.id = :supervisorId")
-    List<Department> findDepartmentsBySupervisorId(@Param("supervisorId") Long supervisorId);
+    List<Department> findDepartmentsBySupervisor_Id(@Param("supervisorId") Long supervisorId);
 
     @Query("""
                 SELECT CASE WHEN COUNT(sd) > 0 THEN true ELSE false END
@@ -26,6 +26,8 @@ public interface SupervisorDepartmentRepository extends JpaRepository<Supervisor
                 WHERE nd.nurse.id = :nurseId
                 AND sd.supervisor.id = :supervisorId
             """)
-    boolean existsByNurseIdAndSupervisorId(@Param("nurseId") Long nurseId,
-            @Param("supervisorId") Long supervisorId);
+    boolean existsByNurse_IdAndSupervisor_Id(@Param("nurseId") Long nurseId,
+                                             @Param("supervisorId") Long supervisorId);
+
+    Optional<SupervisorDepartment> findByDepartment_Id(Long departmentId);
 }

@@ -14,9 +14,9 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long>
 {
-    Page<Notification> findByUserId(Long userId, Pageable pageable);
+    Page<Notification> findByUser_Id(Long userId, Pageable pageable);
 
-    Optional<Notification> findByIdAndUserId(Long id, Long userId);
+    Optional<Notification> findByIdAndUser_Id(Long id, Long userId);
 
     @Modifying
     @Query("UPDATE Notification n SET n.isRead = :isRead WHERE n.id = :id AND n.user.id = :userId")
@@ -24,5 +24,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
                           @Param("userId") Long userId,
                           @Param("isRead") Boolean isRead);
 
-    boolean existsByIdAndUserId(Long id, Long userId);
+    boolean existsByIdAndUser_Id(Long id, Long userId);
 }

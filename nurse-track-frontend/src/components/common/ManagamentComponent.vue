@@ -72,7 +72,7 @@ const props = defineProps({
   },
   updateItem: {
     type: Function as PropType<(id: number, formData: any) => Promise<void>>,
-    required: true,
+    required: false,
   },
   //Pa PK
   itemIdKey: {
@@ -112,9 +112,14 @@ const handleModalSubmitInternal = async (formData: any) => {
       //Si no entity selecionada es creacion
       await props.createItem(formData);
     } else {
-      // Update
-      const id = selectedEntity.value[props.itemIdKey];
-      await props.updateItem(id, formData);
+      if (props.updateItem) {
+        //Puede ser null si solo hay una accion
+        // Update
+        const id = selectedEntity.value[props.itemIdKey];
+        await props.updateItem(id, formData);
+      } else {
+        console.warn('Update operation not supported for this component type.');
+      }
     }
 
     closeModal();

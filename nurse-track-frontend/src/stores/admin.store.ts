@@ -363,20 +363,32 @@ export const useAdminStore = defineStore('admin', {
     },
 
     async removeSupervisorFromDepartment(departmentId: number) {
+      console.log(
+        'Attempting to remove supervisor from department ID:',
+        departmentId,
+      );
       try {
         await useAdminAssignmentService.removeSupervisorFromDepartment(
           departmentId,
         );
+        console.log(
+          'Backend call for removeSupervisorFromDepartment succeeded.',
+        );
 
+        // This client-side filter is just for immediate UI update;
+        // the getAllSupervisorAssignments call will truly refresh.
         this.supervisorAssignments.content =
           this.supervisorAssignments.content.filter(
             (assignment) => assignment.department.id !== departmentId,
           );
+        console.log('Client-side state updated.');
 
         await this.getAllSupervisorAssignments(
           this.supervisorAssignments.number,
         );
+        console.log('Table reloaded with current assignments.');
       } catch (e: any) {
+        console.error('Error during removeSupervisorFromDepartment:', e);
         this.error = e.response?.data?.message || e.message;
         throw e;
       }

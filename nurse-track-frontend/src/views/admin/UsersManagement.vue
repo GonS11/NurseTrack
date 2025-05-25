@@ -121,5 +121,5 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use 'UsersManagement.scss';
+@use 'AdminView.scss';
 </style>

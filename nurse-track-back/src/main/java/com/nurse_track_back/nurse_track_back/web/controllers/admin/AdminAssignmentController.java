@@ -1,5 +1,6 @@
 package com.nurse_track_back.nurse_track_back.web.controllers.admin;
 
+import com.nurse_track_back.nurse_track_back.exceptions.ResourceNotFoundException;
 import com.nurse_track_back.nurse_track_back.services.NurseDepartmentService;
 import com.nurse_track_back.nurse_track_back.services.SupervisorDepartmentService;
 import com.nurse_track_back.nurse_track_back.web.dto.request.nurseDepartment.AssignNurseRequest;
@@ -9,11 +10,14 @@ import com.nurse_track_back.nurse_track_back.web.dto.response.NurseDepartmentRes
 import com.nurse_track_back.nurse_track_back.web.dto.response.SupervisorDepartmentResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,12 +25,13 @@ import java.util.List;
 @RequestMapping("/api/admin/assignments/departments")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@Slf4j
 public class AdminAssignmentController {
     private final SupervisorDepartmentService supervisorDepartmentService;
     private final NurseDepartmentService nurseDepartmentService;
 
     // ==============================================
-    // ASIGNACIÓN DE SUPERVISORES (1:1 con departamento)
+    // ASIGNACIÓN DE SUPERVISORES (1:N con departamento)
     // ==============================================
 
     @GetMapping()
@@ -64,6 +69,15 @@ public class AdminAssignmentController {
     public ResponseEntity<Void> removeSupervisorFromDepartment(@PathVariable("departmentId") Long departmentId) {
         supervisorDepartmentService.removeSupervisor(departmentId);
         return ResponseEntity.noContent().build();
+    }
+
+    // Add this temporarily for debugging
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleControllerExceptions(Exception ex) {
+        // This will only catch exceptions thrown directly from this controller's methods
+        // or from service methods if they are not part of a separate transaction.
+        log.error("Error in AdminAssignmentController:", ex);
+        return new ResponseEntity<>("Controller Error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // ==============================================

@@ -16,7 +16,7 @@ public class NurseAssignmentValidator implements ConstraintValidator<ValidNurseA
     @Override
     public boolean isValid(AssignNurseRequest request, ConstraintValidatorContext context)
     {
-        if (nurseDepartmentRepository.existsByNurseIdAndDepartmentId(request.getNurseId(), request.getDepartmentId()))
+        if (nurseDepartmentRepository.existsByNurse_IdAndDepartment_Id(request.getNurseId(), request.getDepartmentId()))
         {
             ValidationUtils.addValidationError(context, "nurseId", "Nurse with id " + request.getNurseId()
                     + " is already assigned to the department with id "
