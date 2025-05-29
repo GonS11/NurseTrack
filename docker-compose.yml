@@ -10,19 +10,20 @@ services:
     ports:
       - '8080:8080'
     environment:
-      SPRING_DATASOURCE_URL: >-
-        jdbc:mysql://mysql:3306/nurse-track-back ?allowPublicKeyRetrieval=true
-        &useSSL=false &serverTimezone=UTC
+      # Simplificamos la URL a una sola línea para evitar problemas de espacios/saltos
+      SPRING_DATASOURCE_URL: 'jdbc:mysql://mysql:3306/nurse-track-back?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC'
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ''
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      # Ya no sobrescribimos ddl-auto aquí, toma el valor de application.properties
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
       SPRING_JPA_SHOW_SQL: 'true'
     depends_on:
-      - mysql
-    volumes:
-      - ./nurse-track-back/src:/app/src
-    # Si usas wait-for-it.sh, ajusta ENTRYPOINT en Dockerfile en lugar de aquí.
+      # ¡CAMBIO CLAVE AQUÍ! Esperamos a que el servicio MySQL esté 'healthy'
+      mysql:
+        condition: service_healthy
+    # Quitamos la sección volumes del backend si no la usas para desarrollo en caliente
+    # Ya que el Dockerfile copia los archivos.
+    # Si quieres hot-reloading de código, necesitarías un setup más avanzado.
 
   mysql:
     image: mysql:8.0
@@ -31,10 +32,9 @@ services:
     environment:
       MYSQL_DATABASE: nurse-track-back
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      # o bien: MYSQL_ROOT_PASSWORD: root
     ports:
       - '3306:3306'
-    healthcheck:
+    healthcheck: # Ya tenías un healthcheck, lo cual es excelente
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 10s
       timeout: 5s

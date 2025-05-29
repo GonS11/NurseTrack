@@ -25,7 +25,7 @@
         <ul v-if="assignedNurses.length > 0">
           <li v-for="assignment in assignedNurses" :key="assignment.nurse.id">
             {{ assignment.nurse.firstname }} {{ assignment.nurse.lastname }} ({{
-              assignment.nurse.email
+              assignment.nurse.username
             }})
             <button
               type="button"
@@ -75,15 +75,14 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue';
-import BaseModal from '../common/BaseModal.vue';
-import { useAdminStore } from '../../stores/admin.store';
+import type { DepartmentResponse } from '../../../types/schemas/department.schema';
+import { useAdminStore } from '../../../stores/admin.store';
 import type {
-  NurseDepartmentResponse,
   AssignNurseRequest,
-} from '../../types/schemas/assignments.schema';
-import type { DepartmentResponse } from '../../types/schemas/department.schema';
-import type { UserResponse } from '../../types/schemas/user.schema';
-import { UserRole } from '../../types/schemas/user.schema';
+  NurseDepartmentResponse,
+} from '../../../types/schemas/assignments.schema';
+import type { UserResponse } from '../../../types/schemas/user.schema';
+import { UserRole } from '../../../types/enums/user-role.enum';
 
 const props = defineProps<{
   isOpen: boolean;
