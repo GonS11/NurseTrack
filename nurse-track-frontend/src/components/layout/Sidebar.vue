@@ -6,7 +6,9 @@
     <button class="toggle" @click="$emit('toggle')" :aria-expanded="isOpen">
       <span class="material-icons">
         {{
-          isOpen ? 'keyboard_double_arrow_left' : 'keyboard_double_arrow_right'
+          isOpen && !isMobile
+            ? 'keyboard_double_arrow_left'
+            : 'keyboard_double_arrow_right'
         }}
       </span>
     </button>
@@ -38,21 +40,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useAuthStore } from '../../services';
 import { UserRole } from '../../types/enums/user-role.enum';
 import { useNotificationStore } from '../../stores/notification.store';
 
 const props = defineProps<{
-  isOpen: boolean; // Renombrada de 'collapsed' a 'isOpen' para mayor claridad
+  isOpen: boolean;
+  isMobile: boolean;
 }>();
 
 const emit = defineEmits(['toggle']);
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
-const isMobile = ref(window.innerWidth < 900);
 const isLoggingOut = ref(false);
 
 const handleLogout = async () => {
@@ -62,12 +64,10 @@ const handleLogout = async () => {
 };
 
 const closeSidebarOnMobile = () => {
-  // En móvil, si el sidebar está abierto (expandido), lo cerramos (colapsamos a solo iconos)
-  // Al hacer clic en un enlace.
-  if (isMobile.value && props.isOpen) {
-    emit('toggle');
-  }
-  // No necesitamos controlar el overflow aquí, AppShell lo maneja.
+  // Si el sidebar en móvil es una barra superior, no se necesita "cerrar" al hacer clic
+  // Solo se cierra si se implementa como un menú hamburguesa desplegable
+  // En este caso, al ser una barra siempre visible, no hacemos nada aquí
+  // Si en el futuro se implementa un menú hamburguesa en móvil, aquí se emitiría el 'toggle'
 };
 
 const allowedRoutes = computed(() => {
@@ -105,49 +105,10 @@ const allowedRoutes = computed(() => {
 
 const unreadCount = computed(() => notificationStore.unreadNotifications);
 
-const handleResize = () => {
-  isMobile.value = window.innerWidth < 900;
-  // Cuando se redimensiona a desktop, si el sidebar está abierto,
-  // nos aseguramos de que no tenga overflow oculto en el body
-  // y lo dejamos abierto (expandido) por defecto en desktop.
-  if (!isMobile.value) {
-    emit('toggle'); // Esto forzará el estado a 'isOpen = false' en AppShell si ya estaba abierto,
-    // y luego el onToggle de AppShell lo pondrá en true (expandido)
-    // si ya estaba expandido y pasó a no ser móvil.
-    // Para simplificar, en desktop siempre asumimos que está "expandido"
-    // visualmente, por lo que su estado de 'isOpen' es lo que controla el tamaño.
-  } else {
-    // Si es móvil y el sidebar estaba expandido, lo colapsamos (solo iconos)
-    // para que no ocupe demasiado espacio inicialmente.
-    if (props.isOpen) {
-      emit('toggle');
-    }
-  }
-};
-
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
-  // Al montar, si es móvil, asegúrate de que el sidebar esté colapsado (solo iconos)
-  // por defecto.
-  if (isMobile.value) {
-    if (props.isOpen) {
-      // Si AppShell lo inició como true, lo colapsamos.
-      emit('toggle');
-    }
-  } else {
-    // En desktop, por defecto debe estar abierto (expandido)
-    if (!props.isOpen) {
-      emit('toggle');
-    }
-  }
-
   if (authStore.currentUser) {
     notificationStore.getAllNotifications(authStore.currentUser.id);
   }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize);
 });
 </script>
 

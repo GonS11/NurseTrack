@@ -393,12 +393,9 @@ export const useAdminStore = defineStore('admin', {
         throw e;
       }
     },
+
     // ==================== NURSE ASSIGNMENT ACTIONS ====================
-    async getAllNurseAssignments(
-      page?: number,
-      size?: number,
-      sortBy?: string,
-    ) {
+    async getAllNurseAssignments(page = 0, size = 10, sortBy = 'id') {
       try {
         this.nurseAssignments =
           await useAdminAssignmentService.getAllNurseAssignments(
@@ -447,10 +444,7 @@ export const useAdminStore = defineStore('admin', {
 
     async assignNurseToDepartment(request: AssignNurseRequest) {
       try {
-        const newAssignment =
-          await useAdminAssignmentService.assignNurseToDepartment(request);
-
-        this.nurseAssignments.content.push(newAssignment);
+        await useAdminAssignmentService.assignNurseToDepartment(request);
 
         await this.getAllNurseAssignments(this.nurseAssignments.number);
       } catch (e: any) {
@@ -464,11 +458,6 @@ export const useAdminStore = defineStore('admin', {
         await useAdminAssignmentService.removeNurseFromDepartment(
           departmentId,
           nurseId,
-        );
-        this.nurseAssignments.content = this.nurseAssignments.content.filter(
-          (assignment) =>
-            assignment.department.id !== departmentId ||
-            assignment.nurse.id !== nurseId,
         );
 
         await this.getAllNurseAssignments(this.nurseAssignments.number);

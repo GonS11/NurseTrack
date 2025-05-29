@@ -105,7 +105,11 @@ const routes: RouteRecordRaw[] = [
         path: 'admin',
         meta: { allowedRoles: [UserRole.ADMIN] },
         children: [
-          { path: 'users', name: 'admin-users', component: UsersManagement },
+          {
+            path: 'admin-users',
+            name: 'admin-users',
+            component: UsersManagement,
+          },
           {
             path: 'departments',
             name: 'admin-departments',

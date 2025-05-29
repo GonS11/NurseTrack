@@ -17,8 +17,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import ManagamentComponent from '../../components/common/ManagamentComponent.vue';
-import NurseAssignmentModal from '../../components/ui/modals/NurseAssignmentModal.vue'; // You'll create this modal
-
+import NurseAssignmentModal from '../../components/ui/modals/NurseAssignmentModal.vue';
 import type {
   AssignNurseRequest,
   NurseDepartmentResponse,
@@ -27,24 +26,13 @@ import type { DepartmentResponse } from '../../types/schemas/department.schema';
 import { type TableAction } from '../../components/ui/Table.vue';
 import { useAdminStore } from '../../stores/admin.store';
 
-// --- Stores y estado reactivo ---
 const adminStore = useAdminStore();
 
-// componente ManagementComponen (Para llamar a sus funciones)
 const managementComponentRef = ref<InstanceType<
   typeof ManagamentComponent
 > | null>(null);
 
-// Data for the table
-// We need departments, and for each department, its assigned nurses.
-// This might require a combined data structure or additional fetching.
 const departmentsWithNurses = computed(() => {
-  // This is a simplified example. You might need to fetch all departments
-  // and then for each department, fetch its nurses.
-  // Or, your backend could provide a combined response.
-  // For simplicity, let's assume we use the `nurseAssignments` state,
-  // which contains a list of nurse-department pairs.
-  // We'll group them by department.
   const groupedNurses = new Map<number, NurseDepartmentResponse[]>();
   adminStore.nurseAssignments.content.forEach((assignment) => {
     if (!groupedNurses.has(assignment.department.id)) {
@@ -110,7 +98,6 @@ const nurseAssignmentActions = computed(
     >[],
 );
 
-// MEtodos de CRUD para pasarle al componente
 const getAllDepartmentsWithNurseInfo = async (page: number) => {
   // You might need a more specific API call here that fetches departments
   // along with their assigned nurses, or you'll have to make multiple calls

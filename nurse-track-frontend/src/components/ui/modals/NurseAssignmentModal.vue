@@ -1,76 +1,82 @@
 <template>
-  <BaseModal :is-open="isOpen" :title="title" @close="closeModal">
-    <form @submit.prevent="handleSubmit">
-      <div class="form-group">
-        <label for="department">Department:</label>
-        <select
-          id="department"
-          v-model="selectedDepartmentId"
-          @change="fetchDepartmentNursesAndAvailableNurses"
-          required
-        >
-          <option value="" disabled>Select a department</option>
-          <option
-            v-for="department in allDepartments"
-            :key="department.id"
-            :value="department.id"
-          >
-            {{ department.name }}
-          </option>
-        </select>
-      </div>
-
-      <div v-if="selectedDepartmentId">
-        <h3>Assigned Nurses:</h3>
-        <ul v-if="assignedNurses.length > 0">
-          <li v-for="assignment in assignedNurses" :key="assignment.nurse.id">
-            {{ assignment.nurse.firstname }} {{ assignment.nurse.lastname }} ({{
-              assignment.nurse.username
-            }})
-            <button
-              type="button"
-              class="btn btn-danger btn-sm"
-              @click="
-                removeNurse(assignment.department.id, assignment.nurse.id)
-              "
-            >
-              Remove
-            </button>
-          </li>
-        </ul>
-        <p v-else>No nurses assigned to this department.</p>
-
-        <h3>Assign New Nurse:</h3>
+  <div v-if="isOpen" class="modal-overlay">
+    <div class="modal">
+      <h2>{{ title }}</h2>
+      <form @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label for="newNurse">Select Nurse to Assign:</label>
-          <select id="newNurse" v-model="nurseToAssignId">
-            <option value="" disabled>Select a nurse</option>
+          <label for="department">Department</label>
+          <select
+            id="department"
+            v-model="selectedDepartmentId"
+            @change="fetchDepartmentNursesAndAvailableNurses"
+            required
+          >
+            <option value="" disabled>Select a department</option>
             <option
-              v-for="nurse in availableNurses"
-              :key="nurse.id"
-              :value="nurse.id"
+              v-for="department in allDepartments"
+              :key="department.id"
+              :value="department.id"
             >
-              {{ nurse.firstname }} {{ nurse.lastname }} ({{ nurse.email }})
+              {{ department.name }}
             </option>
           </select>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            @click="assignNurse"
-            :disabled="!nurseToAssignId"
-          >
-            Assign
-          </button>
         </div>
-      </div>
 
-      <div class="modal-actions">
-        <button type="button" @click="closeModal" class="btn btn-secondary">
-          Close
-        </button>
-      </div>
-    </form>
-  </BaseModal>
+        <div v-if="selectedDepartmentId">
+          <h3>Assigned Nurses:</h3>
+          <ul v-if="assignedNurses.length > 0" class="nurse-list">
+            <li v-for="assignment in assignedNurses" :key="assignment.nurse.id">
+              <span>
+                {{ assignment.nurse.firstname }}
+                {{ assignment.nurse.lastname }} ({{
+                  assignment.nurse.username
+                }})
+              </span>
+              <button
+                type="button"
+                class="button button-danger button-sm"
+                @click="
+                  removeNurse(assignment.department.id, assignment.nurse.id)
+                "
+              >
+                Remove
+              </button>
+            </li>
+          </ul>
+          <p v-else>No nurses assigned to this department.</p>
+
+          <h3>Assign New Nurse:</h3>
+          <div class="form-group">
+            <label for="newNurse">Select Nurse to Assign</label>
+            <select id="newNurse" v-model="nurseToAssignId">
+              <option value="" disabled>Select a nurse</option>
+              <option
+                v-for="nurse in availableNurses"
+                :key="nurse.id"
+                :value="nurse.id"
+              >
+                {{ nurse.firstname }} {{ nurse.lastname }} ({{ nurse.email }})
+              </option>
+            </select>
+          </div>
+          <div class="form-actions assign-actions">
+            <button
+              type="button"
+              class="button button-primary"
+              @click="assignNurse"
+              :disabled="!nurseToAssignId"
+            >
+              Assign
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" @click="closeModal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -99,11 +105,11 @@ const assignedNurses = ref<NurseDepartmentResponse[]>([]);
 const availableNurses = ref<UserResponse[]>([]);
 const nurseToAssignId = ref<number | null>(null);
 
-const allDepartments = computed(() => adminStore.departments.content); // You might need to fetch all departments first
+const allDepartments = computed(() => adminStore.departments.content);
 
 const fetchInitialData = async () => {
   try {
-    await adminStore.getAllDepartments(); // Fetch all departments for the dropdown
+    await adminStore.getAllDepartments();
     if (props.item) {
       selectedDepartmentId.value = props.item.id;
       await fetchDepartmentNursesAndAvailableNurses();
@@ -120,12 +126,10 @@ const fetchDepartmentNursesAndAvailableNurses = async () => {
     return;
   }
   try {
-    // Fetch nurses currently assigned to the selected department
     await adminStore.getAllNursesByDepartment(selectedDepartmentId.value);
     assignedNurses.value = adminStore.nurseAssignments.content;
 
-    // Fetch all potential nurses and filter out those already assigned
-    await adminStore.getAllUsers(); // Assuming this fetches all users
+    await adminStore.getAllUsers();
     const allNurses = adminStore.users.content.filter(
       (user) => user.role === UserRole.NURSE,
     );
@@ -135,14 +139,14 @@ const fetchDepartmentNursesAndAvailableNurses = async () => {
     availableNurses.value = allNurses.filter(
       (nurse) => !assignedNurseIds.has(nurse.id),
     );
-    nurseToAssignId.value = null; // Reset selection
+    nurseToAssignId.value = null;
   } catch (error) {
     console.error(
       'Error fetching department nurses or available nurses:',
       error,
     );
-    assignedNurses.value = []; // Reset on error
-    availableNurses.value = []; // Reset on error
+    assignedNurses.value = [];
+    availableNurses.value = [];
   }
 };
 
@@ -154,7 +158,7 @@ const assignNurse = async () => {
     };
     try {
       await adminStore.assignNurseToDepartment(request);
-      await fetchDepartmentNursesAndAvailableNurses(); // Re-fetch to update lists
+      await fetchDepartmentNursesAndAvailableNurses();
     } catch (error) {
       console.error('Error assigning nurse:', error);
     }
@@ -167,7 +171,7 @@ const removeNurse = async (departmentId: number, nurseId: number) => {
   ) {
     try {
       await adminStore.removeNurseFromDepartment(departmentId, nurseId);
-      await fetchDepartmentNursesAndAvailableNurses(); // Re-fetch to update lists
+      await fetchDepartmentNursesAndAvailableNurses();
     } catch (error) {
       console.error('Error removing nurse:', error);
     }
@@ -179,14 +183,17 @@ watch(
   (newVal) => {
     if (newVal) {
       fetchInitialData();
+    } else {
+      // Reset state when modal closes
+      selectedDepartmentId.value = null;
+      assignedNurses.value = [];
+      availableNurses.value = [];
+      nurseToAssignId.value = null;
     }
   },
 );
 
 const handleSubmit = () => {
-  // This modal doesn't have a single "submit" for a new item,
-  // rather it manages assignments directly.
-  // You can emit a generic 'refresh' or just rely on state updates.
   closeModal();
 };
 
@@ -202,5 +209,87 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use 'Modal.scss';
+@use 'Modal.scss'; // This implicitly uses main.scss as well
+@use '../../../styles/main.scss' as *; // Explicitly import if needed for direct variable access
+
+.nurse-list {
+  list-style: none;
+  padding: 0;
+  margin-top: $spacer * 3; // Using Sass variable directly
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacer * 0.5 0; // Using Sass variable
+    border-bottom: 1px solid $gray-200; // Using Sass variable
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .button-danger {
+      margin-left: $spacer * 3; // Using Sass variable
+    }
+  }
+}
+
+.assign-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacer * 3; // Using Sass variable
+}
+
+.button {
+  padding: $btn-padding-y $btn-padding-x; // Use Sass variable directly
+  border-radius: $btn-border-radius; // Use Sass variable directly
+  font-size: $font-size-base; // Use Sass variable directly
+  cursor: pointer;
+  transition: $transition; // Use Sass variable directly
+
+  &.button-primary {
+    background-color: $primary; // Use Sass variable directly
+    color: $white; // Use Sass variable directly
+    border: 1px solid $primary; // Use Sass variable directly
+
+    &:hover {
+      background-color: $primary-hover; // Use Sass variable directly
+      border-color: $primary-hover; // Use Sass variable directly
+    }
+  }
+
+  &.button-secondary {
+    background-color: $white;
+    color: $gray-700;
+    border: 1px solid $gray-300;
+
+    &:hover {
+      background-color: $gray-100;
+    }
+  }
+
+  &.button-danger {
+    background-color: $error;
+    color: $white;
+    border: 1px solid $error;
+
+    &:hover {
+      background-color: color.adjust(
+        $error,
+        $lightness: -10%
+      ); // Or define $error-dark
+      border-color: color.adjust($error, $lightness: -10%);
+    }
+  }
+
+  &.button-sm {
+    // You'd need to define these in your variables.scss if not already
+    padding: $btn-padding-y * 0.75 $btn-padding-x * 0.75; // Example smaller padding
+    font-size: $font-size-base * 0.875; // Example smaller font size
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
 </style>

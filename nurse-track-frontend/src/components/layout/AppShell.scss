@@ -7,6 +7,7 @@
   position: relative;
   background: $background;
   min-height: 100vh;
+  flex-direction: column; // Por defecto en móvil, los elementos se apilan
 
   .overlay {
     display: none;
@@ -15,11 +16,12 @@
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     z-index: 900;
-    transition: opacity $transition;
     opacity: 0;
+    transition: opacity $transition;
 
     .app-shell.sidebar-open & {
       @include responsive(tablet) {
+        // Esto es para cuando el sidebar SÍ es lateral en móvil (si activas isLateralSidebarOnMobile)
         display: block;
         opacity: 1;
       }
@@ -28,24 +30,30 @@
 
   main {
     flex: 1;
-    margin-left: $sidebar-width;
     padding: map.get($spacers, 4);
-    transition: margin-left $transition, filter $transition;
+    transition: margin-left $transition, padding-top $transition,
+      filter $transition;
+    margin-left: $sidebar-width; // Margen para desktop cuando el sidebar está cerrado
 
-    .app-shell.sidebar-expanded & {
+    .app-shell.sidebar-open & {
       margin-left: $expanded-sidebar-width;
     }
 
     @include responsive(tablet) {
       margin-left: 0;
       padding: map.get($spacers, 3);
-    }
+      padding-top: $sidebar-width; // Deja espacio para la barra superior móvil (la altura del sidebar en su versión compacta)
 
-    .app-shell.sidebar-open & {
-      @include responsive(tablet) {
+      .app-shell.sidebar-open & {
+        // Si isLateralSidebarOnMobile fuera true
         filter: brightness(0.7);
         pointer-events: none;
       }
     }
+  }
+
+  @include responsive(tablet) {
+    // En pantallas pequeñas, el AppShell no es un flex row principal, la sidebar es superior
+    flex-direction: column;
   }
 }

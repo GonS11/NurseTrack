@@ -1,0 +1,84 @@
+@use 'sass:map';
+@use '../../styles/main.scss' as *; // Ensure this path is correct relative to your components/ui folder
+
+.dashboard-stat-card {
+  flex: 1 1 200px;
+  background: $white;
+  padding: map.get($spacers, 4);
+  border-radius: $btn-border-radius;
+  box-shadow: $card-shadow;
+  transition: $transition;
+  display: flex;
+  align-items: center;
+  gap: map.get($spacers, 3);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba($primary, 0.1); // Default icon background
+    .material-icons {
+      font-size: 28px;
+      color: $primary; // Default icon color
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title {
+    color: $gray-600;
+    font-size: $font-size-base;
+    margin-bottom: map.get($spacers, 1);
+  }
+
+  .value {
+    color: $text-primary;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  // Color variations for the card and icon
+  &.primary {
+    .icon-wrapper {
+      background-color: rgba($primary, 0.1);
+      .material-icons {
+        color: $primary;
+      }
+    }
+  }
+  &.secondary {
+    .icon-wrapper {
+      background-color: rgba($secondary, 0.1);
+      .material-icons {
+        color: $secondary;
+      }
+    }
+  }
+  &.warning {
+    .icon-wrapper {
+      background-color: rgba($warning-border, 0.1);
+      .material-icons {
+        color: $warning-border;
+      }
+    }
+  }
+  &.info {
+    .icon-wrapper {
+      background-color: rgba($info-border, 0.1);
+      .material-icons {
+        color: $info-border;
+      }
+    }
+  }
+}

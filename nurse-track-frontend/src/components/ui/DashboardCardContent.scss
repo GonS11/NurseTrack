@@ -1,0 +1,60 @@
+@use 'sass:map';
+@use '../../styles/main.scss' as *; // Ensure this path is correct relative to your components/ui folder
+
+.dashboard-insight-card {
+  padding: map.get($spacers, 3);
+  margin-bottom: map.get(
+    $spacers,
+    3
+  ); // Not strictly needed with Grid, but good for standalone use
+  border-radius: $btn-border-radius;
+  border-left: 5px solid;
+  display: flex;
+  flex-direction: column;
+  gap: map.get($spacers, 1);
+  box-shadow: $card-shadow-sm; // Added a new smaller shadow
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .link {
+    color: inherit;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-top: map.get($spacers, 2);
+    display: inline-block;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &.warning {
+    border-color: $warning-border;
+    background-color: $warning-bg;
+    color: $warning-text;
+  }
+  &.info {
+    border-color: $info-border;
+    background-color: $info-bg;
+    color: $info-text;
+  }
+  &.success {
+    border-color: $success-border;
+    background-color: $success-bg;
+    color: $success-text;
+  }
+  &.tip {
+    border-color: $tip-border;
+    background-color: $tip-bg;
+    color: $tip-text;
+  }
+}

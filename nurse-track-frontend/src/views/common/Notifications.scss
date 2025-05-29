@@ -3,6 +3,8 @@
 @use '../../styles/main.scss' as *;
 
 .notifications-container {
+  background: $gray-200;
+  border-radius: $border-radius;
   max-width: 800px;
   margin: 2rem auto;
   padding: 1.5rem;
@@ -32,7 +34,7 @@
 
   .mark-all-read {
     background: rgba($primary, 0.1);
-    color: $primary;
+    color: $black;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     transition: background 0.2s ease;
@@ -147,10 +149,10 @@
     transition: background 0.2s ease;
 
     &.mark-read {
-      color: $primary;
+      color: $black;
 
       &:hover {
-        background: rgba($primary, 0.1);
+        background: rgba($black, 0.1);
       }
     }
 
@@ -169,7 +171,7 @@
   gap: 1rem;
   margin-top: map.get($spacers, 4);
   padding: 1rem;
-  background: $white;
+  background: $gray-500;
   border-radius: 0.5rem;
   @include box-shadow(1);
 
@@ -177,7 +179,7 @@
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     background: rgba($primary, 0.1);
-    color: $primary;
+    color: $black;
 
     &:disabled {
       opacity: 0.5;

@@ -10,10 +10,13 @@ aside {
   padding: map.get($spacers, 2) map.get($spacers, 1);
   background: $white;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
-  transition: width $transition, transform $transition;
+  transition: width $transition, transform $transition, height $transition,
+    padding $transition;
   position: fixed;
   z-index: 1000;
   overflow: hidden;
+  top: 0;
+  left: 0;
 
   .logo {
     opacity: 0;
@@ -51,6 +54,7 @@ aside {
     @include box-shadow(1);
     transition: $transition;
     z-index: 1001;
+    border: 1px rgba($primary, 0.08) solid;
 
     &:hover {
       background: rgba($primary, 0.1);
@@ -63,9 +67,7 @@ aside {
     }
 
     @include responsive(tablet) {
-      left: auto;
-      right: map.get($spacers, 2);
-      z-index: 1002;
+      display: none; // El toggle del sidebar lateral ya no es necesario en la barra superior
     }
   }
 
@@ -75,6 +77,12 @@ aside {
     flex-direction: column;
     gap: map.get($spacers, 1);
     padding: 0 map.get($spacers, 1);
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 
     .item {
       position: relative;
@@ -143,7 +151,6 @@ aside {
       display: flex;
       align-items: center;
       width: 100%;
-
       @include button-base;
       background: none;
       border: none;
@@ -172,33 +179,56 @@ aside {
   }
 
   @include responsive(tablet) {
-    width: $sidebar-width;
-    transform: translateX(-$sidebar-width);
-    box-shadow: none;
+    width: 100%; // Ocupa todo el ancho en móvil
+    height: $sidebar-width; // Altura fija como una barra superior
+    min-height: auto; // No necesita min-height de 100dvh
+    flex-direction: row; // Los elementos se organizan horizontalmente
+    justify-content: space-around; // Distribuye los iconos
+    align-items: center;
+    padding: map.get($spacers, 1) map.get($spacers, 2); // Padding ajustado para barra superior
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Sombra inferior
+    transform: translateX(0); // Siempre visible en la parte superior
 
-    &.is-open {
-      transform: translateX(0);
-      width: $expanded-sidebar-width;
-      box-shadow: 8px 0 24px rgba(0, 0, 0, 0.15);
+    .logo,
+    footer.footer {
+      display: none; // Oculta el logo y el footer en la barra superior móvil
     }
 
-    .menu .item .text,
-    footer.footer button .text {
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .logo {
-      opacity: 0;
-      transition: opacity $transition;
-    }
+    .menu {
+      flex-direction: row; // Los elementos del menú también en fila
+      flex-grow: 1; // Permite que el menú ocupe el espacio disponible
+      justify-content: space-around;
+      padding: 0; // Quita padding del menú en móvil
 
-    &.is-open {
-      .menu .item .text,
-      footer.footer button .text,
-      .logo {
-        opacity: 1;
-        transition-delay: 0.1s;
+      .item {
+        flex-direction: column; // Icono y texto apilados verticalmente
+        padding: map.get($spacers, 1); // Padding más compacto
+        margin: 0 map.get($spacers, 1); // Espacio entre ítems
+        text-align: center;
+        width: auto;
+
+        .material-icons {
+          margin-right: 0; // No hay margen a la derecha del icono
+          margin-bottom: map.get($spacers, 1); // Espacio entre icono y texto
+        }
+
+        .text {
+          opacity: 1; // El texto siempre es visible en la barra superior móvil
+          font-size: 0.75rem; // Tamaño de fuente más pequeño para el texto
+        }
+
+        &.active {
+          &::before {
+            display: none; // Oculta la barra lateral activa en la barra superior
+          }
+        }
       }
+    }
+
+    // El estado 'is-open' no tiene un efecto visual significativo en la barra superior móvil,
+    // ya que siempre está "abierta" y visible.
+    &.is-open {
+      width: 100%;
     }
   }
 }

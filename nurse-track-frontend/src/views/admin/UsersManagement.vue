@@ -25,7 +25,7 @@ import type {
   UpdateUserRequest,
   UserResponse,
 } from '../../types/schemas/user.schema';
-import { type TableAction } from '../../components/ui/Table.vue'; // Importa TableAction desde Table.vue
+import { type TableAction } from '../../components/ui/Table.vue';
 import { useAuthStore } from '../../services';
 import { useAdminStore } from '../../stores/admin.store';
 
