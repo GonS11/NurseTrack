@@ -61,6 +61,7 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
     -   **`views/`:** Contains the main application views or pages.
     -   **`router/`:** Configures the application's navigation routes.
     -   **`services/`:** Manages the logic for interacting with the backend REST API.
+    -   **`stores/`:** Manages the global state with Pinia.
     -   **`assets/`:** Holds static resources such as images, fonts, and global stylesheets.
 
 ---
