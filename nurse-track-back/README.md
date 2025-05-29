@@ -114,3 +114,13 @@ If you need to build the Spring Boot application into a standalone JAR file (e.g
     # mvnw clean install
     ```
     This will generate a JAR file in the `target/` directory.
+
+---
+
+## 🖼️ **Images**
+
+Here you'll find visual aids to understand the project better.
+
+### Database Schema
+
+![NurseTrack Database Schema](https://github.com/GonS11/NurseTrack/blob/main/docs/db_diagrams/script-nursetrack-sql.png?raw=true)
