@@ -49,7 +49,7 @@ The frontend application is structured to promote modularity, reusability, and c
 
 ## 🚀 **Getting Started**
 
-To run the NurseTrack Frontend locally, ensure you have set up the [NurseTrack Backend](https://github.com/GonS11/NurseTrack/nurse-track-back) first, as this frontend relies on its API.
+To run the NurseTrack Frontend locally, ensure you have set up the [NurseTrack Backend]([https://github.com/GonS11/NurseTrack/nurse-track-back](https://github.com/GonS11/NurseTrack/tree/main/nurse-track-back)) first, as this frontend relies on its API.
 
 ### **Prerequisites:**
 
