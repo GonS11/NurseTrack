@@ -78,9 +78,11 @@ aside {
     gap: map.get($spacers, 1);
     padding: 0 map.get($spacers, 1);
     overflow-y: auto;
+
     &::-webkit-scrollbar {
       display: none;
     }
+
     -ms-overflow-style: none;
     scrollbar-width: none;
 
@@ -170,6 +172,7 @@ aside {
         font-size: 1.5rem;
         margin-right: map.get($spacers, 2);
       }
+
       .text {
         opacity: 0;
         transition: opacity 0.2s ease;
@@ -188,11 +191,6 @@ aside {
     padding: map.get($spacers, 1) map.get($spacers, 2); // Padding ajustado para barra superior
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Sombra inferior
     transform: translateX(0); // Siempre visible en la parte superior
-
-    .logo,
-    footer.footer {
-      display: none; // Oculta el logo y el footer en la barra superior móvil
-    }
 
     .menu {
       flex-direction: row; // Los elementos del menú también en fila

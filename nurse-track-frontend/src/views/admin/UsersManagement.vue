@@ -19,7 +19,6 @@
 import { computed, onMounted, ref } from 'vue';
 import ManagamentComponent from '../../components/common/ManagamentComponent.vue';
 import UserModal from '../../components/ui/modals/UserModal.vue';
-
 import type {
   CreateUserRequest,
   UpdateUserRequest,

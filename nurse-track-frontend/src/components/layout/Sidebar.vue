@@ -72,23 +72,18 @@ const closeSidebarOnMobile = () => {
 
 const allowedRoutes = computed(() => {
   const base = [
-    { name: 'dashboard', icon: 'home', text: 'Inicio' },
-    { name: 'notifications', icon: 'notifications', text: 'Notificaciones' },
+    { name: 'dashboard', icon: 'home', text: 'Home' },
+    { name: 'notifications', icon: 'notifications', text: 'Notifications' },
   ];
+
   const role = authStore.user?.roles?.[0]?.authority;
-  if (role === UserRole.NURSE)
+
+  if (role === UserRole.ADMIN) {
     base.splice(
       1,
       0,
-      { name: 'nurse-schedule', icon: 'calendar_today', text: 'Mis Turnos' },
-      { name: 'nurse-shift-swap', icon: 'swap_horiz', text: 'Cambio de Turno' },
-    );
-  if (role === UserRole.ADMIN)
-    base.splice(
-      1,
-      0,
-      { name: 'admin-users', icon: 'group', text: 'Usuarios' },
-      { name: 'admin-departments', icon: 'business', text: 'Departamentos' },
+      { name: 'admin-users', icon: 'group', text: 'Users' },
+      { name: 'admin-departments', icon: 'business', text: 'Departments' },
       {
         name: 'supervisor-assignment',
         icon: 'supervised_user_circle',
@@ -100,6 +95,41 @@ const allowedRoutes = computed(() => {
         text: 'Nurse Management',
       },
     );
+  }
+
+  if (role === UserRole.SUPERVISOR) {
+    base.splice(
+      1,
+      0,
+      {
+        name: 'supervisor-department-staff',
+        icon: 'people',
+        text: 'Management',
+      },
+      { name: 'supervisor-shifts', icon: 'calendar_today', text: 'My Shifts' },
+      {
+        name: 'supervisor-requests',
+        icon: 'description',
+        text: 'Request Management',
+      },
+    );
+  }
+
+  if (role === UserRole.NURSE) {
+    base.splice(
+      1,
+      0,
+      { name: 'nurse-departments', icon: 'business', text: 'My Departments' },
+      { name: 'nurse-schedule', icon: 'calendar_month', text: 'My Schedule' },
+      { name: 'nurse-shift-swap', icon: 'swap_horiz', text: 'Shift Request' },
+      {
+        name: 'nurse-vacation',
+        icon: 'flight_takeoff',
+        text: 'Vacation Request',
+      },
+    );
+  }
+
   return base;
 });
 

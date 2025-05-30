@@ -1,16 +1,20 @@
 package com.nurse_track_back.nurse_track_back.web.controllers.supervisor;
 
+import com.nurse_track_back.nurse_track_back.domain.enums.Role;
 import com.nurse_track_back.nurse_track_back.domain.models.User;
 import com.nurse_track_back.nurse_track_back.services.DepartmentService;
 import com.nurse_track_back.nurse_track_back.services.NurseDepartmentService;
 import com.nurse_track_back.nurse_track_back.services.ShiftService;
 import com.nurse_track_back.nurse_track_back.services.SupervisorDepartmentService;
+import com.nurse_track_back.nurse_track_back.services.UserService;
 import com.nurse_track_back.nurse_track_back.web.dto.request.nurseDepartment.AssignNurseRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.request.shift.CreateShiftRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.request.shift.UpdateShiftRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.response.DepartmentResponse;
 import com.nurse_track_back.nurse_track_back.web.dto.response.NurseDepartmentResponse;
 import com.nurse_track_back.nurse_track_back.web.dto.response.ShiftResponse;
+import com.nurse_track_back.nurse_track_back.web.dto.response.UserResponse;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/supervisor/departments")
@@ -30,6 +35,7 @@ public class SupervisorDepartmentController {
     private final SupervisorDepartmentService supervisorDepartmentService;
     private final NurseDepartmentService nurseDepartmentService;
     private final ShiftService shiftService;
+    private final UserService userService;
 
     @GetMapping()
     public ResponseEntity<List<DepartmentResponse>> getAllMyDepartments(@AuthenticationPrincipal User supervisor) {
@@ -45,6 +51,16 @@ public class SupervisorDepartmentController {
     }
 
     // ==================== ENFERMERAS DEL DEPARTAMENTO ====================
+    @GetMapping("/nurses/all")
+    public ResponseEntity<List<UserResponse>> getAllNurses() {
+        List<UserResponse> allUsers = userService.getAllUsers(0, 1000, "id").getContent(); // Fetch a reasonable number
+                                                                                           // or implement pagination
+        List<UserResponse> nurses = allUsers.stream()
+                .filter(user -> user.getRole() == Role.ROLE_NURSE)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(nurses);
+    }
+
     @GetMapping("/{departmentId}/nurses")
     public ResponseEntity<List<NurseDepartmentResponse>> getDepartmentNurses(
             @PathVariable("departmentId") Long departmentId,

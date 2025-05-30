@@ -6,7 +6,6 @@ import {
 import AppShell from '../components/layout/AppShell.vue';
 import { useAuthStore } from '../services';
 import { UserRole } from '../types/enums/user-role.enum';
-//import About from '../components/layout/About.vue';
 
 // Lazy-loaded views
 const LoginPage = () => import('../views/auth/LoginPage.vue');
@@ -23,9 +22,8 @@ const NurseAssignment = () => import('../views/admin/NurseAssignment.vue');
 // Supervisor
 const SupervisorDashboard = () =>
   import('../views/dashboard/SupervisorDashboard.vue');
-const DepartmentManagement = () =>
-  import('../views/supervisor/DepartmentManagement.vue');
-const StaffManagement = () => import('../views/supervisor/StaffManagement.vue');
+const SupervisorDepartmentAndStaff = () =>
+  import('../views/supervisor/SupervisorManagement.vue');
 const ShiftSchedule = () => import('../views/supervisor/ShiftSchedule.vue');
 const RequestsManagement = () =>
   import('../views/supervisor/RequestsManagement.vue');
@@ -56,7 +54,6 @@ const routes: RouteRecordRaw[] = [
     component: AppShell,
     meta: { requiresAuth: true },
     children: [
-      // Redirect root to role-based dashboard
       {
         path: '',
         name: 'dashboard',
@@ -80,7 +77,6 @@ const routes: RouteRecordRaw[] = [
         },
       },
 
-      // Dashboards
       {
         path: 'dashboard/admin',
         name: 'admin-dashboard',
@@ -100,7 +96,6 @@ const routes: RouteRecordRaw[] = [
         meta: { allowedRoles: [UserRole.NURSE] },
       },
 
-      // Admin section
       {
         path: 'admin',
         meta: { allowedRoles: [UserRole.ADMIN] },
@@ -128,20 +123,14 @@ const routes: RouteRecordRaw[] = [
         ],
       },
 
-      // Supervisor section
       {
         path: 'supervisor',
         meta: { allowedRoles: [UserRole.SUPERVISOR] },
         children: [
           {
-            path: 'department',
-            name: 'supervisor-department',
-            component: DepartmentManagement,
-          },
-          {
-            path: 'staff',
-            name: 'supervisor-staff',
-            component: StaffManagement,
+            path: 'department-staff-management',
+            name: 'supervisor-department-staff',
+            component: SupervisorDepartmentAndStaff,
           },
           {
             path: 'shifts',
@@ -156,7 +145,6 @@ const routes: RouteRecordRaw[] = [
         ],
       },
 
-      // Nurse section
       {
         path: 'nurse',
         meta: { allowedRoles: [UserRole.NURSE] },
@@ -180,14 +168,12 @@ const routes: RouteRecordRaw[] = [
         ],
       },
 
-      // Common routes
       {
         path: 'notifications',
         name: 'notifications',
         component: Notifications,
       },
 
-      // 404 inside shell
       { path: ':pathMatch(.*)*', name: 'not-found', component: NotFound },
     ],
   },

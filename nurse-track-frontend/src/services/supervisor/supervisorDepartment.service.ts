@@ -9,14 +9,14 @@ import type {
   ShiftResponse,
   UpdateShiftRequest,
 } from '../../types/schemas/shifts.schema';
+import type { UserResponse } from '../../types/schemas/user.schema';
 
 export const useSupervisorDepartmentService = {
-  // ==================== DEPARTMENT ====================
+  //==== DEPARTMENT ====
   async getAllMyDepartments(): Promise<DepartmentResponse[]> {
     const response = await api.get<DepartmentResponse[]>(
       '/supervisor/departments',
     );
-
     return response.data;
   },
 
@@ -24,18 +24,23 @@ export const useSupervisorDepartmentService = {
     const response = await api.get<DepartmentResponse>(
       `/supervisor/departments/${departmentId}`,
     );
-
     return response.data;
   },
 
-  // ==================== NURSES ====================
+  //==== NURSES ====
+  async getAllNursesForAssignment(): Promise<UserResponse[]> {
+    const response = await api.get<UserResponse[]>(
+      '/supervisor/departments/nurses/all',
+    );
+    return response.data;
+  },
+
   async getDepartmentNurses(
     departmentId: number,
   ): Promise<NurseDepartmentResponse[]> {
     const response = await api.get<NurseDepartmentResponse[]>(
       `/supervisor/departments/${departmentId}/nurses`,
     );
-
     return response.data;
   },
 
@@ -47,7 +52,6 @@ export const useSupervisorDepartmentService = {
       `/supervisor/departments/${departmentId}/nurses`,
       data,
     );
-
     return response.data;
   },
 
@@ -55,17 +59,17 @@ export const useSupervisorDepartmentService = {
     departmentId: number,
     nurseId: number,
   ): Promise<void> {
-    await api.delete(
+    await api.delete<void>(
       `/supervisor/departments/${departmentId}/nurses/${nurseId}`,
     );
+    // No data to return for a delete operation
   },
 
-  // ==================== SHIFTS ====================
+  //==== SHIFTS ====
   async getDepartmentShifts(departmentId: number): Promise<ShiftResponse[]> {
     const response = await api.get<ShiftResponse[]>(
       `/supervisor/departments/${departmentId}/shifts`,
     );
-
     return response.data;
   },
 
@@ -96,5 +100,6 @@ export const useSupervisorDepartmentService = {
     await api.delete(
       `/supervisor/departments/${departmentId}/shifts/${shiftId}`,
     );
+    // No data to return for a delete operation
   },
 };

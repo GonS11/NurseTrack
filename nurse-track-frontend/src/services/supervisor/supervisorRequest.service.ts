@@ -7,7 +7,7 @@ import type {
 } from '../../types/schemas/requests.schema';
 
 export const useSupervisorRequestService = {
-  // ==================== VACATION REQUESTS ====================
+  //==== VACATION REQUESTS ====
   async getPendingVacationRequests(
     departmentId: number,
   ): Promise<VacationRequestResponse[]> {
@@ -50,7 +50,7 @@ export const useSupervisorRequestService = {
     return response.data;
   },
 
-  // ==================== SHIFT CHANGE REQUESTS ====================
+  //==== SHIFT CHANGE REQUESTS ====
   async getPendingShiftChangeRequests(
     departmentId: number,
   ): Promise<ShiftChangeResponse[]> {
@@ -78,7 +78,6 @@ export const useSupervisorRequestService = {
       `/supervisor/departments/${departmentId}/requests/shift-changes/${requestId}/approve`,
       data,
     );
-
     return response.data;
   },
 
@@ -91,7 +90,6 @@ export const useSupervisorRequestService = {
       `/supervisor/departments/${departmentId}/requests/shift-changes/${requestId}/reject`,
       data,
     );
-
     return response.data;
   },
 };

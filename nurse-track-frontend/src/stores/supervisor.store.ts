@@ -25,16 +25,21 @@ export const useSupervisorStore = defineStore('supervisor', {
     shifts: [] as ShiftResponse[],
     shiftChangeRequests: [] as ShiftChangeResponse[],
     vacationRequests: [] as VacationRequestResponse[],
+    // Optional: You could add general loading/error states here if you want to
+    // manage them globally across the store, not just per component.
+    // isLoading: false as boolean,
+    // errorMessage: null as string | null,
   }),
 
   actions: {
     // ===================== DEPARTMENT ACTIONS =====================
     async getAllMyDepartments() {
       try {
-        this.departments =
-          await useSupervisorDepartmentService.getAllMyDepartments();
-      } catch (error) {
+        const data = await useSupervisorDepartmentService.getAllMyDepartments();
+        this.departments = data;
+      } catch (error: any) {
         console.error('Error fetching departments:', error);
+        throw error; // Re-throw to allow component to catch and display
       }
     },
 
@@ -43,12 +48,20 @@ export const useSupervisorStore = defineStore('supervisor', {
         const department = await useSupervisorDepartmentService.getMyDepartment(
           departmentId,
         );
-        this.departments = [department];
-      } catch (error) {
+        // If you're fetching a single department that might already be in 'departments',
+        // you should update it or add if not found.
+        const index = this.departments.findIndex((d) => d.id === department.id);
+        if (index !== -1) {
+          this.departments[index] = department;
+        } else {
+          this.departments.push(department);
+        }
+      } catch (error: any) {
         console.error(
           `Error fetching department with ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -59,11 +72,12 @@ export const useSupervisorStore = defineStore('supervisor', {
           await useSupervisorDepartmentService.getDepartmentNurses(
             departmentId,
           );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching nurses for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -78,11 +92,12 @@ export const useSupervisorStore = defineStore('supervisor', {
             request,
           );
         this.nurseAssignments.push(newAssignment);
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error adding nurse with ID ${request.nurseId} to department ID ${request.departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -92,16 +107,20 @@ export const useSupervisorStore = defineStore('supervisor', {
           departmentId,
           nurseId,
         );
+        // Corrected logic: Filter out the assignment where BOTH nurseId and departmentId match
         this.nurseAssignments = this.nurseAssignments.filter(
           (assign) =>
-            assign?.nurse?.id !== nurseId ||
-            assign?.department?.id !== departmentId,
+            !(
+              assign?.nurse?.id === nurseId &&
+              assign?.department?.id === departmentId
+            ),
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error removing nurse with ID ${nurseId} from department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -111,11 +130,12 @@ export const useSupervisorStore = defineStore('supervisor', {
         this.shifts = await useSupervisorDepartmentService.getDepartmentShifts(
           departmentId,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching shifts for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -126,11 +146,12 @@ export const useSupervisorStore = defineStore('supervisor', {
           request,
         );
         this.shifts.push(newShift);
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error creating shift for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -152,11 +173,12 @@ export const useSupervisorStore = defineStore('supervisor', {
         if (shiftIndex !== -1) {
           this.shifts[shiftIndex] = updatedShift;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error updating shift with ID ${shiftId} for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -164,11 +186,12 @@ export const useSupervisorStore = defineStore('supervisor', {
       try {
         await useSupervisorDepartmentService.cancelShift(departmentId, shiftId);
         this.shifts = this.shifts.filter((shift) => shift.id !== shiftId);
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error canceling shift with ID ${shiftId} for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -179,11 +202,12 @@ export const useSupervisorStore = defineStore('supervisor', {
           await useSupervisorRequestService.getPendingVacationRequests(
             departmentId,
           );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching pending vacation requests for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -193,11 +217,12 @@ export const useSupervisorStore = defineStore('supervisor', {
           await useSupervisorRequestService.getAllVacationRequests(
             departmentId,
           );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching all vacation requests for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -214,17 +239,18 @@ export const useSupervisorStore = defineStore('supervisor', {
             request,
           );
         const requestIndex = this.vacationRequests.findIndex(
-          (request) => request.id === requestId,
+          (req) => req.id === requestId,
         );
 
         if (requestIndex !== -1) {
           this.vacationRequests[requestIndex] = updatedRequest;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error approving vacation request with ID ${requestId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -241,17 +267,18 @@ export const useSupervisorStore = defineStore('supervisor', {
             request,
           );
         const requestIndex = this.vacationRequests.findIndex(
-          (request) => request.id === requestId,
+          (req) => req.id === requestId,
         );
 
         if (requestIndex !== -1) {
           this.vacationRequests[requestIndex] = updatedRequest;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error rejecting vacation request with ID ${requestId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -262,11 +289,12 @@ export const useSupervisorStore = defineStore('supervisor', {
           await useSupervisorRequestService.getPendingShiftChangeRequests(
             departmentId,
           );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching pending shift change requests for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -276,11 +304,12 @@ export const useSupervisorStore = defineStore('supervisor', {
           await useSupervisorRequestService.getAllShiftChangeRequests(
             departmentId,
           );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching all shift change requests for department ID ${departmentId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -297,17 +326,18 @@ export const useSupervisorStore = defineStore('supervisor', {
             request,
           );
         const requestIndex = this.shiftChangeRequests.findIndex(
-          (request) => request.id === requestId,
+          (req) => req.id === requestId,
         );
 
         if (requestIndex !== -1) {
           this.shiftChangeRequests[requestIndex] = updatedRequest;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error approving shift change request with ID ${requestId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -324,17 +354,18 @@ export const useSupervisorStore = defineStore('supervisor', {
             request,
           );
         const requestIndex = this.shiftChangeRequests.findIndex(
-          (request) => request.id === requestId,
+          (req) => req.id === requestId,
         );
 
         if (requestIndex !== -1) {
           this.shiftChangeRequests[requestIndex] = updatedRequest;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error rejecting shift change request with ID ${requestId}:`,
           error,
         );
+        throw error;
       }
     },
   },

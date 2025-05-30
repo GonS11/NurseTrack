@@ -1,0 +1,67 @@
+@use 'sass:color';
+@use 'sass:map';
+@use '../../../styles/main.scss' as *;
+
+.nurse-table-container {
+  overflow-x: auto;
+  margin-top: map.get($spacers, 3); // Corresponds to $spacing-md
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: $white; // Use white for table background
+    border-radius: $border-radius;
+    overflow: hidden; // Ensures border-radius applies to table
+    box-shadow: $card-shadow-sm; // Use small card shadow
+
+    thead {
+      background-color: $primary; // Use primary color for header background
+      color: $white;
+
+      th {
+        padding: map.get($spacers, 2) map.get($spacers, 3); // Corresponds to $spacing-sm $spacing-md
+        text-align: left;
+        font-weight: 600;
+        font-size: $font-size-base * 0.9;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $gray-200; // Use a light gray for row dividers
+
+        &:nth-child(even) {
+          background-color: $gray-100; // Alternate row background
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: map.get($spacers, 2) map.get($spacers, 3); // Corresponds to $spacing-sm $spacing-md
+          color: $gray-700; // Use a specific gray for text
+          vertical-align: middle;
+        }
+      }
+    }
+
+    .remove-btn {
+      @include button-action-icon; // Use the action icon button mixin
+      // Override default color if needed, but the 'danger' class handles this
+      // background-color: $error; // This will be set by the .danger modifier within the mixin
+      // color: $white;
+
+      .button-text {
+        // Optional: Hide text on smaller screens if you only want the icon
+        @include responsive(phone) {
+          display: none;
+        }
+      }
+
+      .material-icons {
+        font-size: 1.2rem; // Slightly larger icon
+      }
+    }
+  }
+}

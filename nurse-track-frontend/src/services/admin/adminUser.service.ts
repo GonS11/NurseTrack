@@ -7,33 +7,49 @@ import type {
 } from '../../types/schemas/user.schema';
 
 export const useAdminUserService = {
-  // Return response.data directly for all methods
-  getAllUsers: (page = 0, size = 10, sortBy = 'id') =>
-    api
-      .get<Page<UserResponse>>('/admin/users', {
-        params: { page, size, sortBy },
-      })
-      .then((res) => res.data), // Ensure .data is returned
+  //==== USERS ====
+  async getAllUsers(
+    page = 0,
+    size = 10,
+    sortBy = 'id',
+  ): Promise<Page<UserResponse>> {
+    const response = await api.get<Page<UserResponse>>('/admin/users', {
+      params: { page, size, sortBy },
+    });
+    return response.data;
+  },
 
-  getUserById: (id: number) =>
-    api.get<UserResponse>(`/admin/users/${id}`).then((res) => res.data),
+  async getUserById(id: number): Promise<UserResponse> {
+    const response = await api.get<UserResponse>(`/admin/users/${id}`);
+    return response.data;
+  },
 
-  createUser: (data: CreateUserRequest) =>
-    api.post<UserResponse>('/admin/users', data).then((res) => res.data),
+  async createUser(data: CreateUserRequest): Promise<UserResponse> {
+    const response = await api.post<UserResponse>('/admin/users', data);
+    return response.data;
+  },
 
-  updateUser: (id: number, data: UpdateUserRequest) =>
-    api.patch<UserResponse>(`/admin/users/${id}`, data).then((res) => res.data),
+  async updateUser(id: number, data: UpdateUserRequest): Promise<UserResponse> {
+    const response = await api.patch<UserResponse>(`/admin/users/${id}`, data);
+    return response.data;
+  },
 
-  deleteUser: (id: number) =>
-    api.delete<void>(`/admin/users/${id}`).then((res) => res.data),
+  async deleteUser(id: number): Promise<void> {
+    await api.delete<void>(`/admin/users/${id}`);
+    // No data to return for a delete operation
+  },
 
-  activateUser: (id: number) =>
-    api
-      .patch<UserResponse>(`/admin/users/${id}/activate`)
-      .then((res) => res.data),
+  async activateUser(id: number): Promise<UserResponse> {
+    const response = await api.patch<UserResponse>(
+      `/admin/users/${id}/activate`,
+    );
+    return response.data;
+  },
 
-  desactivateUser: (id: number) =>
-    api
-      .patch<UserResponse>(`/admin/users/${id}/desactivate`)
-      .then((res) => res.data),
+  async desactivateUser(id: number): Promise<UserResponse> {
+    const response = await api.patch<UserResponse>(
+      `/admin/users/${id}/desactivate`,
+    );
+    return response.data;
+  },
 };

@@ -7,7 +7,7 @@ import type {
 } from '../../types/schemas/requests.schema';
 
 export const useNurseRequestService = {
-  // ==================== VACATION REQUESTS ====================
+  //==== VACATION REQUESTS ====
   async getMyVacationRequests(): Promise<VacationRequestResponse[]> {
     const response = await api.get<VacationRequestResponse[]>(
       '/nurses/requests/vacations',
@@ -33,12 +33,12 @@ export const useNurseRequestService = {
     );
     return response.data;
   },
-  // ==================== SHIFT CHANGE REQUESTS ====================
+
+  //==== SHIFT CHANGE REQUESTS ====
   async getMyShiftChangeRequests(): Promise<ShiftChangeResponse[]> {
     const response = await api.get<ShiftChangeResponse[]>(
       '/nurses/requests/shift-changes',
     );
-
     return response.data;
   },
 
@@ -46,7 +46,6 @@ export const useNurseRequestService = {
     const response = await api.get<ShiftChangeResponse[]>(
       '/nurses/requests/shift-changes/received',
     );
-
     return response.data;
   },
 
@@ -56,7 +55,6 @@ export const useNurseRequestService = {
     const response = await api.get<ShiftChangeResponse>(
       `/nurses/requests/shift-changes/${requestId}`,
     );
-
     return response.data;
   },
 
@@ -67,7 +65,6 @@ export const useNurseRequestService = {
       '/nurses/requests/shift-changes',
       data,
     );
-
     return response.data;
   },
 };

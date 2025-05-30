@@ -6,12 +6,12 @@ import type {
 } from '../../types/schemas/auth.schema';
 
 export const useAuthService = {
+  //==== AUTHENTICATION ====
   async register(request: RegisterRequest): Promise<AuthenticationResponse> {
     const response = await api.post<AuthenticationResponse>(
       '/auth/register',
       request,
     );
-
     return response.data;
   },
 
@@ -22,7 +22,6 @@ export const useAuthService = {
       '/auth/authenticate',
       request,
     );
-
     return response.data;
   },
 };

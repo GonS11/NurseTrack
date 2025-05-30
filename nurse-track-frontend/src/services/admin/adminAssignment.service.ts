@@ -9,77 +9,100 @@ import type {
 import type { DepartmentResponse } from '../../types/schemas/department.schema';
 
 export const useAdminAssignmentService = {
-  // ======= SUPERVISOR =======
-  getAllSupervisorAssignments: (page = 0, size = 10, sortBy = 'departmentId') =>
-    api
-      .get<Page<SupervisorDepartmentResponse>>(
-        '/admin/assignments/departments',
-        {
-          params: { page, size, sortBy },
-        },
-      )
-      .then((res) => res.data),
+  //==== SUPERVISOR ASSIGNMENTS ====
+  async getAllSupervisorAssignments(
+    page = 0,
+    size = 10,
+    sortBy = 'departmentId',
+  ): Promise<Page<SupervisorDepartmentResponse>> {
+    const response = await api.get<Page<SupervisorDepartmentResponse>>(
+      '/admin/assignments/departments',
+      {
+        params: { page, size, sortBy },
+      },
+    );
+    return response.data;
+  },
 
-  getUnassignedDepartmentsForSupervisor: () =>
-    api
-      .get<DepartmentResponse[]>('/admin/assignments/departments/unassigned')
-      .then((res) => res.data),
+  async getUnassignedDepartmentsForSupervisor(): Promise<DepartmentResponse[]> {
+    const response = await api.get<DepartmentResponse[]>(
+      '/admin/assignments/departments/unassigned',
+    );
+    return response.data;
+  },
 
-  getSupervisorByDepartment: (departmentId: number) =>
-    api
-      .get<SupervisorDepartmentResponse>(
-        `/admin/assignments/departments/${departmentId}/supervisor`,
-      )
-      .then((res) => res.data),
+  async getSupervisorByDepartment(
+    departmentId: number,
+  ): Promise<SupervisorDepartmentResponse> {
+    const response = await api.get<SupervisorDepartmentResponse>(
+      `/admin/assignments/departments/${departmentId}/supervisor`,
+    );
+    return response.data;
+  },
 
-  assignSupervisorToDepartment: (data: AssignSupervisorRequest) =>
-    api
-      .post<SupervisorDepartmentResponse>(
-        `/admin/assignments/departments/${data.departmentId}/supervisor`,
-        data,
-      )
-      .then((res) => res.data),
+  async assignSupervisorToDepartment(
+    data: AssignSupervisorRequest,
+  ): Promise<SupervisorDepartmentResponse> {
+    const response = await api.post<SupervisorDepartmentResponse>(
+      `/admin/assignments/departments/${data.departmentId}/supervisor`,
+      data,
+    );
+    return response.data;
+  },
 
-  removeSupervisorFromDepartment: (departmentId: number) =>
-    api
-      .delete<void>(`/admin/assignments/departments/${departmentId}/supervisor`)
-      .then((res) => res.data),
+  async removeSupervisorFromDepartment(departmentId: number): Promise<void> {
+    await api.delete<void>(
+      `/admin/assignments/departments/${departmentId}/supervisor`,
+    );
+    // No data to return
+  },
 
-  // ======= NURSE =============
-  getAllNurseAssignments: (page = 0, size = 10, sortBy = 'departmentId') =>
-    api
-      .get<Page<NurseDepartmentResponse>>(
-        '/admin/assignments/departments/nurses',
-        { params: { page, size, sortBy } },
-      )
-      .then((res) => res.data),
+  //==== NURSE ASSIGNMENTS ====
+  async getAllNurseAssignments(
+    page = 0,
+    size = 10,
+    sortBy = 'departmentId',
+  ): Promise<Page<NurseDepartmentResponse>> {
+    const response = await api.get<Page<NurseDepartmentResponse>>(
+      '/admin/assignments/departments/nurses',
+      { params: { page, size, sortBy } },
+    );
+    return response.data;
+  },
 
-  getUnassignedDepartmentsForNurses: () =>
-    api
-      .get<DepartmentResponse[]>(
-        '/admin/assignments/departments/nurses/unassigned',
-      )
-      .then((res) => res.data),
+  async getUnassignedDepartmentsForNurses(): Promise<DepartmentResponse[]> {
+    const response = await api.get<DepartmentResponse[]>(
+      '/admin/assignments/departments/nurses/unassigned',
+    );
+    return response.data;
+  },
 
-  getAllNursesByDepartment: (departmentId: number) =>
-    api
-      .get<NurseDepartmentResponse[]>(
-        `/admin/assignments/departments/${departmentId}/nurses`,
-      )
-      .then((res) => res.data),
+  async getAllNursesByDepartment(
+    departmentId: number,
+  ): Promise<NurseDepartmentResponse[]> {
+    const response = await api.get<NurseDepartmentResponse[]>(
+      `/admin/assignments/departments/${departmentId}/nurses`,
+    );
+    return response.data;
+  },
 
-  assignNurseToDepartment: (data: AssignNurseRequest) =>
-    api
-      .post<NurseDepartmentResponse>(
-        `/admin/assignments/departments/${data.departmentId}/nurses`,
-        data,
-      )
-      .then((res) => res.data),
+  async assignNurseToDepartment(
+    data: AssignNurseRequest,
+  ): Promise<NurseDepartmentResponse> {
+    const response = await api.post<NurseDepartmentResponse>(
+      `/admin/assignments/departments/${data.departmentId}/nurses`,
+      data,
+    );
+    return response.data;
+  },
 
-  removeNurseFromDepartment: (departmentId: number, nurseId: number) =>
-    api
-      .delete<void>(
-        `/admin/assignments/departments/${departmentId}/nurses/${nurseId}`,
-      )
-      .then((res) => res.data),
+  async removeNurseFromDepartment(
+    departmentId: number,
+    nurseId: number,
+  ): Promise<void> {
+    await api.delete<void>(
+      `/admin/assignments/departments/${departmentId}/nurses/${nurseId}`,
+    );
+    // No data to return
+  },
 };
