@@ -73,6 +73,16 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 
 ---
 
+## Screenshots
+### Login Page
+![Login Page](https://github.com/user-attachments/assets/4edd3299-8022-45e7-ab77-0600dfae269e)
+
+### Admin Dashboard
+![Admin Dashboard](https://github.com/user-attachments/assets/f319da0b-830a-4d1f-a5cb-07ab43a1a76f)
+
+
+---
+
 ## 🌟 **How to Run the Project**
 
 > ⚠️ **Important:** The backend and database are containerized using Docker. Make sure you have **Docker** installed (Docker Desktop for Windows/macOS, or Docker Engine on Linux).  
