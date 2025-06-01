@@ -46,23 +46,30 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 
 ### **Backend:**
 
-- `src/main/java/com/nursetrack`:
+- `src/main/java/com/nurse_track_back`:
+  - `auth/`
   - `config/`
-  - `controller/`
-  - `service/`
-  - `repository/`
-  - `dto/`
-  - `mappers/`
+  - `domain/`
+  - `exceptions/`
+  - `handlers/`
+  - `repositories/`
+  - `services/`
+  - `utils/`
+  - `validations/`
+  - `web/`
 
 ### **Frontend:**
 
 - `src/`:
-  - `components/`
-  - `views/`
+  - `api/`
+  - `assets/`
   - `router/`
   - `services/`
   - `stores/`
-  - `assets/`
+  - `styles/`
+  - `types/`
+  - `utils/`
+  - `views/`
 
 ---
 
@@ -81,10 +88,9 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 
 1. **Clone the repository:**
 
-```bash
-git clone https://github.com/GonS11/NurseTrack.git
-cd NurseTrack
-
+    ```bash
+    git clone https://github.com/GonS11/NurseTrack.git
+    cd NurseTrack
     ```
 
 2.  **Start Backend and Database Services (using Docker Compose):**
