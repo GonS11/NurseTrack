@@ -10,11 +10,11 @@ NurseTrack serves as a pivotal tool for enhancing time management and fostering 
 
 ### **Key Features:**
 
--   **Shift Management:** Intuitive tools to view, assign, and modify shifts for nursing personnel.
--   **Vacation Requests:** A simplified process for nurses to request and manage their vacation days, with clear approval workflows.
--   **Shift Swaps:** Integrated functionality allowing colleagues to propose and arrange shift exchanges.
--   **Role-Based Dashboards:** Customized interfaces providing relevant information and functionalities tailored to each user's role (administrator, supervisor, or nurse).
--   **Notifications:** Real-time alerts for crucial updates, including status changes in requests and schedule modifications.
+- **Shift Management:** Intuitive tools to view, assign, and modify shifts for nursing personnel.
+- **Vacation Requests:** A simplified process for nurses to request and manage their vacation days, with clear approval workflows.
+- **Shift Swaps:** Integrated functionality allowing colleagues to propose and arrange shift exchanges.
+- **Role-Based Dashboards:** Customized interfaces providing relevant information and functionalities tailored to each user's role (administrator, supervisor, or nurse).
+- **Notifications:** Real-time alerts for crucial updates, including status changes in requests and schedule modifications.
 
 ---
 
@@ -24,21 +24,21 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 
 ### **Backend:**
 
--   **[Spring Boot](https://spring.io/projects/spring-boot):** The leading framework for building high-performance, production-ready RESTful applications in Java.
--   **MySQL:** A reliable relational database management system, essential for storing and managing critical data such as user profiles, shift assignments, and request details.
--   **JWT (JSON Web Tokens):** Implemented for secure and stateless user authentication and authorization across the application.
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- MySQL
+- JWT (JSON Web Tokens)
 
 ### **Frontend:**
 
--   **[Vue 3](https://vuejs.org/):** A progressive JavaScript framework renowned for building interactive and high-performance user interfaces with its intuitive API and robust ecosystem.
--   **TypeScript:** Enhances frontend development with static type checking, leading to more robust and maintainable code.
--   **Vite:** A next-generation frontend tooling that provides an extremely fast development server and optimized build process for Vue applications.
--   **Sass:** Used for advanced CSS pre-processing, enabling more organized, maintainable, and dynamic stylesheets.
+- [Vue 3](https://vuejs.org/)
+- TypeScript
+- Vite
+- Sass
 
 ### **Infrastructure:**
 
--   **Docker:** Facilitates the deployment and management of services (backend, database) through lightweight, portable containers.
--   **Docker Compose:** An indispensable tool for orchestrating multi-container Docker applications, making local development environments easy to set up and manage.
+- Docker
+- Docker Compose
 
 ---
 
@@ -46,53 +46,73 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 
 ### **Backend:**
 
--   **`src/main/java/com/nursetrack`:** Contains all the Java source code for the backend application.
-    -   **`config/`:** Houses general application configurations, including CORS settings and security configurations.
-    -   **`controller/`:** Defines the REST controllers responsible for handling incoming HTTP requests and mapping them to appropriate business logic.
-    -   **`service/`:** Encapsulates the core business logic and orchestrates operations between controllers and repositories.
-    -   **`repository/`:** Manages interactions with the database, handling data persistence and retrieval.
-    -   **`dto/`:** Contains Data Transfer Objects, used for efficient data exchange between layers.
-    -   **`mappers/`:** Utilizes MapStruct for automatic mapping between entities and DTOs, reducing boilerplate code.
+- `src/main/java/com/nurse_track_back`:
+  - `auth/`
+  - `config/`
+  - `domain/`
+  - `exceptions/`
+  - `handlers/`
+  - `repositories/`
+  - `services/`
+  - `utils/`
+  - `validations/`
+  - `web/`
 
 ### **Frontend:**
 
--   **`src/`:** The root directory for the frontend application's source code.
-    -   **`components/`:** Stores reusable UI components that can be used across different views.
-    -   **`views/`:** Contains the main application views or pages.
-    -   **`router/`:** Configures the application's navigation routes.
-    -   **`services/`:** Manages the logic for interacting with the backend REST API.
-    -   **`stores/`:** Manages the global state with Pinia.
-    -   **`assets/`:** Holds static resources such as images, fonts, and global stylesheets.
+- `src/`:
+  - `api/`
+  - `assets/`
+  - `router/`
+  - `services/`
+  - `stores/`
+  - `styles/`
+  - `types/`
+  - `utils/`
+  - `views/`
+
+---
+
+## Screenshots
+### Login Page
+![Login Page](https://github.com/user-attachments/assets/4edd3299-8022-45e7-ab77-0600dfae269e)
+
+### Admin Dashboard
+![Admin Dashboard](https://github.com/user-attachments/assets/f319da0b-830a-4d1f-a5cb-07ab43a1a76f)
+
 
 ---
 
 ## 🌟 **How to Run the Project**
 
-To get NurseTrack up and running on your local machine, follow these steps:
+> ⚠️ **Important:** The backend and database are containerized using Docker. Make sure you have **Docker** installed (Docker Desktop for Windows/macOS, or Docker Engine on Linux).  
+> The frontend is **not dockerized** and must be run separately using `npm run dev`.
 
 ### **Prerequisites:**
 
-Ensure you have the following software installed:
-
--   **Node.js** (v16 or higher)
--   **Java Development Kit (JDK)** (v21)
--   **Docker** and **Docker Compose** (Docker Desktop or a similar Docker environment is recommended)
+- Node.js (v16 or higher)
+- Java Development Kit (JDK) v21
+- Docker & Docker Compose
 
 ### **Steps to Run:**
 
-1.  **Clone the repository:**
-    Start by cloning the NurseTrack GitHub repository to your local machine and navigating into the project directory.
+1. **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/GonS11/NurseTrack.git](https://github.com/GonS11/NurseTrack.git)
+    git clone https://github.com/GonS11/NurseTrack.git
     cd NurseTrack
     ```
 
 2.  **Start Backend and Database Services (using Docker Compose):**
-    This command will build (if necessary) and start the backend Spring Boot application and the MySQL database in detached mode.
 
     ```bash
     docker-compose up -d
+    ```
+
+    - To stop the services:
+
+    ```bash
+    docker-compose down
     ```
 
 3.  **Verify Backend Readiness:**
@@ -105,7 +125,7 @@ Ensure you have the following software installed:
     ```
     The backend is ready when the response displays: `"status": "UP"`.
 
-4.  **Navigate to the Frontend Directory:**
+4.  **Run the frontend (not dockerized):**
     Change your current directory to the frontend project.
 
     ```bash
