@@ -1,24 +1,22 @@
-@use 'sass:color';
-@use 'sass:map';
 @use '../../../styles/main.scss' as *;
 
 .department-detail-card {
-  background-color: $white; // Use white for card background
-  padding: map.get($spacers, 3); // Corresponds to $spacing-md
+  background-color: $white;
+  padding: $spacer-3;
   border-radius: $border-radius;
-  border: 1px solid $gray-300; // Use a light gray border
-  box-shadow: $card-shadow-sm; // Use small card shadow
+  border: 1px solid $gray-300;
+  box-shadow: $card-shadow-sm;
 
   h3 {
     color: $text-primary;
     margin-top: 0;
-    margin-bottom: map.get($spacers, 2); // Corresponds to $spacing-sm
+    margin-bottom: $spacer-2;
     font-size: 1.3rem;
   }
 
   p {
-    margin-bottom: map.get($spacers, 1); // Corresponds to $spacing-xs
-    color: $gray-700; // Use a specific gray for text
+    margin-bottom: $spacer-1;
+    color: $gray-700;
     font-size: $font-size-base * 0.95;
 
     &:last-child {
@@ -28,18 +26,18 @@
 
   .status-badge {
     display: inline-block;
-    padding: map.get($spacers, 1) map.get($spacers, 2); // Corresponds to $spacing-xs $spacing-sm
-    border-radius: $border-radius; // Use general border-radius, or a smaller one if you define a specific `$badge-border-radius`
+    padding: $spacer-1 $spacer-2;
+    border-radius: $border-radius;
     font-size: $font-size-base * 0.8;
     font-weight: 600;
     color: $white;
 
     &.is-active {
-      background-color: $success; // Use success color
+      background-color: $success;
     }
 
     &.is-inactive {
-      background-color: $warning-border; // Use warning color for inactive status
+      background-color: $warning-border;
     }
   }
 }

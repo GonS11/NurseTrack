@@ -24,16 +24,16 @@ import type {
 import { type TableAction } from '../../components/ui/Table.vue';
 import { useAdminStore } from '../../stores/admin.store';
 import SupervisorAssignmentModal from '../../components/ui/modals/SupervisorAssignmentModal.vue';
+import { useNotifications } from '../../composables/useNotifications';
 
-// --- Stores y estado reactivo ---
 const adminStore = useAdminStore();
 
-// componente ManagementComponen (Para llamar a sus funciones)
 const managementComponentRef = ref<InstanceType<
   typeof ManagamentComponent
 > | null>(null);
 
-// Datos de la tabla
+const { showSuccess, showError } = useNotifications();
+
 const supervisorAssignments = computed(() => adminStore.supervisorAssignments);
 
 const supervisorAssignmentHeaders = [
@@ -64,37 +64,54 @@ const supervisorAssignmentActions = computed(
         icon: 'person_remove',
         class: 'danger',
         handler: async (assignment: SupervisorDepartmentResponse) => {
-          if (
-            confirm(
-              `Are you sure you want to remove supervisor ${assignment.supervisor.firstname} ${assignment.supervisor.lastname} from department ${assignment.department.name}?`,
-            )
-          ) {
-            await removeSupervisor(assignment.department.id);
-            await getAllSupervisorAssignments(
-              supervisorAssignments.value.number,
-            ); // Refresca la tabla
+          try {
+            if (
+              confirm(
+                `Are you sure you want to remove supervisor ${assignment.supervisor.firstname} ${assignment.supervisor.lastname} from department ${assignment.department.name}?`,
+              )
+            ) {
+              await removeSupervisor(assignment.department.id);
+              await getAllSupervisorAssignments(
+                supervisorAssignments.value.number, // Refresca la tabla
+              );
+              showSuccess('Supervisor assignment removed successfully!');
+            }
+          } catch (error: any) {
+            showError(error);
           }
         },
       },
     ] as TableAction<SupervisorDepartmentResponse>[],
 );
 
-// MEtodos de CRUD para pasarle al componente
+// Métodos de CRUD para pasarle al componente
 const getAllSupervisorAssignments = async (page: number) => {
-  await adminStore.getAllSupervisorAssignments(page);
+  try {
+    await adminStore.getAllSupervisorAssignments(page);
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
 const assignSupervisor = async (formData: AssignSupervisorRequest) => {
-  await adminStore.assignSupervisorToDepartment(formData);
+  try {
+    await adminStore.assignSupervisorToDepartment(formData);
+    showSuccess('Supervisor assigned successfully!');
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
 const removeSupervisor = async (departmentId: number) => {
-  await adminStore.removeSupervisorFromDepartment(departmentId);
+  try {
+    await adminStore.removeSupervisorFromDepartment(departmentId);
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
-//Hook de ciclo de vida
 onMounted(() => {
-  getAllSupervisorAssignments(0); //Cargar la primera pagina al montar
+  getAllSupervisorAssignments(0);
 });
 </script>
 

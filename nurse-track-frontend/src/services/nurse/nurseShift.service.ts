@@ -8,6 +8,7 @@ export const useNurseShiftService = {
     const response = await api.get<DepartmentResponse[]>(
       `/nurses/${nurseId}/departments`,
     );
+
     return response.data;
   },
 
@@ -16,6 +17,7 @@ export const useNurseShiftService = {
     const response = await api.get<ShiftResponse[]>(
       `/nurses/${nurseId}/shifts`,
     );
+
     return response.data;
   },
 
@@ -26,6 +28,7 @@ export const useNurseShiftService = {
     const response = await api.get<ShiftResponse[]>(
       `/nurses/${nurseId}/departments/${departmentId}/shifts`,
     );
+
     return response.data;
   },
 };

@@ -8,7 +8,7 @@ export enum NotificationType {
 
 export interface NotificationTypeDetails {
   displayName: string;
-  icon: string; // Material icon name
+  icon: string;
 }
 
 export const NotificationTypeData: {

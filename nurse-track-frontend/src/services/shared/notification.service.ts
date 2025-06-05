@@ -19,6 +19,7 @@ export const useNotificationService = {
         params: { page, size, sortBy },
       },
     );
+
     return response.data;
   },
 
@@ -29,6 +30,7 @@ export const useNotificationService = {
     const response = await api.get<NotificationResponse>(
       `/users/${userId}/notifications/${notificationId}`,
     );
+
     return response.data;
   },
 
@@ -40,12 +42,12 @@ export const useNotificationService = {
       `/users/${userId}/notifications`,
       data,
     );
+
     return response.data;
   },
 
   async markAsRead(userId: number, notificationId: number): Promise<void> {
     await api.put(`/users/${userId}/notifications/${notificationId}/read`);
-    // No data to return
   },
 
   async deleteNotification(
@@ -53,6 +55,5 @@ export const useNotificationService = {
     notificationId: number,
   ): Promise<void> {
     await api.delete(`/users/${userId}/notifications/${notificationId}`);
-    // No data to return
   },
 };

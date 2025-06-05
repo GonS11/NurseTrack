@@ -1,22 +1,11 @@
-@use 'sass:color';
-@use 'sass:map';
 @use '../../styles/main.scss' as *;
 
-:deep(td.status-active) {
+.status-active {
   color: $success;
   font-weight: bold;
 }
 
-:deep(td.status-inactive) {
-  color: $error;
-  font-weight: bold;
-}
-
-:deep(span.status-text-active) {
-  color: $success;
-  font-weight: bold;
-}
-:deep(span.status-text-inactive) {
+.status-inactive {
   color: $error;
   font-weight: bold;
 }

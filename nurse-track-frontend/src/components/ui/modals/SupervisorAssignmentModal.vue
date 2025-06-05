@@ -2,41 +2,36 @@
   <div v-if="isOpen" class="modal-overlay">
     <div class="modal">
       <h2>Assign Supervisor</h2>
-      <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label for="department">Department:</label>
-          <select id="department" v-model="formData.departmentId">
-            <option :value="0" disabled>Select a department</option>
-            <option
-              v-for="department in unassignedDepartments"
-              :key="department.id"
-              :value="department.id"
-            >
-              {{ department.name }}
-            </option>
-          </select>
-          <div v-if="errors.departmentId" class="error">
-            {{ errors.departmentId[0] }}
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="supervisor">Supervisor:</label>
-          <select id="supervisor" v-model="formData.supervisorId">
-            <option :value="0" disabled>Select a supervisor</option>
-            <option
-              v-for="supervisor in availableSupervisors"
-              :key="supervisor.id"
-              :value="supervisor.id"
-            >
-              {{ supervisor.firstname }} {{ supervisor.lastname }} ({{
-                supervisor.email
-              }})
-            </option>
-          </select>
-          <div v-if="errors.supervisorId" class="error">
-            {{ errors.supervisorId[0] }}
-          </div>
+      <form @submit.prevent="submitForm">
+        <div class="form-fields">
+          <InputSelect
+            id="department"
+            label="Department"
+            :modelValue="formData.departmentId"
+            @update:modelValue="updateDepartmentId"
+            :text="'Select a department'"
+            :entities="unassignedDepartments"
+            :item-key="'id'"
+            :item-value="'id'"
+            option-value="name"
+            :error="errors.departmentId"
+            :placeholder-value="0"
+          />
+
+          <InputSelect
+            id="supervisor"
+            label="Supervisor"
+            :modelValue="formData.supervisorId"
+            @update:modelValue="updateSupervisorId"
+            :text="'Select a supervisor'"
+            :entities="availableSupervisors"
+            :item-key="'id'"
+            :item-value="'id'"
+            :option-value="supervisorOptionText"
+            :error="errors.supervisorId"
+            :placeholder-value="0"
+          />
         </div>
 
         <div class="form-actions">
@@ -60,6 +55,8 @@ import {
 import type { DepartmentResponse } from '../../../types/schemas/department.schema';
 import type { UserResponse } from '../../../types/schemas/user.schema';
 import { UserRole } from '../../../types/enums/user-role.enum';
+import InputSelect from '../InputSelect.vue';
+import { useFormErrors } from '../../../utils/formValidation';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -76,40 +73,40 @@ const initialFormData: AssignSupervisorRequest = {
 };
 
 const formData = reactive<AssignSupervisorRequest>({ ...initialFormData });
-const errors = reactive<Record<string, string[]>>({});
+
+const { errors, mapZodErrors, clearErrors } = useFormErrors({
+  departmentId: null,
+  supervisorId: null,
+});
 
 const unassignedDepartments = ref<DepartmentResponse[]>([]);
 const availableSupervisors = ref<UserResponse[]>([]);
 
 const fetchDropdownData = async () => {
   try {
-    // Departments that are currently unassigned to a supervisor.
     await adminStore.getUnassignedDepartmentsForSupervisor();
-    unassignedDepartments.value = adminStore.departments.content;
-
-    // A supervisor can be assigned to multiple departments.
     await adminStore.getAllUsers();
-    availableSupervisors.value = adminStore.users.content.filter(
+
+    // Manejo seguro de datos (arreglo vs estructura paginada)
+    unassignedDepartments.value = Array.isArray(adminStore.departments)
+      ? adminStore.departments
+      : adminStore.departments?.content || [];
+
+    const users = Array.isArray(adminStore.users)
+      ? adminStore.users
+      : adminStore.users?.content || [];
+
+    availableSupervisors.value = users.filter(
       (user) => user.role === UserRole.SUPERVISOR,
     );
-
-    // The following lines were for the old logic where a supervisor could only have one department.
-    // They are now removed because a supervisor can be assigned to multiple departments.
-    // const currentlyAssignedSupervisorIds = new Set(
-    //   adminStore.supervisorAssignments.content.map((sa) => sa.supervisor.id),
-    // );
-    // availableSupervisors.value = allSupervisors.filter(
-    //   (user) => !currentlyAssignedSupervisorIds.has(user.id)
-    // );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching dropdown data:', error);
-    // You might want to set an error message for the user here.
   }
 };
 
 const resetForm = () => {
   Object.assign(formData, initialFormData);
-  Object.keys(errors).forEach((k) => delete errors[k]);
+  clearErrors();
 };
 
 watch(
@@ -123,22 +120,45 @@ watch(
   { immediate: true },
 );
 
-const submitForm = () => {
-  Object.keys(errors).forEach((k) => delete errors[k]);
+const updateDepartmentId = (value: string | number | null) => {
+  formData.departmentId = value ? Number(value) : 0;
+};
 
-  const result = AssignmentSchemas.assignSupervisor.safeParse(formData);
+const updateSupervisorId = (value: string | number | null) => {
+  formData.supervisorId = value ? Number(value) : 0;
+};
+
+const supervisorOptionText = (supervisor: UserResponse) => {
+  return `${supervisor.firstname} ${supervisor.lastname} (${supervisor.email})`;
+};
+
+const submitForm = async () => {
+  clearErrors();
+
+  // Convertir a número si es cadena
+  const payload = {
+    departmentId:
+      typeof formData.departmentId === 'string'
+        ? parseInt(formData.departmentId)
+        : formData.departmentId,
+    supervisorId:
+      typeof formData.supervisorId === 'string'
+        ? parseInt(formData.supervisorId)
+        : formData.supervisorId,
+  };
+
+  const result = AssignmentSchemas.assignSupervisor.safeParse(payload);
 
   if (result.success) {
     emit('submit', result.data);
     closeModal();
   } else {
-    const flattened = result.error.flatten();
-    Object.assign(errors, flattened.fieldErrors);
-    console.error('Validation errors:', flattened.fieldErrors);
+    mapZodErrors(result.error);
   }
 };
 
 const closeModal = () => {
+  resetForm();
   emit('close');
 };
 </script>

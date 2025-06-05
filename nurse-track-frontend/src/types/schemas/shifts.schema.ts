@@ -24,13 +24,7 @@ export const ShiftSchemas = {
       nurseId: validation.requiredId(),
       departmentId: validation.requiredId(),
       shiftTemplateId: validation.requiredId(),
-      shiftDate: z
-        .string()
-        .refine(
-          (date) =>
-            new Date(date) >= new Date(new Date().toISOString().split('T')[0]),
-          { message: 'Shift date must be today or in the future' },
-        ),
+      shiftDate: validation.date(),
       status: validation.shiftStatus().default(ShiftStatus.SCHEDULED),
       notes: validation.optionalString(0, 500),
       createdById: validation.requiredId(),
@@ -42,13 +36,7 @@ export const ShiftSchemas = {
       nurseId: validation.optionalId(),
       departmentId: validation.optionalId(),
       shiftTemplateId: validation.optionalId(),
-      shiftDate: z
-        .string()
-        .refine(
-          (date) =>
-            new Date(date) >= new Date(new Date().toISOString().split('T')[0]),
-          { message: 'Shift date must be today or in the future' },
-        ),
+      shiftDate: validation.date(),
       status: validation.shiftStatus().optional(),
       notes: validation.optionalString(0, 500),
     })
@@ -60,19 +48,18 @@ export const ShiftSchemas = {
       nurse: UserSchemas.simpleResponse,
       department: DepartmentSchemas.response,
       shiftTemplate: ShiftTemplateSchemas.response,
-      shiftDate: z.string(), // LocalDate as ISO string
+      shiftDate: z.string(),
       status: validation.shiftStatus(),
       notes: validation.optionalString(0, 500),
       createdBy: UserSchemas.simpleResponse,
       createdAt: validation.dateTime(),
       updatedAt: validation.dateTime(),
-      shiftStart: validation.dateTime(), // Calculated in the backend
-      shiftEnd: validation.dateTime(), // Calculated in the backend
+      shiftStart: validation.dateTime(),
+      shiftEnd: validation.dateTime(),
     })
     .strict(),
 };
 
-// Tipos inferidos
 export type CreateShiftRequest = z.infer<typeof ShiftSchemas.create>;
 export type UpdateShiftRequest = z.infer<typeof ShiftSchemas.update>;
 export type ShiftResponse = z.infer<typeof ShiftSchemas.response>;

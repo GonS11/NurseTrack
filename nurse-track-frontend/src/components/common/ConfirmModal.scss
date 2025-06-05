@@ -1,0 +1,91 @@
+@use '../../styles/main.scss' as *;
+
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba($black, 0.6);
+  @include flex-center;
+  z-index: 1000;
+  padding: $spacer-3;
+}
+
+.confirm-modal-content {
+  background: $white;
+  padding: $spacer-4;
+  border-radius: $border-radius;
+  min-width: 300px;
+  max-width: 450px;
+  box-shadow: $card-shadow;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: $spacer-3;
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  .confirm-modal-content {
+    transition: $transition;
+  }
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  .confirm-modal-content {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  .confirm-modal-content {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.confirm-message {
+  margin-bottom: 0;
+  font-size: $font-size-base;
+  color: $text-primary;
+  line-height: $line-height-base;
+}
+
+.confirm-actions {
+  @include flex-center;
+  gap: $spacer-3;
+
+  .btn {
+    flex-grow: 1;
+    max-width: 150px;
+    font-size: $font-size-md;
+    @include button-base;
+
+    &.btn-danger {
+      @include button-danger;
+    }
+
+    &.btn-outline {
+      @include button-outline;
+    }
+  }
+}
+
+@include responsive(phone) {
+  .confirm-modal-content {
+    max-width: 90%;
+    padding: $spacer-3;
+  }
+
+  .confirm-actions {
+    flex-direction: column;
+    .btn {
+      width: 100%;
+      max-width: none;
+    }
+  }
+}

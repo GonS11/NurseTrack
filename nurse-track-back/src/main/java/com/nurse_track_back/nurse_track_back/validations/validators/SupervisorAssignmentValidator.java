@@ -10,22 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-public class SupervisorAssignmentValidator implements ConstraintValidator<ValidSupervisorAssignment, AssignSupervisorRequest>
-{
+public class SupervisorAssignmentValidator
+        implements ConstraintValidator<ValidSupervisorAssignment, AssignSupervisorRequest> {
     @Autowired
     private SupervisorDepartmentRepository supervisorDepartmentRepository;
 
     @Override
-    public boolean isValid(AssignSupervisorRequest request, ConstraintValidatorContext context)
-    {
+    public boolean isValid(AssignSupervisorRequest request, ConstraintValidatorContext context) {
         boolean isValid = true;
 
         // Verificar si el departamento ya tiene supervisor
-        Optional<SupervisorDepartment> existingDeptAssignment = supervisorDepartmentRepository.findByDepartmentId(request.getDepartmentId());
+        Optional<SupervisorDepartment> existingDeptAssignment = supervisorDepartmentRepository
+                .findByDepartment_Id(request.getDepartmentId());
 
         if (existingDeptAssignment.isPresent() &&
-                !existingDeptAssignment.get().getSupervisor().getId().equals(request.getSupervisorId()))
-        {
+                !existingDeptAssignment.get().getSupervisor().getId().equals(request.getSupervisorId())) {
             context.buildConstraintViolationWithTemplate("Department already has one supervisor assigned")
                     .addPropertyNode("departmentId")
                     .addConstraintViolation();

@@ -21,6 +21,7 @@ export const useAdminAssignmentService = {
         params: { page, size, sortBy },
       },
     );
+
     return response.data;
   },
 
@@ -28,6 +29,7 @@ export const useAdminAssignmentService = {
     const response = await api.get<DepartmentResponse[]>(
       '/admin/assignments/departments/unassigned',
     );
+
     return response.data;
   },
 
@@ -37,6 +39,7 @@ export const useAdminAssignmentService = {
     const response = await api.get<SupervisorDepartmentResponse>(
       `/admin/assignments/departments/${departmentId}/supervisor`,
     );
+
     return response.data;
   },
 
@@ -44,17 +47,15 @@ export const useAdminAssignmentService = {
     data: AssignSupervisorRequest,
   ): Promise<SupervisorDepartmentResponse> {
     const response = await api.post<SupervisorDepartmentResponse>(
-      `/admin/assignments/departments/${data.departmentId}/supervisor`,
+      `/admin/assignments/departments`,
       data,
     );
+
     return response.data;
   },
 
   async removeSupervisorFromDepartment(departmentId: number): Promise<void> {
-    await api.delete<void>(
-      `/admin/assignments/departments/${departmentId}/supervisor`,
-    );
-    // No data to return
+    await api.delete<void>(`/admin/assignments/departments/${departmentId}`);
   },
 
   //==== NURSE ASSIGNMENTS ====
@@ -67,6 +68,7 @@ export const useAdminAssignmentService = {
       '/admin/assignments/departments/nurses',
       { params: { page, size, sortBy } },
     );
+
     return response.data;
   },
 
@@ -74,6 +76,7 @@ export const useAdminAssignmentService = {
     const response = await api.get<DepartmentResponse[]>(
       '/admin/assignments/departments/nurses/unassigned',
     );
+
     return response.data;
   },
 
@@ -83,6 +86,7 @@ export const useAdminAssignmentService = {
     const response = await api.get<NurseDepartmentResponse[]>(
       `/admin/assignments/departments/${departmentId}/nurses`,
     );
+
     return response.data;
   },
 
@@ -93,6 +97,7 @@ export const useAdminAssignmentService = {
       `/admin/assignments/departments/${data.departmentId}/nurses`,
       data,
     );
+
     return response.data;
   },
 
@@ -103,6 +108,5 @@ export const useAdminAssignmentService = {
     await api.delete<void>(
       `/admin/assignments/departments/${departmentId}/nurses/${nurseId}`,
     );
-    // No data to return
   },
 };

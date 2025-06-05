@@ -37,7 +37,6 @@ export const AssignmentSchemas = {
     .strict(),
 };
 
-// Tipos inferidos
 export type AssignNurseRequest = z.infer<typeof AssignmentSchemas.assignNurse>;
 export type AssignSupervisorRequest = z.infer<
   typeof AssignmentSchemas.assignSupervisor

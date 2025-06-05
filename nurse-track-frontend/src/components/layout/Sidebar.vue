@@ -3,6 +3,7 @@
     <div class="logo">
       <img src="../../assets/img/Nursetrack-logo.png" alt="Logo" />
     </div>
+
     <button class="toggle" @click="$emit('toggle')" :aria-expanded="isOpen">
       <span class="material-icons">
         {{
@@ -12,6 +13,7 @@
         }}
       </span>
     </button>
+
     <nav class="menu">
       <RouterLink
         v-for="route in allowedRoutes"
@@ -30,8 +32,13 @@
         >
       </RouterLink>
     </nav>
+
     <footer class="footer">
-      <button @click="handleLogout" :disabled="isLoggingOut">
+      <button
+        @click="handleLogout"
+        :disabled="isLoggingOut"
+        class="btn-sidebar-footer"
+      >
         <span class="material-icons">logout</span>
         <span class="text">Salir</span>
       </button>
@@ -45,6 +52,7 @@ import { RouterLink } from 'vue-router';
 import { useAuthStore } from '../../services';
 import { UserRole } from '../../types/enums/user-role.enum';
 import { useNotificationStore } from '../../stores/notification.store';
+import { useNotifications } from '../../composables/useNotifications';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -55,19 +63,30 @@ const emit = defineEmits(['toggle']);
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
+const notificationsGlobal = useNotifications();
 const isLoggingOut = ref(false);
 
 const handleLogout = async () => {
   isLoggingOut.value = true;
-  await authStore.logout();
-  isLoggingOut.value = false;
+  try {
+    await authStore.logout();
+    notificationsGlobal.showSuccess('Session closed successfully.');
+  } catch (error: any) {
+    notificationsGlobal.showError(error.message || 'Failed to log out.');
+  } finally {
+    isLoggingOut.value = false;
+  }
 };
 
 const closeSidebarOnMobile = () => {
-  // Si el sidebar en móvil es una barra superior, no se necesita "cerrar" al hacer clic
-  // Solo se cierra si se implementa como un menú hamburguesa desplegable
-  // En este caso, al ser una barra siempre visible, no hacemos nada aquí
-  // Si en el futuro se implementa un menú hamburguesa en móvil, aquí se emitiría el 'toggle'
+  // Note: AppShell.vue's `isLateralSidebarOnMobile` is currently `false`.
+  // If you want the sidebar to close on route click on mobile, you'd need
+  // to change `isLateralSidebarOnMobile` to `true` in AppShell.vue
+  // and then this condition `props.isMobile` would be sufficient.
+  if (props.isMobile && false) {
+    // This `&& false` makes the condition always false. Remove `&& false` if `isLateralSidebarOnMobile` ever becomes true.
+    emit('toggle');
+  }
 };
 
 const allowedRoutes = computed(() => {
@@ -95,14 +114,12 @@ const allowedRoutes = computed(() => {
         text: 'Nurse Management',
       },
     );
-  }
-
-  if (role === UserRole.SUPERVISOR) {
+  } else if (role === UserRole.SUPERVISOR) {
     base.splice(
       1,
       0,
       {
-        name: 'supervisor-department-staff',
+        name: 'supervisor-management',
         icon: 'people',
         text: 'Management',
       },
@@ -113,9 +130,7 @@ const allowedRoutes = computed(() => {
         text: 'Request Management',
       },
     );
-  }
-
-  if (role === UserRole.NURSE) {
+  } else if (role === UserRole.NURSE) {
     base.splice(
       1,
       0,
@@ -135,9 +150,15 @@ const allowedRoutes = computed(() => {
 
 const unreadCount = computed(() => notificationStore.unreadNotifications);
 
-onMounted(() => {
+onMounted(async () => {
   if (authStore.currentUser) {
-    notificationStore.getAllNotifications(authStore.currentUser.id);
+    try {
+      await notificationStore.getAllNotifications(authStore.currentUser.id);
+    } catch (error: any) {
+      notificationsGlobal.showError(
+        error.message || 'Failed to fetch notifications.',
+      );
+    }
   }
 });
 </script>

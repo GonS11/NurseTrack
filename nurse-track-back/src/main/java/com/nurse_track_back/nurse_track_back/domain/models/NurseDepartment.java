@@ -29,6 +29,6 @@ public class NurseDepartment
     private Department department;
 
     @CreationTimestamp
-    @Column(name = "assigned_at", updatable = false)
+    @Column(name = "assigned_at", updatable = false, nullable = false)
     private LocalDateTime assignedAt;
 }

@@ -27,6 +27,7 @@ import type {
 import { type TableAction } from '../../components/ui/Table.vue';
 import { useAuthStore } from '../../services';
 import { useAdminStore } from '../../stores/admin.store';
+import { useNotifications } from '../../composables/useNotifications';
 
 // --- Stores y estado reactivo ---
 const authStore = useAuthStore();
@@ -36,6 +37,9 @@ const adminStore = useAdminStore();
 const managamentComponentRef = ref<InstanceType<
   typeof ManagamentComponent
 > | null>(null);
+
+// Notificaciones
+const { showSuccess, showError } = useNotifications();
 
 // Datos de la tabla
 const users = computed(() => adminStore.users);
@@ -74,11 +78,20 @@ const userActions = computed(
         icon: (user: UserResponse) => (user.isActive ? 'lock' : 'lock_open'),
         handler: async (user: UserResponse) => {
           if (user.isActive) {
-            await adminStore.desactivateUser(user.id);
+            try {
+              await adminStore.desactivateUser(user.id);
+              showSuccess('User deactivated successfully!');
+            } catch (error: any) {
+              showError(error);
+            }
           } else {
-            await adminStore.activateUser(user.id);
+            try {
+              await adminStore.activateUser(user.id);
+              showSuccess('User activated successfully!');
+            } catch (error: any) {
+              showError(error);
+            }
           }
-
           await getAllUsers(users.value.number); // Refresca la tabla después del toggle
         },
         condition: () => authStore.isAdmin,
@@ -91,8 +104,13 @@ const userActions = computed(
           if (
             confirm(`Are you sure you want to delete user "${user.username}"?`)
           ) {
-            await adminStore.deleteUser(user.id);
-            await getAllUsers(users.value.number); // Refresca la tabla después de borrar
+            try {
+              await adminStore.deleteUser(user.id);
+              showSuccess('User deleted successfully!');
+              await getAllUsers(users.value.number); // Refresca la tabla después de borrar
+            } catch (error: any) {
+              showError(error);
+            }
           }
         },
         condition: () => authStore.isAdmin,
@@ -100,18 +118,31 @@ const userActions = computed(
     ] as TableAction<UserResponse>[],
 );
 
-// MEtodos de CRUD para pasarle al componente
+// Métodos de CRUD para pasarle al componente
 const getAllUsers = async (page: number) => {
-  await adminStore.getAllUsers(page);
+  try {
+    await adminStore.getAllUsers(page);
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
 const createUser = async (formData: CreateUserRequest) => {
-  await adminStore.createUser(formData);
+  try {
+    await adminStore.createUser(formData);
+    showSuccess('User created successfully!');
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
 const updateUser = async (id: number, formData: UpdateUserRequest) => {
-  // Asegúrate de que el ID sea string aquí también
-  await adminStore.updateUser(id, formData);
+  try {
+    await adminStore.updateUser(id, formData);
+    showSuccess('User updated successfully!');
+  } catch (error: any) {
+    showError(error);
+  }
 };
 //Hook de ciclo de vida
 onMounted(() => {

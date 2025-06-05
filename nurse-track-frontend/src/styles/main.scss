@@ -1,2 +1,27 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'base' as *;
+
 @forward 'variables';
 @forward 'mixins';
+@forward 'base';
+
+.btn {
+  @include button-base;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+.btn-danger {
+  @include button-danger;
+}
+
+.btn-outline {
+  @include button-outline;
+}

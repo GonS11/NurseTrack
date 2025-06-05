@@ -1,7 +1,6 @@
 package com.nurse_track_back.nurse_track_back.repositories;
 
 import com.nurse_track_back.nurse_track_back.domain.models.Department;
-import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,8 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DepartmentRepository extends JpaRepository<Department, Long>
-{
+public interface DepartmentRepository extends JpaRepository<Department, Long> {
     boolean existsByName(String departmentName);
 
     List<Department> findByIsActiveTrue();

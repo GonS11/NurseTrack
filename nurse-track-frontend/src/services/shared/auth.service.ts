@@ -12,6 +12,7 @@ export const useAuthService = {
       '/auth/register',
       request,
     );
+
     return response.data;
   },
 
@@ -22,6 +23,7 @@ export const useAuthService = {
       '/auth/authenticate',
       request,
     );
+
     return response.data;
   },
 };

@@ -1,0 +1,62 @@
+@use '../../styles/main.scss' as *;
+
+.form-group {
+  margin-bottom: $spacer-4;
+
+  label {
+    display: block;
+    color: $gray-700;
+    margin-bottom: $spacer-2;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+}
+
+.input-wrapper {
+  @include flex-center(row);
+  border: 1px solid $gray-300;
+  border-radius: $border-radius;
+  padding: 0 $spacer-3;
+  height: 3rem;
+  transition: $transition;
+  background: $white;
+  position: relative;
+
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px $input-focus-glow;
+  }
+
+  &.error-border {
+    border-color: $error;
+    box-shadow: 0 0 0 0.25rem rgba($error, 0.25);
+  }
+
+  select {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    outline: none;
+    height: 100%;
+    padding: 0;
+    color: $text-primary;
+
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right $spacer-3 center;
+    background-size: 1.25rem;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.error-text {
+  color: $error;
+  font-size: 0.875rem;
+  margin-top: $spacer-1;
+  display: block;
+}

@@ -3,16 +3,19 @@ package com.nurse_track_back.nurse_track_back.repositories;
 import com.nurse_track_back.nurse_track_back.domain.models.Department;
 import com.nurse_track_back.nurse_track_back.domain.models.SupervisorDepartment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface SupervisorDepartmentRepository extends JpaRepository<SupervisorDepartment, Long> {
-    Optional<SupervisorDepartment> findByDepartmentId(Long departmentId);
+    //Optional<SupervisorDepartment> findByDepartmentId(Long departmentId);
+    Optional<SupervisorDepartment> findByDepartment_Id(Long departmentId);
 
     boolean existsBySupervisor_IdAndDepartment_Id(Long supervisorId, Long departmentId);
 
@@ -27,7 +30,10 @@ public interface SupervisorDepartmentRepository extends JpaRepository<Supervisor
                 AND sd.supervisor.id = :supervisorId
             """)
     boolean existsByNurse_IdAndSupervisor_Id(@Param("nurseId") Long nurseId,
-                                             @Param("supervisorId") Long supervisorId);
+            @Param("supervisorId") Long supervisorId);
 
-    Optional<SupervisorDepartment> findByDepartment_Id(Long departmentId);
+    @Modifying // Indicates that this query will modify the database
+    @Transactional // **Add this annotation**
+    @Query("DELETE FROM SupervisorDepartment sd WHERE sd.supervisor.id = :supervisorId")
+    void deleteBySupervisorId(Long supervisorId);
 }

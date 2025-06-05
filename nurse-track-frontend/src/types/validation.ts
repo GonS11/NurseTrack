@@ -1,4 +1,3 @@
-// src/utils/validation.ts
 import { z } from 'zod';
 import { UserRole } from './enums/user-role.enum';
 import { ShiftStatus } from './enums/shift-status.enum';
@@ -30,7 +29,7 @@ export const validation = {
   optionalString: (min = 1, max = 255) => {
     return z
       .string()
-      .min(min, `Should have at least ${min} characters`) // Si no está vacío, debe cumplir el min
+      .min(min, `Should have at least ${min} characters`)
       .max(max, `Cannot exceed ${max} characters`)
       .trim()
       .optional();
@@ -103,6 +102,25 @@ export const validation = {
     return z.number().positive('Should be a positive number');
   },
 
+  positiveNumberOptional: () => {
+    return z.number().positive('Should be a positive number').optional();
+  },
+
+  //ShiftDate
+  date: () => {
+    return z.string().refine(
+      (date) => {
+        if (!date) return false;
+
+        const inputDate = new Date(date);
+        const today = new Date(new Date().toISOString().split('T')[0]);
+
+        return inputDate >= today;
+      },
+      { message: 'Date must be today or in the future' },
+    );
+  },
+
   // Date time
   dateTime: () => {
     return z.string().datetime();
@@ -161,9 +179,11 @@ export const validation = {
       $validator: (value: unknown) => schema.safeParse(value).success,
       $message: (ctx: any) => {
         const result = schema.safeParse(ctx.$model);
+
         if (!result.success) {
           return result.error.errors[0]?.message || 'Invalid value';
         }
+
         return '';
       },
     };

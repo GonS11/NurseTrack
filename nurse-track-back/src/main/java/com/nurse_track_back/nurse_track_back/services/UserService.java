@@ -1,6 +1,7 @@
 package com.nurse_track_back.nurse_track_back.services;
 
 import com.nurse_track_back.nurse_track_back.domain.models.User;
+import com.nurse_track_back.nurse_track_back.repositories.SupervisorDepartmentRepository;
 import com.nurse_track_back.nurse_track_back.web.dto.request.user.CreateUserRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.request.user.UpdateUserRequest;
 import com.nurse_track_back.nurse_track_back.web.dto.response.UserResponse;
@@ -27,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final SupervisorDepartmentRepository supervisorDepartmentRepository;
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(int page, int size, String sortBy) {
@@ -78,10 +80,19 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id))
-            throw ResourceNotFoundException.create("User", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.create("User", id));
 
+        if (user.getRole() == com.nurse_track_back.nurse_track_back.domain.enums.Role.ROLE_SUPERVISOR) {
+            log.info("Deleting supervisor department assignments for user ID: {}", id);
+            supervisorDepartmentRepository.deleteBySupervisorId(id);
+            // Remove: entityManager.flush(); // No longer needed here
+            log.info("Supervisor department assignments deleted for user ID: {}", id); // Update log message
+        }
+
+        log.info("Attempting to delete user ID: {}", id);
         userRepository.deleteById(id);
+        log.info("User ID: {} deleted successfully.", id);
     }
 
 }

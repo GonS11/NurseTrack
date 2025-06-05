@@ -2,91 +2,110 @@
   <div v-if="isOpen" class="modal-overlay">
     <div class="modal">
       <h2>{{ item ? 'Edit User' : 'New User' }}</h2>
+
       <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label>First Name</label>
-          <input v-model="formData.firstname" />
-          <div v-if="errors.firstname" class="error">
-            {{ errors.firstname[0] }}
-          </div>
-        </div>
+        <div class="form-fields">
+          <Input
+            id="firstname"
+            label="First Name"
+            type="text"
+            v-model="formData.firstname"
+            placeholder="Enter firstname"
+            :error="errors.firstname"
+            required
+          />
 
-        <div class="form-group">
-          <label>Last Name</label>
-          <input v-model="formData.lastname" />
-          <div v-if="errors.lastname" class="error">
-            {{ errors.lastname[0] }}
-          </div>
-        </div>
+          <Input
+            id="lastname"
+            label="Last Name"
+            type="text"
+            v-model="formData.lastname"
+            placeholder="Enter lastname"
+            :error="errors.lastname"
+            required
+          />
 
-        <template v-if="!item">
-          <div class="form-group">
-            <label>Username</label>
-            <input v-model="formData.username" />
-            <div v-if="errors.username" class="error">
-              {{ errors.username[0] }}
-            </div>
-          </div>
+          <template v-if="!item">
+            <Input
+              id="username"
+              label="Username"
+              type="text"
+              v-model="formData.username"
+              placeholder="Enter username"
+              :error="errors.username"
+              required
+            />
 
-          <div class="form-group">
-            <label>Email</label>
-            <input v-model="formData.email" type="email" />
-            <div v-if="errors.email" class="error">
-              {{ errors.email[0] }}
-            </div>
-          </div>
+            <Input
+              id="email"
+              label="Email"
+              type="email"
+              v-model="formData.email"
+              placeholder="Enter email"
+              :error="errors.email"
+              required
+            />
 
-          <div class="form-group">
-            <label>Password</label>
-            <input v-model="formData.password" type="password" />
-            <div v-if="errors.password" class="error">
-              {{ errors.password[0] }}
-            </div>
-          </div>
-        </template>
+            <Input
+              id="password"
+              label="Password"
+              type="password"
+              v-model="formData.password"
+              placeholder="Enter password"
+              :error="errors.password"
+              required
+            />
+          </template>
 
-        <div class="form-group">
-          <label>Role</label>
-          <select v-model="formData.role">
-            <option disabled value="">Select role</option>
-            <option
-              v-for="role in Object.values(UserRole)"
-              :key="role"
-              :value="role"
-            >
-              {{ UserRoleData[role].displayName }}
-            </option>
-          </select>
-          <div v-if="errors.role" class="error">
-            {{ errors.role[0] }}
-          </div>
-        </div>
+          <InputSelect
+            id="role"
+            label="Role"
+            v-model="formData.role"
+            text="Select a role"
+            :entities="roleOptions"
+            item-key="id"
+            item-value="id"
+            option-value="name"
+            :error="errors.role"
+            :placeholder-value="null"
+            required
+          />
 
-        <div
-          v-if="[UserRole.NURSE, UserRole.SUPERVISOR].includes(formData.role)"
-          class="form-group"
-        >
-          <label>License Number</label>
-          <input v-model="formData.licenseNumber" />
-          <div v-if="errors.licenseNumber" class="error">
-            {{ errors.licenseNumber[0] }}
-          </div>
-        </div>
+          <Input
+            v-if="[UserRole.NURSE, UserRole.SUPERVISOR].includes(formData.role as UserRole)"
+            id="licenseNumber"
+            label="License Number"
+            type="text"
+            v-model="formData.licenseNumber"
+            placeholder="Enter license number"
+            :error="errors.licenseNumber"
+            required
+          />
 
-        <div v-if="item" class="form-group">
-          <label>Status</label>
-          <select v-model="formData.isActive">
-            <option :value="true">Active</option>
-            <option :value="false">Inactive</option>
-          </select>
-          <div v-if="errors.isActive" class="error">
-            {{ errors.isActive[0] }}
-          </div>
+          <InputSelect
+            v-if="item"
+            id="isActive"
+            label="Status"
+            v-model="formData.isActive"
+            text="Select status"
+            :entities="[
+              { id: true, name: 'Active' },
+              { id: false, name: 'Inactive' },
+            ]"
+            item-key="id"
+            item-value="id"
+            option-value="name"
+            :error="errors.isActive"
+            :placeholder-value="null"
+            required
+          />
         </div>
 
         <div class="form-actions">
-          <button type="button" @click="close">Cancel</button>
-          <button type="submit">
+          <button type="button" @click="close" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
             {{ item ? 'Update' : 'Create' }}
           </button>
         </div>
@@ -96,16 +115,22 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { reactive, watch, computed } from 'vue';
 import {
   UserSchemas,
   type CreateUserRequest,
   type UpdateUserRequest,
   type UserResponse,
 } from '../../../types/schemas/user.schema';
-import { UserRole, UserRoleData } from '../../../types/enums/user-role.enum';
+import {
+  UserRole,
+  UserRoleData,
+  type UserRoleConfig,
+} from '../../../types/enums/user-role.enum';
+import { useFormErrors } from '../../../utils/formValidation';
+import Input from '../Input.vue';
+import InputSelect from '../InputSelect.vue';
 
-//item es user
 const props = defineProps<{
   isOpen: boolean;
   item: UserResponse | null;
@@ -113,98 +138,132 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'submit']);
 
-// Define el estado inicial del formulario con valores por defecto
+// Define initialFormData para permitir 'null' en el rol si es una nueva creación
 const initialFormData: Omit<CreateUserRequest, 'id' | 'createdAt'> &
   Partial<UpdateUserRequest> = {
   firstname: '',
   lastname: '',
-  role: UserRole.NURSE,
+  role: null as any,
   licenseNumber: undefined,
   username: '',
   email: '',
   password: '',
-  isActive: true, // Por defecto activo para nuevas creaciones
+  isActive: true,
 };
 
 const formData = reactive<typeof initialFormData>({ ...initialFormData });
-const errors = reactive<Record<string, string[]>>({});
 
-// createUserMode ya no es necesario, puedes usar `!props.item` directamente
-// const createUserMode = computed(() => !props.item);
+const { errors, mapZodErrors, clearErrors } = useFormErrors({
+  firstname: null,
+  lastname: null,
+  username: null,
+  email: null,
+  password: null,
+  role: null,
+  licenseNumber: null,
+  isActive: null,
+});
+
+const roleOptions = computed(() => {
+  const options = Object.values(UserRole).map((role: UserRole) => {
+    const config: UserRoleConfig = UserRoleData[role];
+    return {
+      id: role,
+      name: config.displayName,
+    };
+  });
+  return options;
+});
+
+const roleOptionText = (entity: { id: UserRole; name: string }) => {
+  return entity.name;
+};
 
 const resetForm = () => {
-  Object.assign(formData, initialFormData); // Restablece a los valores iniciales
-  Object.keys(errors).forEach((k) => delete errors[k]); // Limpia errores
+  Object.assign(formData, initialFormData);
+  clearErrors();
 };
 
 watch(
-  () => props.item, // <--- Cambiado de 'user' a 'item'
+  () => props.item,
   (newItem) => {
     if (newItem) {
-      // Si hay un item, estamos editando, poblar el formulario
       Object.assign(formData, {
         firstname: newItem.firstname,
         lastname: newItem.lastname,
         role: newItem.role,
-        licenseNumber: newItem.licenseNumber || undefined, // Asegúrate de que undefined si es null
-        username: newItem.username, // Solo para visualización o si se permitiera editar
-        email: newItem.email, // Solo para visualización o si se permitiera editar
-        password: '', // Nunca precargues la contraseña
+        licenseNumber: newItem.licenseNumber || undefined,
+        username: newItem.username,
+        email: newItem.email,
+        password: '',
         isActive: newItem.isActive,
       });
-      // Para un junior, podrías simplificar quitando username y email si no se editan en el update
-      // o dejándolos en el formulario como deshabilitados si solo son de lectura en modo edición.
-      // Aquí los he dejado, pero la validación Zod se encargará de si son obligatorios o no en cada modo.
     } else {
-      // Si no hay item, es una creación, resetear el formulario
       resetForm();
     }
   },
-  { immediate: true }, // Ejecutar al montar el componente
+  { immediate: true },
 );
 
 watch(
   () => props.isOpen,
   (newVal) => {
     if (!newVal) {
-      // Si el modal se cierra, resetea el formulario y los errores
       resetForm();
     }
   },
 );
 
-const submitForm = () => {
-  Object.keys(errors).forEach((k) => delete errors[k]); // Limpiar errores anteriores
+watch(
+  () => formData.role,
+  (newRole) => {
+    // Asegurarse de que el casting sea seguro si newRole puede ser null
+    if (![UserRole.NURSE, UserRole.SUPERVISOR].includes(newRole as UserRole)) {
+      formData.licenseNumber = undefined;
+      if (errors.licenseNumber) {
+        errors.licenseNumber = null;
+      }
+    }
+  },
+);
 
-  // Preparar los datos para la validación/envío
+const submitForm = () => {
+  clearErrors();
+
   const cleanData: any = { ...formData };
-  // Eliminar campos que solo aplican a 'crear' cuando estamos 'editando'
-  // o campos vacíos que Zod debería tratar como `undefined` para `partial()`
+
+  // Convertir null a undefined para Zod si el campo no es opcional
+  if (cleanData.role === null) {
+    cleanData.role = undefined;
+  }
+
   if (props.item) {
-    // Si estamos editando
     delete cleanData.username;
     delete cleanData.email;
-    delete cleanData.password;
+
+    if (cleanData.password === '') {
+      delete cleanData.password;
+    }
+
+    if (typeof cleanData.isActive === 'string') {
+      cleanData.isActive = cleanData.isActive === 'true';
+    }
   }
-  // Convertir campos vacíos a undefined para Zod.optional() o Zod.partial()
+
   for (const key in cleanData) {
     if (cleanData[key] === '') {
       cleanData[key] = undefined;
     }
   }
 
-  // Determinar qué esquema Zod usar (crear o actualizar)
   const schema = props.item ? UserSchemas.update : UserSchemas.create;
-  const result = schema.safeParse(cleanData); // Validar los datos
+  const result = schema.safeParse(cleanData);
 
   if (result.success) {
-    // Si la validación es exitosa, emitir el evento 'submit' con los datos validados
     emit('submit', result.data);
   } else {
-    // Si la validación falla, poblar el objeto de errores para mostrarlos en el formulario
-    const flattened = result.error.flatten();
-    Object.assign(errors, flattened.fieldErrors);
-    console.error('Validation errors:', flattened.fieldErrors);
+    mapZodErrors(result.error);
+    console.error('Validation errors:', result.error.flatten().fieldErrors);
   }
 };
 
@@ -214,5 +273,5 @@ const close = () => {
 </script>
 
 <style lang="scss" scoped>
-@use 'Modal.scss'; // Mantén tu importación de estilos
+@use 'Modal.scss';
 </style>

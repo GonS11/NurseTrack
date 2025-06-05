@@ -27,17 +27,17 @@ import type {
   UpdateDepartmentRequest,
 } from '../../types/schemas/department.schema';
 import DepartmentModal from '../../components/ui/modals/DepartmentModal.vue';
+import { useNotifications } from '../../composables/useNotifications';
 
-// --- Stores y estado reactivo ---
 const authStore = useAuthStore();
 const adminStore = useAdminStore();
 
-// componente ManagementComponen (Para llamar a sus funciones)
 const managamentComponentRef = ref<InstanceType<
   typeof ManagamentComponent
 > | null>(null);
 
-// Datos de la tabla
+const { showSuccess, showError } = useNotifications();
+
 const departments = computed(() => adminStore.departments);
 
 const departmentHeaders = [
@@ -53,7 +53,6 @@ const departmentActions = computed(
         icon: 'edit',
         class: 'edit',
         handler: (department: DepartmentResponse) => {
-          // Llama a la función expuesta de EntityManagement
           managamentComponentRef.value?.openUpdateModal(department);
         },
       },
@@ -63,11 +62,20 @@ const departmentActions = computed(
           department.isActive ? 'lock' : 'lock_open',
         handler: async (department: DepartmentResponse) => {
           if (department.isActive) {
-            await adminStore.desactivateDepartment(department.id);
+            try {
+              await adminStore.desactivateDepartment(department.id);
+              showSuccess('Department deactivated successfully!');
+            } catch (error: any) {
+              showError(error);
+            }
           } else {
-            await adminStore.activeDepartment(department.id);
+            try {
+              await adminStore.activeDepartment(department.id);
+              showSuccess('Department activated successfully!');
+            } catch (error: any) {
+              showError(error);
+            }
           }
-
           await getAllDepartments(departments.value.number);
         },
         condition: () => authStore.isAdmin,
@@ -82,8 +90,13 @@ const departmentActions = computed(
               `Are you sure you want to delete user "${department.name}"?`,
             )
           ) {
-            await adminStore.deleteDepartment(department.id);
-            await getAllDepartments(departments.value.number); // Refresca la tabla después de borrar
+            try {
+              await adminStore.deleteDepartment(department.id);
+              showSuccess('Department deleted successfully!');
+              await getAllDepartments(departments.value.number);
+            } catch (error: any) {
+              showError(error);
+            }
           }
         },
         condition: () => authStore.isAdmin,
@@ -91,25 +104,37 @@ const departmentActions = computed(
     ] as TableAction<DepartmentResponse>[],
 );
 
-// Metodos de CRUD para pasarle al componente
 const getAllDepartments = async (page: number) => {
-  await adminStore.getAllDepartments(page);
+  try {
+    await adminStore.getAllDepartments(page);
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
 const createDepartment = async (formData: CreateDepartmentRequest) => {
-  await adminStore.createDepartment(formData);
+  try {
+    await adminStore.createDepartment(formData);
+    showSuccess('Department created successfully!');
+  } catch (error: any) {
+    showError(error);
+  }
 };
 
 const updateDepartment = async (
   id: number,
   formData: UpdateDepartmentRequest,
 ) => {
-  // Asegúrate de que el ID sea string aquí también
-  await adminStore.updateDepartment(id, formData);
+  try {
+    await adminStore.updateDepartment(id, formData);
+    showSuccess('Department updated successfully!');
+  } catch (error: any) {
+    showError(error);
+  }
 };
-//Hook de ciclo de vida
+
 onMounted(() => {
-  getAllDepartments(0); //Cargar la primera pagina al montar
+  getAllDepartments(0);
 });
 </script>
 

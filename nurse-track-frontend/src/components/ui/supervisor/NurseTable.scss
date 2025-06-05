@@ -1,25 +1,23 @@
-@use 'sass:color';
-@use 'sass:map';
 @use '../../../styles/main.scss' as *;
 
 .nurse-table-container {
   overflow-x: auto;
-  margin-top: map.get($spacers, 3); // Corresponds to $spacing-md
+  margin-top: $spacer-3;
 
   table {
     width: 100%;
     border-collapse: collapse;
-    background-color: $white; // Use white for table background
+    background-color: $white;
     border-radius: $border-radius;
-    overflow: hidden; // Ensures border-radius applies to table
-    box-shadow: $card-shadow-sm; // Use small card shadow
+    overflow: hidden;
+    box-shadow: $card-shadow-sm;
 
     thead {
-      background-color: $primary; // Use primary color for header background
+      background-color: $primary;
       color: $white;
 
       th {
-        padding: map.get($spacers, 2) map.get($spacers, 3); // Corresponds to $spacing-sm $spacing-md
+        padding: $spacer-2 $spacer-3;
         text-align: left;
         font-weight: 600;
         font-size: $font-size-base * 0.9;
@@ -28,10 +26,10 @@
 
     tbody {
       tr {
-        border-bottom: 1px solid $gray-200; // Use a light gray for row dividers
+        border-bottom: 1px solid $gray-200;
 
         &:nth-child(even) {
-          background-color: $gray-100; // Alternate row background
+          background-color: $gray-100;
         }
 
         &:last-child {
@@ -39,28 +37,24 @@
         }
 
         td {
-          padding: map.get($spacers, 2) map.get($spacers, 3); // Corresponds to $spacing-sm $spacing-md
-          color: $gray-700; // Use a specific gray for text
+          padding: $spacer-2 $spacer-3;
+          color: $gray-700;
           vertical-align: middle;
         }
       }
     }
 
     .remove-btn {
-      @include button-action-icon; // Use the action icon button mixin
-      // Override default color if needed, but the 'danger' class handles this
-      // background-color: $error; // This will be set by the .danger modifier within the mixin
-      // color: $white;
+      @include button-action-icon;
 
       .button-text {
-        // Optional: Hide text on smaller screens if you only want the icon
         @include responsive(phone) {
           display: none;
         }
       }
 
       .material-icons {
-        font-size: 1.2rem; // Slightly larger icon
+        font-size: 1.2rem;
       }
     }
   }

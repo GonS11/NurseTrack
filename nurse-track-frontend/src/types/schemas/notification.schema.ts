@@ -23,7 +23,6 @@ export const NotificationSchemas = {
   }),
 };
 
-// Tipos inferidos
 export type CreateNotificationRequest = z.infer<
   typeof NotificationSchemas.create
 >;

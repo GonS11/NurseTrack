@@ -7,7 +7,6 @@ import AppShell from '../components/layout/AppShell.vue';
 import { useAuthStore } from '../services';
 import { UserRole } from '../types/enums/user-role.enum';
 
-// Lazy-loaded views
 const LoginPage = () => import('../views/auth/LoginPage.vue');
 
 // Admin
@@ -22,7 +21,7 @@ const NurseAssignment = () => import('../views/admin/NurseAssignment.vue');
 // Supervisor
 const SupervisorDashboard = () =>
   import('../views/dashboard/SupervisorDashboard.vue');
-const SupervisorDepartmentAndStaff = () =>
+const SupervisorManagement = () =>
   import('../views/supervisor/SupervisorManagement.vue');
 const ShiftSchedule = () => import('../views/supervisor/ShiftSchedule.vue');
 const RequestsManagement = () =>
@@ -128,19 +127,34 @@ const routes: RouteRecordRaw[] = [
         meta: { allowedRoles: [UserRole.SUPERVISOR] },
         children: [
           {
-            path: 'department-staff-management',
-            name: 'supervisor-department-staff',
-            component: SupervisorDepartmentAndStaff,
+            path: 'supervisor-management',
+            name: 'supervisor-management',
+            component: SupervisorManagement,
+            props: (route) => ({
+              departmentId: route.query.departmentId
+                ? Number(route.query.departmentId)
+                : null,
+            }),
           },
           {
             path: 'shifts',
             name: 'supervisor-shifts',
             component: ShiftSchedule,
+            props: (route) => ({
+              departmentId: route.query.departmentId
+                ? Number(route.query.departmentId)
+                : null,
+            }),
           },
           {
             path: 'requests',
             name: 'supervisor-requests',
             component: RequestsManagement,
+            props: (route) => ({
+              departmentId: route.query.departmentId
+                ? Number(route.query.departmentId)
+                : null,
+            }),
           },
         ],
       },
@@ -178,7 +192,6 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  // Global 404
   { path: '/:pathMatch(.*)*', name: 'global-not-found', component: NotFound },
 ];
 
@@ -190,17 +203,18 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const { isAuthenticated, user } = useAuthStore();
 
-  // Redirect to login if not authenticated
+  // Redirige si no esta auntenticado
   if (to.meta.requiresAuth && !isAuthenticated) {
     return next({ name: 'login', query: { redirect: to.fullPath } });
   }
 
-  // Role-based access control
+  // Control roles
   const allowedRoles = to.meta.allowedRoles as UserRole[] | undefined;
+
   if (allowedRoles?.length && user?.roles) {
     const userRoles = user.roles.map((r) => r.authority);
+
     if (!userRoles.some((role) => allowedRoles.includes(role))) {
-      // Insufficient permission: send to dashboard redirect
       return next({ name: 'dashboard' });
     }
   }

@@ -7,7 +7,7 @@ export enum RequestStatus {
 
 export interface StatusConfig {
   displayName: string;
-  badgeStyle: string; // For UI styling
+  badgeStyle: string;
 }
 
 export const RequestStatusData: Record<RequestStatus, StatusConfig> = {

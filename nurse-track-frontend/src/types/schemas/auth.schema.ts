@@ -42,7 +42,6 @@ export const AuthSchemas = {
   }),
 };
 
-// Tipos inferidos
 export type AuthenticationRequest = z.infer<
   typeof AuthSchemas.authenticationRequest
 >;

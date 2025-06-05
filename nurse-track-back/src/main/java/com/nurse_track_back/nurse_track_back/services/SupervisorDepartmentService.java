@@ -38,10 +38,8 @@ public class SupervisorDepartmentService {
     @Transactional(readOnly = true)
     public Page<SupervisorDepartmentResponse> getAllAssignments(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<SupervisorDepartment> assingmentsPage = supervisorDepartmentRepository.findAll(pageable);
-
-        // Mapear content del Page manualmente
-        return assingmentsPage.map(supervisorDepartmentMapper::toDTO);
+        Page<SupervisorDepartment> assignmentsPage = supervisorDepartmentRepository.findAll(pageable);
+        return assignmentsPage.map(supervisorDepartmentMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -55,49 +53,32 @@ public class SupervisorDepartmentService {
         if (!departmentRepository.existsById(id)) {
             throw ResourceNotFoundException.create("department", id);
         }
-
-        return supervisorDepartmentRepository.findByDepartmentId(id)
+        return supervisorDepartmentRepository.findByDepartment_Id(id)
                 .map(supervisorDepartmentMapper::toDTO)
                 .orElseThrow(() -> ResourceNotFoundException.create("Department", id));
     }
 
     public SupervisorDepartmentResponse assignSupervisor(AssignSupervisorRequest request) {
-        SupervisorDepartment assignment = supervisorDepartmentMapper.toEntity(request, userRepository,
-                departmentRepository);
-
-        return supervisorDepartmentMapper.toDTO(supervisorDepartmentRepository.save(assignment));
+        SupervisorDepartment assignment =
+                supervisorDepartmentMapper.toEntity(request, userRepository, departmentRepository);
+        return supervisorDepartmentMapper.toDTO(
+                supervisorDepartmentRepository.save(assignment)
+        );
     }
 
     public void removeSupervisor(Long departmentId) {
-        log.info("Attempting to delete assignment for department ID: {}", departmentId);
         SupervisorDepartment assignment = supervisorDepartmentRepository.findByDepartment_Id(departmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found for department ID: " + departmentId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Assignment not found for department ID: " + departmentId));
 
-        log.info("Found assignment with ID {} for department ID {}. Deleting...", assignment.getId(), departmentId);
         supervisorDepartmentRepository.delete(assignment);
-        log.info("Assignment with ID {} for department ID {} successfully deleted.", assignment.getId(), departmentId);
-
-        // --- DIAGNOSTIC CODE START ---
-        if (TransactionSynchronizationManager.isActualTransactionActive()) {
-            log.info("DIAGNOSTIC: Transaction is still active after delete operation.");
-            // You can even try to force a flush here, though delete should trigger it
-            // JpaTransactionManager will auto-flush before commit
-            // entityManager.flush(); // If you have EntityManager injected
-        } else {
-            log.warn("DIAGNOSTIC: No active transaction after delete operation. This is unexpected for a @Transactional method.");
-        }
-        // --- DIAGNOSTIC CODE END ---
     }
 
-
     public void validateSupervisorAccess(Long supervisorId, Long departmentId) {
-        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisor_IdAndDepartment_Id(supervisorId,
-                                                                                                 departmentId);
-
+        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisor_IdAndDepartment_Id(supervisorId, departmentId);
         if (!hasAccess) {
             throw SecurityException.create("validateSupervisorAccess",
-                    "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
-
+                                           "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
         }
     }
 }

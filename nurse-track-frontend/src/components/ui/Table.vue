@@ -19,9 +19,13 @@
         </thead>
         <tbody>
           <tr v-for="item in data" :key="item.id">
-            <td v-for="(header, j) in headers" :key="j">
+            <td
+              v-for="(header, j) in headers"
+              :key="j"
+              :class="{ 'text-center': header.alignCenter }"
+            >
               <template v-if="header.format">
-                {{ header.format(item) }}
+                <span v-html="header.format(item)"></span>
               </template>
               <template v-else-if="$slots[`cell-${header.key}`]">
                 <slot :name="`cell-${header.key}`" :item="item"></slot>
@@ -92,7 +96,8 @@ import { computed, type PropType } from 'vue';
 type Header = {
   key: string;
   label: string;
-  format?: (item: any) => string; // La función format recibe el 'item' completo
+  format?: (item: any) => string;
+  alignCenter?: boolean; // Nueva prop para centrar el texto de la celda
 };
 
 export interface TableAction<Item = any> {
@@ -144,10 +149,8 @@ const showAction = (action: TableAction, item: any) => {
 };
 
 const handleAction = (action: TableAction, item: any) => {
-  // Emit 'action' event if parent needs to listen to all actions
   emit('action', { action: action.label, item });
-  // Call the specific handler function defined in the action
-  action.handler(item);
+  action.handler(item); // The actual action handler
 };
 
 const changePage = (delta: number) => {
@@ -159,5 +162,5 @@ const changePage = (delta: number) => {
 </script>
 
 <style scoped lang="scss">
-@use 'Table.scss'; // Mantén tu importación de estilos
+@use 'Table.scss';
 </style>

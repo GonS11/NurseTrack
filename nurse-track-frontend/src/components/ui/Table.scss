@@ -1,16 +1,14 @@
-@use 'sass:color';
-@use 'sass:map';
 @use '../../styles/main.scss' as *;
 
 .data-table {
   background: $white;
-  border-radius: $btn-border-radius;
+  border-radius: $border-radius;
   @include box-shadow(1);
   overflow: hidden;
 }
 
 .table-header {
-  padding: map.get($spacers, 4);
+  padding: $spacer-4;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34,9 +32,13 @@ table {
 
   th,
   td {
-    padding: map.get($spacers, 3);
+    padding: $spacer-3;
     text-align: left;
     vertical-align: middle;
+  }
+
+  .text-center {
+    text-align: center;
   }
 
   thead {
@@ -67,11 +69,21 @@ table {
     width: 1%;
     white-space: nowrap;
   }
+
+  @include responsive(phone) {
+    min-width: 100%;
+
+    th,
+    td {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+  }
 }
 
 .actions-wrapper {
   display: flex;
-  gap: map.get($spacers, 2);
+  gap: $spacer-2;
   flex-wrap: nowrap;
 }
 
@@ -81,8 +93,8 @@ table {
 
 .empty-state {
   @include flex-center(row);
-  gap: map.get($spacers, 2);
-  padding: map.get($spacers, 4);
+  gap: $spacer-2;
+  padding: $spacer-4;
   color: $gray-600;
   text-align: center;
   font-style: italic;
@@ -91,7 +103,7 @@ table {
 .pagination-controls {
   @include flex-center(row);
   justify-content: space-between;
-  padding: map.get($spacers, 3) map.get($spacers, 4);
+  padding: $spacer-3 $spacer-4;
   border-top: 1px solid $gray-200;
 
   .pagination-info {
@@ -101,12 +113,12 @@ table {
 
   .pagination-buttons {
     @include flex-center(row);
-    gap: map.get($spacers, 2);
+    gap: $spacer-2;
   }
 
   .pagination-button {
     @include flex-center;
-    padding: map.get($spacers, 2);
+    padding: $spacer-2;
     border-radius: $btn-border-radius;
     background: rgba($primary, 0.1);
     color: $primary;
@@ -125,9 +137,20 @@ table {
   }
 
   .page-indicator {
-    padding: map.get($spacers, 2) map.get($spacers, 3);
+    padding: $spacer-2 $spacer-3;
     background: $gray-100;
     border-radius: $btn-border-radius;
     font-weight: 500;
+  }
+
+  @include responsive(phone) {
+    flex-direction: column;
+    gap: $spacer-3;
+    align-items: flex-start;
+
+    .pagination-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
   }
 }

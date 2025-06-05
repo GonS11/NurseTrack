@@ -16,8 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @ValidSupervisorAssignment
-public class AssignSupervisorRequest
-{
+public class AssignSupervisorRequest {
     @NotNull(message = "Department ID is required")
     @ValidDepartmentId(message = "Invalid department ID")
     private Long departmentId;

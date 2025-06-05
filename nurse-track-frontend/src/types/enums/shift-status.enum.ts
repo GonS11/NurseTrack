@@ -7,7 +7,7 @@ export enum ShiftStatus {
 
 export interface ShiftStatusConfig {
   displayName: string;
-  badgeStyle: string; // For UI styling
+  badgeStyle: string;
 }
 
 export const ShiftStatusData: Record<ShiftStatus, ShiftStatusConfig> = {

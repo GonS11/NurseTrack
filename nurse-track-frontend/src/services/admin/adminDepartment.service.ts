@@ -19,6 +19,7 @@ export const useAdminDepartmentService = {
         params: { page, size, sortBy },
       },
     );
+
     return response.data;
   },
 
@@ -26,6 +27,7 @@ export const useAdminDepartmentService = {
     const response = await api.get<DepartmentResponse[]>(
       '/admin/departments/active',
     );
+
     return response.data;
   },
 
@@ -33,6 +35,7 @@ export const useAdminDepartmentService = {
     const response = await api.get<DepartmentResponse[]>(
       '/admin/departments/inactive',
     );
+
     return response.data;
   },
 
@@ -40,6 +43,7 @@ export const useAdminDepartmentService = {
     const response = await api.get<DepartmentResponse>(
       `/admin/departments/${departmentId}`,
     );
+
     return response.data;
   },
 
@@ -50,6 +54,7 @@ export const useAdminDepartmentService = {
       '/admin/departments',
       data,
     );
+
     return response.data;
   },
 
@@ -61,21 +66,19 @@ export const useAdminDepartmentService = {
       `/admin/departments/${departmentId}`,
       data,
     );
+
     return response.data;
   },
 
   async activateDepartment(departmentId: number): Promise<void> {
     await api.put<void>(`/admin/departments/${departmentId}/activate`);
-    // No data to return
   },
 
   async desactivateDepartment(departmentId: number): Promise<void> {
     await api.put<void>(`/admin/departments/${departmentId}/desactivate`);
-    // No data to return
   },
 
   async deleteDepartment(departmentId: number): Promise<void> {
     await api.delete<void>(`/admin/departments/${departmentId}`);
-    // No data to return
   },
 };

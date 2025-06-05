@@ -12,6 +12,7 @@ export const useNurseRequestService = {
     const response = await api.get<VacationRequestResponse[]>(
       '/nurses/requests/vacations',
     );
+
     return response.data;
   },
 
@@ -21,6 +22,7 @@ export const useNurseRequestService = {
     const response = await api.get<VacationRequestResponse>(
       `/nurses/requests/vacations/${requestId}`,
     );
+
     return response.data;
   },
 
@@ -31,6 +33,7 @@ export const useNurseRequestService = {
       '/nurses/requests/vacations',
       data,
     );
+
     return response.data;
   },
 
@@ -39,6 +42,7 @@ export const useNurseRequestService = {
     const response = await api.get<ShiftChangeResponse[]>(
       '/nurses/requests/shift-changes',
     );
+
     return response.data;
   },
 
@@ -46,6 +50,7 @@ export const useNurseRequestService = {
     const response = await api.get<ShiftChangeResponse[]>(
       '/nurses/requests/shift-changes/received',
     );
+
     return response.data;
   },
 
@@ -55,6 +60,7 @@ export const useNurseRequestService = {
     const response = await api.get<ShiftChangeResponse>(
       `/nurses/requests/shift-changes/${requestId}`,
     );
+
     return response.data;
   },
 
@@ -65,6 +71,7 @@ export const useNurseRequestService = {
       '/nurses/requests/shift-changes',
       data,
     );
+
     return response.data;
   },
 };

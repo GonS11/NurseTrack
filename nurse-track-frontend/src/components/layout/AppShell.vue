@@ -31,11 +31,9 @@ const isLateralSidebarOnMobile = false;
 const toggleSidebar = () => {
   if (isMobile.value && isLateralSidebarOnMobile) {
     isSidebarOpen.value = !isSidebarOpen.value;
-
     document.body.style.overflow = isSidebarOpen.value ? 'hidden' : '';
   } else if (!isMobile.value) {
     isSidebarOpen.value = !isSidebarOpen.value;
-
     document.body.style.overflow = '';
   }
 };
@@ -46,13 +44,13 @@ const handleResize = () => {
 
   if (wasMobile && !isMobile.value) {
     isSidebarOpen.value = true;
-    document.body.style.overflow = '';
-  } else if (!wasMobile && isMobile.value) {
-    // Si pasamos de desktop a móvil, el sidebar en móvil no se "cierra" (oculta),
-    // sino que se transforma en la barra superior.
-    isSidebarOpen.value = false; // Establecemos a false para que los estilos móviles de Sidebar actúen
-    document.body.style.overflow = '';
+  } else if (!isMobile.value) {
+    isSidebarOpen.value = true;
+  } else if (isMobile.value && !isLateralSidebarOnMobile) {
+    isSidebarOpen.value = false;
   }
+
+  document.body.style.overflow = '';
 };
 
 onMounted(() => {

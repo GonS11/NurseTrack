@@ -375,8 +375,6 @@ export const useAdminStore = defineStore('admin', {
           'Backend call for removeSupervisorFromDepartment succeeded.',
         );
 
-        // This client-side filter is just for immediate UI update;
-        // the getAllSupervisorAssignments call will truly refresh.
         this.supervisorAssignments.content =
           this.supervisorAssignments.content.filter(
             (assignment) => assignment.department.id !== departmentId,
@@ -411,13 +409,11 @@ export const useAdminStore = defineStore('admin', {
 
     async getUnassignedDepartmentsForNurses() {
       try {
-        this.departments.content =
+        const depts =
           await useAdminAssignmentService.getUnassignedDepartmentsForNurses();
 
-        this.departments.number = 0;
-        this.departments.totalPages = 1;
-        this.departments.size = this.departments.content.length;
-        this.departments.totalElements = this.departments.content.length;
+        this.departments.content = depts;
+        this.departments.totalElements = depts.length;
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -426,16 +422,13 @@ export const useAdminStore = defineStore('admin', {
 
     async getAllNursesByDepartment(departmentId: number) {
       try {
-        this.nurseAssignments.content =
+        const assignments =
           await useAdminAssignmentService.getAllNursesByDepartment(
             departmentId,
           );
 
-        this.nurseAssignments.number = 0;
-        this.nurseAssignments.totalPages = 1;
-        this.nurseAssignments.size = this.nurseAssignments.content.length;
-        this.nurseAssignments.totalElements =
-          this.nurseAssignments.content.length;
+        this.nurseAssignments.content = assignments;
+        this.nurseAssignments.totalElements = assignments.length;
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;

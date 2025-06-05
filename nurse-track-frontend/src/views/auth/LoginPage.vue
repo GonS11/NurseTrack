@@ -8,39 +8,33 @@
       </div>
 
       <div class="form-container">
-        <div v-if="error" class="error-message">
-          <ExclamationCircleIcon class="icon" />
-          <span>{{ error }}</span>
+        <div v-if="formGeneralError" class="error-message">
+          <i class="material-icons icon">error</i>
+          <span>{{ formGeneralError }}</span>
         </div>
 
         <form @submit.prevent="handleSubmit" class="login-form">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <div class="input-wrapper">
-              <EnvelopeIcon class="icon" />
-              <input
-                id="username"
-                type="text"
-                v-model="username"
-                placeholder="Enter your username"
-                required
-              />
-            </div>
-          </div>
+          <Input
+            id="username"
+            label="Username"
+            icon="person"
+            type="text"
+            v-model="username"
+            placeholder="Enter your username"
+            :error="errors.username"
+            required
+          />
 
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="input-wrapper">
-              <LockClosedIcon class="icon" />
-              <input
-                id="password"
-                type="password"
-                v-model="password"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-          </div>
+          <Input
+            id="password"
+            label="Password"
+            icon="lock"
+            type="password"
+            v-model="password"
+            placeholder="Enter your password"
+            :error="errors.password"
+            required
+          />
 
           <button type="submit" class="btn-primary" :disabled="isLoading">
             <span v-if="isLoading">Signing in...</span>
@@ -51,11 +45,15 @@
         <div class="demo-accounts">
           <p>Demo accounts</p>
           <div class="buttons">
-            <button @click="setDemoAccount('admin1', 'admin1')">Admin</button>
-            <button @click="setDemoAccount('super1', 'super1')">
+            <button @click="setDemoAccount('admin1', 'admin11234')">
+              Admin
+            </button>
+            <button @click="setDemoAccount('super1', 'super11234')">
               Supervisor
             </button>
-            <button @click="setDemoAccount('nurse1', 'nurse1')">Nurse</button>
+            <button @click="setDemoAccount('nurse1', 'nurse11234')">
+              Nurse
+            </button>
           </div>
         </div>
       </div>
@@ -65,37 +63,78 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import {
-  ExclamationCircleIcon,
-  EnvelopeIcon,
-  LockClosedIcon,
-} from '@heroicons/vue/24/outline';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../services';
+import { AuthSchemas } from '../../types/schemas/auth.schema';
+import { ZodError } from 'zod';
+import Input from '../../components/ui/Input.vue';
+import { useFormErrors } from '../../utils/formValidation';
+import { useNotifications } from '../../composables/useNotifications';
 
 const auth = useAuthStore();
 const router = useRouter();
+const notifications = useNotifications();
+
 const username = ref('');
 const password = ref('');
 const isLoading = ref(false);
-const error = ref<string | null>(null);
+
+const formGeneralError = ref<string | null>(null);
+
+const { errors, mapZodErrors, clearErrors } = useFormErrors({
+  username: null,
+  password: null,
+});
+
+const validateForm = (): boolean => {
+  clearErrors();
+  formGeneralError.value = null;
+
+  try {
+    AuthSchemas.authenticationRequest.parse({
+      username: username.value,
+      password: password.value,
+    });
+
+    return true;
+  } catch (err: any) {
+    if (err instanceof ZodError) {
+      mapZodErrors(err);
+    } else {
+      formGeneralError.value =
+        err.message || 'An unexpected error occurred during validation.';
+    }
+
+    return false;
+  }
+};
 
 const handleSubmit = async () => {
+  if (!validateForm()) {
+    return;
+  }
+
   isLoading.value = true;
-  error.value = null;
+  formGeneralError.value = null;
+
   try {
     await auth.login(username.value, password.value);
     await router.push({ name: 'dashboard' });
+    notifications.showSuccess('Login successful! Welcome.');
   } catch (err: any) {
-    error.value = err instanceof Error ? err.message : 'Error desconocido';
+    notifications.showError(
+      err.message || 'Login failed. Please check your credentials.',
+    );
   } finally {
     isLoading.value = false;
   }
 };
 
-const setDemoAccount = (u: string, p: string) => {
-  username.value = u;
-  password.value = p;
+const setDemoAccount = (name: string, passw: string) => {
+  username.value = name;
+  password.value = passw;
+  clearErrors();
+  formGeneralError.value = null;
 };
 </script>
 

@@ -8,8 +8,8 @@ export enum ShiftType {
 
 export interface ShiftTypeDetails {
   displayName: string;
-  defaultStartTime: string; // Format: "HH:mm"
-  defaultEndTime: string; // Format: "HH:mm"
+  defaultStartTime: string;
+  defaultEndTime: string;
   fixedTime: boolean;
   overnight: boolean;
 }

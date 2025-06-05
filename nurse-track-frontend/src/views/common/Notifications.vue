@@ -2,14 +2,14 @@
   <div class="notifications-container">
     <div class="notifications-header">
       <h1>
-        Notificaciones <span class="badge">{{ unreadCount }}</span>
+        Notifications <span class="badge">{{ unreadCount }}</span>
       </h1>
       <button
         class="mark-all-read"
         @click="markAllAsRead"
         :disabled="unreadCount === 0"
       >
-        Marcar todas como leídas
+        Mark all as read
       </button>
     </div>
 
@@ -20,7 +20,7 @@
     <div v-else>
       <div v-if="notifications.length === 0" class="empty-state">
         <span class="material-icons">notifications_off</span>
-        <p>No hay nuevas notificaciones</p>
+        <p>No new notifications</p>
       </div>
 
       <div class="notifications-list">
@@ -79,9 +79,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '../../services';
 import { useNotificationStore } from '../../stores/notification.store';
+import { useNotifications } from '../../composables/useNotifications';
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
+const notificationsGlobal = useNotifications();
 const currentPage = ref(0);
 const loading = ref(true);
 
@@ -117,33 +119,69 @@ const loadNotifications = async () => {
       authStore.user?.id || 0,
       currentPage.value,
       10,
-      'createdAt,desc',
+      'createdAt',
     );
-  } catch (error) {
-    console.error('Error loading notifications:', error);
+  } catch (error: any) {
+    notificationsGlobal.showError(error.message);
   } finally {
     loading.value = false;
   }
 };
 
 const markAsRead = async (id: number) => {
-  if (!authStore.user?.id) return;
-  await notificationStore.markAsRead(authStore.user.id, id);
+  if (!authStore.user?.id) {
+    notificationsGlobal.showWarning(
+      'User not logged in to mark notification as read.',
+    );
+    return;
+  }
+  try {
+    await notificationStore.markAsRead(authStore.user.id, id);
+    notificationsGlobal.showSuccess('Notification marked as read.');
+  } catch (error: any) {
+    notificationsGlobal.showError(error.message);
+  }
 };
 
 const deleteNotification = async (id: number) => {
-  if (!authStore.user?.id) return;
-  await notificationStore.deleteNotification(authStore.user.id, id);
+  if (!authStore.user?.id) {
+    notificationsGlobal.showWarning(
+      'User not logged in to delete notification.',
+    );
+    return;
+  }
+  try {
+    await notificationStore.deleteNotification(authStore.user.id, id);
+    notificationsGlobal.showSuccess('Notification deleted successfully.');
+  } catch (error: any) {
+    notificationsGlobal.showError(error.message);
+  }
 };
 
 const markAllAsRead = async () => {
-  if (!authStore.user?.id) return;
+  if (!authStore.user?.id) {
+    notificationsGlobal.showWarning(
+      'User not logged in to mark all notifications as read.',
+    );
+
+    return;
+  }
   const unreadIds = notifications.value
     .filter((n) => !n.isRead)
     .map((n) => n.id);
 
-  for (const id of unreadIds) {
-    await notificationStore.markAsRead(authStore.user.id, id);
+  if (unreadIds.length === 0) {
+    notificationsGlobal.showInfo('No unread notifications to mark.');
+    return;
+  }
+
+  try {
+    for (const id of unreadIds) {
+      await notificationStore.markAsRead(authStore.user.id, id);
+    }
+    notificationsGlobal.showSuccess('All notifications marked as read.');
+  } catch (error: any) {
+    notificationsGlobal.showError(error.message);
   }
 };
 
@@ -155,6 +193,10 @@ const changePage = (delta: number) => {
 onMounted(() => {
   if (authStore.user?.id) {
     loadNotifications();
+  } else {
+    notificationsGlobal.showWarning(
+      'User not logged in. Cannot load notifications.',
+    );
   }
 });
 </script>

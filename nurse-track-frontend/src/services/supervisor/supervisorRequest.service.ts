@@ -14,6 +14,7 @@ export const useSupervisorRequestService = {
     const response = await api.get<VacationRequestResponse[]>(
       `/supervisor/departments/${departmentId}/requests/vacations/pending`,
     );
+
     return response.data;
   },
 
@@ -23,6 +24,7 @@ export const useSupervisorRequestService = {
     const response = await api.get<VacationRequestResponse[]>(
       `/supervisor/departments/${departmentId}/requests/vacations`,
     );
+
     return response.data;
   },
 
@@ -35,6 +37,7 @@ export const useSupervisorRequestService = {
       `/supervisor/departments/${departmentId}/requests/vacations/${requestId}/approve`,
       data,
     );
+
     return response.data;
   },
 
@@ -47,6 +50,7 @@ export const useSupervisorRequestService = {
       `/supervisor/departments/${departmentId}/requests/vacations/${requestId}/reject`,
       data,
     );
+
     return response.data;
   },
 
@@ -57,6 +61,7 @@ export const useSupervisorRequestService = {
     const response = await api.get<ShiftChangeResponse[]>(
       `/supervisor/departments/${departmentId}/requests/shift-changes/pending`,
     );
+
     return response.data;
   },
 
@@ -66,6 +71,7 @@ export const useSupervisorRequestService = {
     const response = await api.get<ShiftChangeResponse[]>(
       `/supervisor/departments/${departmentId}/requests/shift-changes`,
     );
+
     return response.data;
   },
 
@@ -78,6 +84,7 @@ export const useSupervisorRequestService = {
       `/supervisor/departments/${departmentId}/requests/shift-changes/${requestId}/approve`,
       data,
     );
+
     return response.data;
   },
 
@@ -90,6 +97,7 @@ export const useSupervisorRequestService = {
       `/supervisor/departments/${departmentId}/requests/shift-changes/${requestId}/reject`,
       data,
     );
+
     return response.data;
   },
 };

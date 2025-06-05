@@ -14,7 +14,7 @@
     <template #header-actions>
       <button class="btn-primary" @click="openCreateModal">
         <span class="material-icons">add</span>
-        {{ createButtonModal }}
+        <span class="text">{{ createButtonModal }}</span>
       </button>
     </template>
   </Table>
@@ -33,7 +33,6 @@ import { ref, type PropType } from 'vue';
 import Table, { type TableAction } from '../ui/Table.vue';
 import type { Page } from '../../types/common';
 
-//Props del componente generico
 const props = defineProps({
   title: {
     type: String,
@@ -54,14 +53,13 @@ const props = defineProps({
     required: true,
   },
   modalComponent: {
-    type: Object as PropType<any>, //Compnent del modal
+    type: Object as PropType<any>,
     required: true,
   },
   createButtonModal: {
     type: String,
-    dedault: 'New Item',
+    default: 'New Item',
   },
-  //Para CRUD + paginacion
   fetchData: {
     type: Function as PropType<(page: number) => Promise<void>>,
     required: true,
@@ -74,27 +72,20 @@ const props = defineProps({
     type: Function as PropType<(id: number, formData: any) => Promise<void>>,
     required: false,
   },
-  //Pa PK
   itemIdKey: {
     type: String,
     default: 'id',
   },
 });
 
-//Estado local del modal
 const showModal = ref(false);
 const selectedEntity = ref<any | null>(null);
 
-//Fx para controlar modal
 const openCreateModal = () => {
-  selectedEntity.value = null; //En crear no se selecciona
+  selectedEntity.value = null;
   showModal.value = true;
 };
 
-// Necesitamos una forma para que la vista padre le diga a EntityManagement
-// que se va a editar un item. Esto lo haremos a través de las acciones de la tabla.
-// La acción "Edit" en UsersManagement.vue (o DepartmentsManagement.vue)
-// llamará a una función que a su vez llama a este openModalForEdit.
 const openUpdateModal = (entity: any) => {
   selectedEntity.value = entity;
   showModal.value = true;
@@ -102,41 +93,36 @@ const openUpdateModal = (entity: any) => {
 
 const closeModal = () => {
   showModal.value = false;
-  selectedEntity.value = null; //Limpiar item
+  selectedEntity.value = null;
 };
 
-//Envio del modal
 const handleModalSubmitInternal = async (formData: any) => {
   try {
     if (!selectedEntity.value) {
-      //Si no entity selecionada es creacion
       await props.createItem(formData);
     } else {
       if (props.updateItem) {
-        //Puede ser null si solo hay una accion
-        // Update
         const id = selectedEntity.value[props.itemIdKey];
         await props.updateItem(id, formData);
       } else {
         console.warn('Update operation not supported for this component type.');
       }
     }
-
-    closeModal();
-    await props.fetchData(props.data.number); //Refresca datos de la tabla
-  } catch (error) {
-    console.error('Error saving item: ', error);
-    alert('Error saving item. Try agin later');
+  } catch (error: any) {
+    console.error('Error saving item in ManagementComponent: ', error);
+    throw error;
   }
 };
 
-//Cambio de pagina
 const handlePageChange = async (newPage: number) => {
   await props.fetchData(newPage);
 };
 
-//
-defineExpose({ openUpdateModal });
+defineExpose({
+  openUpdateModal,
+  closeCreateModal: closeModal,
+  closeUpdateModal: closeModal,
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,5 @@
 package com.nurse_track_back.nurse_track_back.web.controllers.admin;
 
-import com.nurse_track_back.nurse_track_back.exceptions.ResourceNotFoundException;
 import com.nurse_track_back.nurse_track_back.services.NurseDepartmentService;
 import com.nurse_track_back.nurse_track_back.services.SupervisorDepartmentService;
 import com.nurse_track_back.nurse_track_back.web.dto.request.nurseDepartment.AssignNurseRequest;
@@ -15,9 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,50 +31,40 @@ public class AdminAssignmentController {
     // ASIGNACIÓN DE SUPERVISORES (1:N con departamento)
     // ==============================================
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<Page<SupervisorDepartmentResponse>> getAllSupervisorAssignments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "departmentId") String sortBy) {
-        return ResponseEntity.ok(supervisorDepartmentService.getAllAssignments(page, size, sortBy));
+        Page<SupervisorDepartmentResponse> dtoPage = supervisorDepartmentService.getAllAssignments(page, size, sortBy);
+
+        return ResponseEntity.ok(dtoPage);
     }
 
     @GetMapping("/unassigned")
     public ResponseEntity<List<DepartmentResponse>> getUnassignedDepartmentsForSupervisor() {
-        return ResponseEntity.ok(supervisorDepartmentService.getAllUnassignedDepartments());
+        List<DepartmentResponse> lista = supervisorDepartmentService.getAllUnassignedDepartments();
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{departmentId}/supervisor")
     public ResponseEntity<SupervisorDepartmentResponse> getDepartmentSupervisor(
             @PathVariable("departmentId") Long departmentId) {
-        return ResponseEntity.ok(supervisorDepartmentService.getByDepartmentId(departmentId));
+        SupervisorDepartmentResponse dto = supervisorDepartmentService.getByDepartmentId(departmentId);
+        return ResponseEntity.ok(dto);
     }
 
-    /**
-     * Asignar un supervisor a un departamento.
-     */
-    @PostMapping("/{departmentId}/supervisor")
+    @PostMapping
     public ResponseEntity<SupervisorDepartmentResponse> assignSupervisor(
             @Valid @RequestBody AssignSupervisorRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(supervisorDepartmentService.assignSupervisor(request));
+        SupervisorDepartmentResponse created = supervisorDepartmentService.assignSupervisor(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    /**
-     * Eliminar el supervisor asignado a un departamento.
-     */
-    @DeleteMapping("/{departmentId}/supervisor")
-    public ResponseEntity<Void> removeSupervisorFromDepartment(@PathVariable("departmentId") Long departmentId) {
+    @DeleteMapping("/{departmentId}")
+    public ResponseEntity<Void> removeSupervisor(@PathVariable("departmentId") Long departmentId) {
         supervisorDepartmentService.removeSupervisor(departmentId);
         return ResponseEntity.noContent().build();
-    }
-
-    // Add this temporarily for debugging
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleControllerExceptions(Exception ex) {
-        // This will only catch exceptions thrown directly from this controller's methods
-        // or from service methods if they are not part of a separate transaction.
-        log.error("Error in AdminAssignmentController:", ex);
-        return new ResponseEntity<>("Controller Error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // ==============================================

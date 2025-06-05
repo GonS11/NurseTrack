@@ -7,20 +7,8 @@ export const VacationRequestSchema = {
   create: z
     .object({
       requestingNurseId: validation.requiredId(),
-      startDate: z
-        .string()
-        .refine(
-          (date) =>
-            new Date(date) >= new Date(new Date().toISOString().split('T')[0]),
-          { message: 'Start date must be in the future or present' },
-        ),
-      endDate: z
-        .string()
-        .refine(
-          (date) =>
-            new Date(date) >= new Date(new Date().toISOString().split('T')[0]),
-          { message: 'End date must be in the future or present' },
-        ),
+      startDate: validation.date(),
+      endDate: validation.date(),
       reason: validation.requiredString(1, 2000),
       status: validation.requestStatus().default(RequestStatus.PENDING),
       reviewedById: validation.requiredId(),
@@ -39,7 +27,7 @@ export const VacationRequestSchema = {
       id: validation.requiredId(),
       requestingNurse: UserSchemas.simpleResponse,
       startDate: z.string(), // LocalDate as ISO string
-      endDate: z.string(), // LocalDate as ISO string
+      endDate: z.string(),
       reason: validation.requiredString(1, 2000),
       reviewedNotes: validation.optionalString(0, 2000),
       status: validation.requestStatus(),

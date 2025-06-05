@@ -29,10 +29,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useSupervisorStore } from '../../../stores/supervisor.store';
-import { useSupervisorDepartmentService } from '../../../services/supervisor/supervisorDepartment.service'; // Import the supervisor service
+import { useSupervisorDepartmentService } from '../../../services/supervisor/supervisorDepartment.service';
 import type { UserResponse } from '../../../types/schemas/user.schema';
-// REMOVED: import { useAdminUserService } from '../../../services/admin/adminUser.service';
-// REMOVED: import { UserRole } from '../../../types/enums/user-role.enum'; // No longer needed for client-side filtering by role
 
 const props = defineProps<{
   departmentId: number;
@@ -48,30 +46,20 @@ const isSubmitting = ref(false);
 const localError = ref('');
 const successMessage = ref('');
 
-// Fetch all nurses, then filter out those already in the current department
 const fetchAvailableNurses = async () => {
   localError.value = '';
   try {
-    // OLD: const allUsersPage = await useAdminUserService.getAllUsers(0, 100, 'id');
-    // OLD: const allNurses = allUsersPage.content.filter(
-    // OLD:   (user) => user.role === UserRole.NURSE,
-    // OLD: );
-
-    // NEW: Call the supervisor-specific service to get all nurses
     const allNurses =
       await useSupervisorDepartmentService.getAllNursesForAssignment();
 
-    // Get nurses already assigned to this department from supervisorStore
     const assignedNurseIds = supervisorStore.nurseAssignments.map(
       (assign) => assign.nurse.id,
     );
 
-    // Filter out nurses already assigned to the current department
     availableNurses.value = allNurses.filter(
       (nurse) => !assignedNurseIds.includes(nurse.id),
     );
 
-    // If a nurse was previously selected but is no longer available (e.g., got assigned), clear selection
     if (
       selectedNurseId.value &&
       !availableNurses.value.some((n) => n.id === selectedNurseId.value)
@@ -100,9 +88,10 @@ const handleSubmit = async () => {
       nurseId: selectedNurseId.value,
     });
     successMessage.value = 'Nurse added successfully!';
-    selectedNurseId.value = null; // Clear selection
-    emit('nurse-added'); // Notify parent to refresh nurse list
-    await fetchAvailableNurses(); // Refresh available nurses for dropdown
+    selectedNurseId.value = null;
+
+    emit('nurse-added');
+    await fetchAvailableNurses();
   } catch (error: any) {
     localError.value =
       error.response?.data?.message || error.message || 'Failed to add nurse.';
@@ -111,7 +100,6 @@ const handleSubmit = async () => {
   }
 };
 
-// Watch for changes in departmentId or nurseAssignments in the store to re-fetch available nurses
 watch(
   () => [props.departmentId, supervisorStore.nurseAssignments],
   () => {
@@ -120,7 +108,7 @@ watch(
     }
   },
   { deep: true, immediate: true },
-); // Deep watch for nurseAssignments array changes
+);
 </script>
 
 <style lang="scss" scoped>

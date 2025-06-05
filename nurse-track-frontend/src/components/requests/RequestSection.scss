@@ -1,0 +1,167 @@
+@use '../../styles/main.scss' as *;
+
+.request-section {
+  padding: $spacer-4;
+  background-color: $white;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+
+  h2 {
+    font-size: $font-size-h2;
+    color: $primary;
+    margin-top: 0;
+    margin-bottom: $spacer-4;
+    text-align: center;
+  }
+
+  .actions {
+    @include flex-center;
+    gap: $spacer-3;
+    margin-bottom: $spacer-4;
+
+    button {
+      @include button-outline;
+      min-width: 150px;
+    }
+  }
+
+  .loading-spinner,
+  .no-requests {
+    text-align: center;
+    padding: $spacer-5;
+    font-size: $font-size-md;
+    color: $gray-600;
+    font-style: italic;
+  }
+
+  .requests-grid {
+    @include grid-layout(3, 4, 2, 1);
+    grid-auto-rows: minmax(100px, auto);
+
+    .request-card {
+      background-color: $white;
+      border-radius: $border-radius;
+      box-shadow: $card-shadow-sm;
+      padding: $spacer-4;
+      display: flex;
+      flex-direction: column;
+      gap: $spacer-2;
+      border: 1px solid $gray-200;
+      transition: transform 0.2s ease-in-out, border-color $transition,
+        box-shadow $transition;
+
+      &:hover {
+        transform: translateY(-5px);
+        border-color: $primary-hover;
+        box-shadow: $card-shadow;
+      }
+
+      &.status-pending {
+        border-left: 5px solid $warning-border;
+        background-color: $warning-bg;
+      }
+
+      &.status-approved {
+        border-left: 5px solid $success-border;
+        background-color: $success-bg;
+      }
+
+      &.status-rejected {
+        border-left: 5px solid $error;
+        background-color: $error-bg;
+      }
+
+      &.status-cancelled {
+        border-left: 5px solid $gray-500;
+        background-color: $gray-100;
+      }
+
+      .request-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $spacer-2;
+
+        h3 {
+          color: $text-primary;
+          margin: 0;
+          font-size: $font-size-h5;
+        }
+
+        .badge {
+          padding: $spacer-1 $spacer-2;
+          border-radius: $border-radius-sm;
+          font-size: $font-size-xs;
+          font-weight: 600;
+          text-transform: uppercase;
+          white-space: nowrap;
+
+          &.badge-primary {
+            background-color: $primary;
+            color: $white;
+          }
+
+          &.badge-secondary {
+            background-color: $gray-500;
+            color: $white;
+          }
+
+          &.badge-success {
+            background-color: $success;
+            color: $white;
+          }
+
+          &.badge-error {
+            background-color: $error;
+            color: $white;
+          }
+
+          &.badge-warning {
+            background-color: $warning-border;
+            color: $white;
+          }
+
+          &.badge-info {
+            background-color: $info-border;
+            color: $white;
+          }
+        }
+      }
+
+      .request-details {
+        flex-grow: 1;
+        margin-bottom: $spacer-3;
+
+        p {
+          margin: $spacer-1 0;
+          color: $gray-700;
+          font-size: $font-size-md;
+          line-height: $line-height-base;
+
+          strong {
+            color: $gray-800;
+          }
+        }
+      }
+
+      .request-actions {
+        @include flex-center;
+        gap: $spacer-2;
+        margin-top: auto;
+
+        button {
+          @include button-base;
+          flex: 1;
+        }
+
+        .btn-primary {
+          @include button-primary;
+        }
+
+        .btn-secondary {
+          @include button-secondary;
+        }
+      }
+    }
+  }
+}

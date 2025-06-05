@@ -1,0 +1,48 @@
+@use '../../styles/main.scss' as *;
+
+.supervisor-dashboard {
+  padding: $spacer-4;
+  max-width: $container-max-widths-lg;
+  margin: 0 auto;
+  background-color: $gray-100;
+  border-radius: $border-radius;
+  @include box-shadow(2);
+
+  h1 {
+    color: $text-primary;
+    margin-bottom: $spacer-4;
+    text-align: center;
+    font-size: $font-size-h1;
+  }
+
+  .loading-message,
+  .error-message,
+  .no-departments-message {
+    text-align: center;
+    padding: $spacer-3;
+    border-radius: $border-radius;
+    margin-top: $spacer-4;
+    font-size: $font-size-md;
+  }
+
+  .loading-message {
+    background-color: $gray-100;
+    color: $gray-700;
+  }
+
+  .error-message {
+    background-color: $error-bg;
+    color: $error-text;
+    border: 1px solid $error;
+  }
+
+  .no-departments-message {
+    background-color: $gray-200;
+    color: $gray-600;
+  }
+
+  .departments-grid {
+    margin-top: $spacer-4;
+    @include grid-layout($cols: 3, $gap: 4, $tablet-cols: 2);
+  }
+}

@@ -25,7 +25,7 @@ export const useNurseStore = defineStore('nurse', {
         this.departements = await useNurseShiftService.getMyDepartments(
           nurseId,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching departments:', error);
       }
     },
@@ -33,7 +33,7 @@ export const useNurseStore = defineStore('nurse', {
     async getShifts(nurseId: number) {
       try {
         this.shifts = await useNurseShiftService.getShifts(nurseId);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching shifts:', error);
       }
     },
@@ -44,7 +44,7 @@ export const useNurseStore = defineStore('nurse', {
           nurseId,
           departmentId,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching shifts for department:', error);
       }
     },
@@ -54,7 +54,7 @@ export const useNurseStore = defineStore('nurse', {
       try {
         this.vacationRequests =
           await useNurseRequestService.getMyVacationRequests();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching vacation requests:', error);
       }
     },
@@ -72,7 +72,7 @@ export const useNurseStore = defineStore('nurse', {
         } else {
           this.vacationRequests.push(vacationRequest);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching vacation request by ID:', error);
       }
     },
@@ -83,7 +83,7 @@ export const useNurseStore = defineStore('nurse', {
           await useNurseRequestService.createVacationRequest(request);
 
         this.vacationRequests.push(newVacationRequest);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating vacation request:', error);
       }
     },
@@ -93,7 +93,7 @@ export const useNurseStore = defineStore('nurse', {
       try {
         this.shiftChangeRequests =
           await useNurseRequestService.getMyShiftChangeRequests();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching shift change requests:', error);
       }
     },
@@ -102,7 +102,7 @@ export const useNurseStore = defineStore('nurse', {
       try {
         this.shiftChangeRequests =
           await useNurseRequestService.getMyReceivedShiftChangeRequests();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching received shift change requests:', error);
       }
     },
@@ -121,7 +121,7 @@ export const useNurseStore = defineStore('nurse', {
         } else {
           this.shiftChangeRequests.push(shiftChangeRequest);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching shift change request by ID:', error);
       }
     },
@@ -131,7 +131,7 @@ export const useNurseStore = defineStore('nurse', {
         const newShiftChangeRequest =
           await useNurseRequestService.createShiftChangeRequest(request);
         this.shiftChangeRequests.push(newShiftChangeRequest);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating shift change request:', error);
       }
     },

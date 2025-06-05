@@ -41,7 +41,6 @@
     <div class="admin-insights">
       <h2>Resume</h2>
       <div class="insights-grid">
-        <!--Departamentos sin super-->
         <DashboardCardContent
           v-if="departmentsWithoutSupervisorCount > 0"
           type="warning"
@@ -56,7 +55,6 @@
           </RouterLink>
         </DashboardCardContent>
 
-        <!--Departamentos sin enfermera-->
         <DashboardCardContent
           v-if="departmentsWithoutNursesCount > 0"
           type="warning"
@@ -68,7 +66,6 @@
           </RouterLink>
         </DashboardCardContent>
 
-        <!--Users inactivos-->
         <DashboardCardContent
           v-if="inactiveUsersCount > 0"
           type="info"
@@ -80,7 +77,6 @@
           </RouterLink>
         </DashboardCardContent>
 
-        <!--Departaments inactives-->
         <DashboardCardContent
           v-if="inactiveDepartmentsCount > 0"
           type="info"
@@ -92,7 +88,6 @@
           </RouterLink>
         </DashboardCardContent>
 
-        <!--Average Nurse/Dept-->
         <DashboardCardContent
           v-if="totalDepartments && averageNursesPerDepartment < 2"
           type="tip"
@@ -103,7 +98,6 @@
           </p>
         </DashboardCardContent>
 
-        <!--Todo asignado-->
         <DashboardCardContent
           v-if="hasAnyAssignments"
           type="success"
@@ -124,6 +118,7 @@ import DashboardCard from '../../components/ui/DashboardCard.vue';
 import DashboardCardContent from '../../components/ui/DashboardCardContent.vue';
 
 const adminStore = useAdminStore();
+
 const users = computed(() => adminStore.users);
 const departments = computed(() => adminStore.departments);
 const supervisorAssignments = computed(() => adminStore.supervisorAssignments);
@@ -175,7 +170,9 @@ onMounted(() => {
     adminStore.getAllDepartments(),
     adminStore.getAllNurseAssignments(),
     adminStore.getAllSupervisorAssignments(),
-  ]);
+  ]).catch((error) => {
+    console.error('Error loading admin dashboard data:', error);
+  });
 });
 </script>
 

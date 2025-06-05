@@ -13,7 +13,7 @@ defineProps({
   },
   type: {
     type: String,
-    default: 'info', // warning, info, success, tip
+    default: 'info',
   },
 });
 </script>

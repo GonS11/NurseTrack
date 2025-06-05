@@ -29,7 +29,6 @@ export const DepartmentSchemas = {
     .strict(),
 };
 
-// Tipos inferidos
 export type CreateDepartmentRequest = z.infer<typeof DepartmentSchemas.create>;
 export type UpdateDepartmentRequest = z.infer<typeof DepartmentSchemas.update>;
 export type DepartmentResponse = z.infer<typeof DepartmentSchemas.response>;

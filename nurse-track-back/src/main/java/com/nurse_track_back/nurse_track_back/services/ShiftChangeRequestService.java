@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ShiftChangeRequestService
-{
+public class ShiftChangeRequestService {
     private final ShiftChangeRequestRepository shiftChangeRequestRepository;
     private final ShiftChangeRequestMapper shiftChangeRequestMapper;
     private final ShiftChangeRequestValidation validator;
@@ -41,9 +40,9 @@ public class ShiftChangeRequestService
     private final UserRepository userRepository;
 
     // ========== CRUD Operations ==========
-    public ShiftChangeResponse createShiftChangeRequest(CreateShiftChangeRequest request)
-    {
-        ShiftChangeRequest shiftChangeRequest = shiftChangeRequestMapper.toEntity(request, userRepository, shiftRepository);
+    public ShiftChangeResponse createShiftChangeRequest(CreateShiftChangeRequest request) {
+        ShiftChangeRequest shiftChangeRequest = shiftChangeRequestMapper.toEntity(request, userRepository,
+                shiftRepository);
         shiftChangeRequest.setIsInterchange(true);
         shiftChangeRequest.setReviewedBy(getSupervisor(request));
 
@@ -52,26 +51,24 @@ public class ShiftChangeRequestService
         ShiftChangeRequest savedRequest = shiftChangeRequestRepository.save(shiftChangeRequest);
 
         sendNotification.notifyCreation(savedRequest.getRequestingNurse().getId(),
-                                        savedRequest.getReceivingNurse().getId(),
-                                        savedRequest.getReviewedBy().getId(),
-                                        NotificationType.SHIFT_CHANGE);
+                savedRequest.getReceivingNurse().getId(),
+                savedRequest.getReviewedBy().getId(),
+                NotificationType.SHIFT_CHANGE);
 
         return shiftChangeRequestMapper.toDTO(savedRequest);
     }
 
     public ShiftChangeResponse updateShiftChangeRequestStatus(Long requestId,
-                                                              UpdateShiftChangeRequest request,
-                                                              Long currentUserId)
-    {
+            UpdateShiftChangeRequest request,
+            Long currentUserId) {
         ShiftChangeRequest shiftChangeRequest = shiftChangeRequestRepository.findById(requestId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Shift change request", requestId));
 
         validator.validateShiftChangeUpdate(shiftChangeRequest, request, currentUserId);
 
         // Asignar campos
-        if(request.getStatus() == RequestStatus.APPROVED
-            || request.getStatus() == RequestStatus.REJECTED)
-        {
+        if (request.getStatus() == RequestStatus.APPROVED
+                || request.getStatus() == RequestStatus.REJECTED) {
             User reviewer = userRepository.findById(currentUserId)
                     .orElseThrow(() -> ResourceNotFoundException.create("User", currentUserId));
 
@@ -83,59 +80,52 @@ public class ShiftChangeRequestService
         // Actualizacion campos
         shiftChangeRequestMapper.updateModel(request, shiftChangeRequest);
 
-        if (request.getStatus() == RequestStatus.APPROVED)
-        {
+        if (request.getStatus() == RequestStatus.APPROVED) {
             executeShiftChangeSwap(shiftChangeRequest);
         }
 
         sendNotification.notifyStatusChange(shiftChangeRequest.getRequestingNurse().getId(),
-                                            shiftChangeRequest.getReceivingNurse().getId(),
-                                            request.getStatus(),
-                                            request.getReviewedNotes(),
-                                            NotificationType.SHIFT_CHANGE);
+                shiftChangeRequest.getReceivingNurse().getId(),
+                request.getStatus(),
+                request.getReviewedNotes(),
+                NotificationType.SHIFT_CHANGE);
 
         return shiftChangeRequestMapper.toDTO(shiftChangeRequestRepository.save(shiftChangeRequest));
     }
 
-    public ShiftChangeResponse getShiftChangeRequestById(Long requestId, Long currentUserId)
-    {
+    public ShiftChangeResponse getShiftChangeRequestById(Long requestId, Long currentUserId) {
         ShiftChangeRequest shiftChangeRequest = shiftChangeRequestRepository.findById(requestId)
-                .orElseThrow(() -> ResourceNotFoundException.create("Shift change request",requestId));
+                .orElseThrow(() -> ResourceNotFoundException.create("Shift change request", requestId));
 
-        if (!shiftChangeRequest.getRequestingNurse().getId().equals(currentUserId))
-        {
+        if (!shiftChangeRequest.getRequestingNurse().getId().equals(currentUserId)) {
             throw new AccessDeniedException("You can only access your own requests");
         }
 
         return shiftChangeRequestMapper.toDTO(shiftChangeRequest);
     }
 
-    public List<ShiftChangeResponse> getShiftChangeRequestsByNurse(Long nurseId)
-    {
+    public List<ShiftChangeResponse> getShiftChangeRequestsByNurse(Long nurseId) {
         return shiftChangeRequestRepository.findByRequestingNurseId(nurseId)
                 .stream()
                 .map(shiftChangeRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<ShiftChangeResponse> getReceivedShiftChangeRequests(Long nurseId)
-    {
+    public List<ShiftChangeResponse> getReceivedShiftChangeRequests(Long nurseId) {
         return shiftChangeRequestRepository.findByReceivingNurseId(nurseId)
                 .stream()
                 .map(shiftChangeRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<ShiftChangeResponse> getPendingShiftChangeRequestsByDepartment(Long departmentId)
-    {
+    public List<ShiftChangeResponse> getPendingShiftChangeRequestsByDepartment(Long departmentId) {
         return shiftChangeRequestRepository.findByDepartmentAndStatus(departmentId, RequestStatus.PENDING)
                 .stream()
                 .map(shiftChangeRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<ShiftChangeResponse> getShiftChangeRequestsByDepartment(Long departmentId)
-    {
+    public List<ShiftChangeResponse> getShiftChangeRequestsByDepartment(Long departmentId) {
         return shiftChangeRequestRepository.findByDepartment(departmentId)
                 .stream()
                 .map(shiftChangeRequestMapper::toDTO)
@@ -143,17 +133,16 @@ public class ShiftChangeRequestService
     }
 
     // ========== Business Logic ==========
-    private User getSupervisor(CreateShiftChangeRequest request)
-    {
+    private User getSupervisor(CreateShiftChangeRequest request) {
         Shift offeredShift = shiftRepository.findById(request.getOfferedShiftId()).orElseThrow();
 
-        return supervisorDepartmentRepository.findByDepartmentId(offeredShift.getDepartment().getId())
+        return supervisorDepartmentRepository.findByDepartment_Id(offeredShift.getDepartment().getId())
                 .map(SupervisorDepartment::getSupervisor)
-                .orElseThrow(() -> ResourceNotFoundException.create("Department", offeredShift.getDepartment().getId()));
+                .orElseThrow(
+                        () -> ResourceNotFoundException.create("Department", offeredShift.getDepartment().getId()));
     }
 
-    private void executeShiftChangeSwap(ShiftChangeRequest request)
-    {
+    private void executeShiftChangeSwap(ShiftChangeRequest request) {
         Shift offeredShift = request.getOfferedShift();
         Shift desiredShift = request.getDesiredShift();
 

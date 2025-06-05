@@ -1,22 +1,19 @@
-@use 'sass:map';
-@use '../../styles/main.scss' as *; // Ensure this path is correct relative to your components/ui folder
+@use '../../styles/main.scss' as *;
 
 .dashboard-insight-card {
-  padding: map.get($spacers, 3);
-  margin-bottom: map.get(
-    $spacers,
-    3
-  ); // Not strictly needed with Grid, but good for standalone use
-  border-radius: $btn-border-radius;
+  padding: $spacer-3;
+  border-radius: $border-radius;
   border-left: 5px solid;
   display: flex;
   flex-direction: column;
-  gap: map.get($spacers, 1);
-  box-shadow: $card-shadow-sm; // Added a new smaller shadow
+  gap: $spacer-1;
+  box-shadow: $card-shadow-sm;
+  height: 100%;
 
   h3 {
     margin: 0;
     font-size: 1.2rem;
+    color: $text-primary;
   }
 
   p {
@@ -25,12 +22,13 @@
     line-height: 1.4;
   }
 
-  .link {
+  a {
     color: inherit;
-    font-weight: bold;
+    font-weight: 600;
     text-decoration: underline;
-    margin-top: map.get($spacers, 2);
+    margin-top: $spacer-2;
     display: inline-block;
+    transition: $transition;
 
     &:hover {
       opacity: 0.8;
@@ -42,16 +40,19 @@
     background-color: $warning-bg;
     color: $warning-text;
   }
+
   &.info {
     border-color: $info-border;
     background-color: $info-bg;
     color: $info-text;
   }
+
   &.success {
     border-color: $success-border;
     background-color: $success-bg;
     color: $success-text;
   }
+
   &.tip {
     border-color: $tip-border;
     background-color: $tip-bg;

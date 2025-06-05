@@ -32,7 +32,7 @@ export const useNotificationStore = defineStore('notification', {
           sortBy,
         );
       } catch (error: any) {
-        console.error('Detalles del error:', {
+        console.error('Error', {
           userId,
           page,
           size,
@@ -58,7 +58,7 @@ export const useNotificationStore = defineStore('notification', {
         } else {
           this.notifications.content.push(notification);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error fetching notification with ID ${notificationId} for user ID ${userId}:`,
           error,
@@ -77,7 +77,7 @@ export const useNotificationStore = defineStore('notification', {
         );
 
         this.notifications.content.push(newNotification);
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error creating notification for user ID ${userId}:`,
           error,
@@ -95,7 +95,7 @@ export const useNotificationStore = defineStore('notification', {
         if (notificationIndex !== -1) {
           this.notifications.content[notificationIndex].isRead = true;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error marking notification with ID ${notificationId} as read for user ID ${userId}:`,
           error,
@@ -110,7 +110,7 @@ export const useNotificationStore = defineStore('notification', {
         this.notifications.content = this.notifications.content.filter(
           (notification) => notification.id !== notificationId,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           `Error deleting notification with ID ${notificationId} for user ID ${userId}:`,
           error,

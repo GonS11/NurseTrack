@@ -1,34 +1,32 @@
-@use 'sass:color';
-@use 'sass:map';
 @use '../../../styles/main.scss' as *;
 
 .add-nurse-form {
-  margin-top: map.get($spacers, 5); // Corresponds to $spacing-xl
-  padding: map.get($spacers, 4); // Corresponds to $spacing-lg
-  border: 1px solid $gray-300; // Use light gray border
+  margin-top: $spacer-5;
+  padding: $spacer-4;
+  border: 1px solid $gray-300;
   border-radius: $border-radius;
-  background-color: $white; // Use white for form background
-  box-shadow: $card-shadow-sm; // Use small card shadow
+  background-color: $white;
+  box-shadow: $card-shadow-sm;
 
   .form-group {
-    margin-bottom: map.get($spacers, 3); // Corresponds to $spacing-md
+    margin-bottom: $spacer-3;
 
     label {
       display: block;
-      margin-bottom: map.get($spacers, 1); // Corresponds to $spacing-xs
+      margin-bottom: $spacer-1;
       font-weight: 600;
       color: $text-primary;
     }
 
     select {
       width: 100%;
-      padding: map.get($spacers, 2); // Corresponds to $spacing-sm
+      padding: $spacer-2;
       border: 1px solid $gray-300;
-      border-radius: $btn-border-radius; // Use button border-radius
-      background-color: $gray-100; // Use light gray background
+      border-radius: $btn-border-radius;
+      background-color: $gray-100;
       color: $text-primary;
       font-size: $font-size-base;
-      transition: $transition; // Apply global transition
+      transition: $transition;
 
       &:focus {
         border-color: $primary;
@@ -39,12 +37,11 @@
   }
 
   .add-nurse-btn {
-    // Changed from button[type='submit'] for clearer styling hook
-    @include button-primary; // Use the primary button mixin
-    margin-top: map.get($spacers, 3); // Add some margin above the button
-    padding: $btn-padding-y $btn-padding-x; // Ensure button padding from mixin
+    @include button-primary;
+    margin-top: $spacer-3;
+    padding: $btn-padding-y $btn-padding-x;
     font-size: 1rem;
-    gap: map.get($spacers, 1); // Corresponds to $spacing-xs for icon gap
+    gap: $spacer-1;
 
     .material-icons {
       font-size: 1.2rem;
@@ -53,32 +50,32 @@
 
   .error-message,
   .success-message {
-    margin-top: map.get($spacers, 3); // Corresponds to $spacing-md
-    padding: map.get($spacers, 2); // Corresponds to $spacing-sm
-    border-radius: $btn-border-radius; // Use button border-radius for message consistency
+    margin-top: $spacer-3;
+    padding: $spacer-2;
+    border-radius: $btn-border-radius;
     font-size: $font-size-base * 0.9;
     text-align: center;
   }
 
   .error-message {
-    background-color: $error-bg; // Use specific error background
-    color: $error-text; // Use specific error text
-    border: 1px solid $error; // Use base error color for border
+    background-color: $error-bg;
+    color: $error-text;
+    border: 1px solid $error;
   }
 
   .success-message {
-    background-color: $success-bg; // Use specific success background
-    color: $success-text; // Use specific success text
-    border: 1px solid $success; // Use base success color for border
+    background-color: $success-bg;
+    color: $success-text;
+    border: 1px solid $success;
   }
 
   .loading-spinner {
     display: inline-block;
     width: 1em;
     height: 1em;
-    border: 2px solid rgba($white, 0.3); // Use $white for spinner
+    border: 2px solid rgba($white, 0.3);
     border-radius: 50%;
-    border-top-color: $white; // Use $white for spinner top color
+    border-top-color: $white;
     animation: spin 1s ease-in-out infinite;
     -webkit-animation: spin 1s ease-in-out infinite;
   }

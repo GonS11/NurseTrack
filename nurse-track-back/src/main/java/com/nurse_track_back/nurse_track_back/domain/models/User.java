@@ -61,8 +61,8 @@ public class User implements UserDetails {
     private LocalDateTime updatedAt;
 
     // Relaciones
-    @OneToOne(mappedBy = "supervisor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private SupervisorDepartment supervisorDepartment;
+    @OneToMany(mappedBy = "supervisor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<SupervisorDepartment> supervisorDepartments;
 
     @OneToMany(mappedBy = "nurse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NurseDepartment> nurseDepartments;

@@ -2,31 +2,29 @@
   <div v-if="isOpen" class="modal-overlay">
     <div class="modal">
       <h2>{{ title }}</h2>
+
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label for="department">Department</label>
-          <select
+          <InputSelect
             id="department"
-            v-model="selectedDepartmentId"
-            @change="fetchDepartmentNursesAndAvailableNurses"
-            required
-          >
-            <option value="" disabled>Select a department</option>
-            <option
-              v-for="department in allDepartments"
-              :key="department.id"
-              :value="department.id"
-            >
-              {{ department.name }}
-            </option>
-          </select>
+            label="Department"
+            :model-value="selectedDepartmentId"
+            @update:model-value="updateSelectedDepartment"
+            :text="'Select a department'"
+            :entities="allDepartments"
+            :item-key="'id'"
+            :item-value="'id'"
+            option-value="name"
+            placeholder-value=""
+          />
         </div>
 
-        <div v-if="selectedDepartmentId">
+        <div v-if="selectedDepartmentId" class="department-content">
           <h3>Assigned Nurses:</h3>
+
           <ul v-if="assignedNurses.length > 0" class="nurse-list">
             <li v-for="assignment in assignedNurses" :key="assignment.nurse.id">
-              <span>
+              <span class="nurse-info">
                 {{ assignment.nurse.firstname }}
                 {{ assignment.nurse.lastname }} ({{
                   assignment.nurse.username
@@ -34,35 +32,43 @@
               </span>
               <button
                 type="button"
-                class="button button-danger button-sm"
+                class="btn btn-danger btn-sm"
                 @click="
-                  removeNurse(assignment.department.id, assignment.nurse.id)
+                  handleRemoveNurseConfirmation(
+                    assignment.department.id,
+                    assignment.nurse.id,
+                    assignment.nurse.firstname,
+                    assignment.nurse.lastname,
+                  )
                 "
               >
                 Remove
               </button>
             </li>
           </ul>
-          <p v-else>No nurses assigned to this department.</p>
+
+          <p v-else class="no-nurses">No nurses assigned to this department.</p>
 
           <h3>Assign New Nurse:</h3>
           <div class="form-group">
-            <label for="newNurse">Select Nurse to Assign</label>
-            <select id="newNurse" v-model="nurseToAssignId">
-              <option value="" disabled>Select a nurse</option>
-              <option
-                v-for="nurse in availableNurses"
-                :key="nurse.id"
-                :value="nurse.id"
-              >
-                {{ nurse.firstname }} {{ nurse.lastname }} ({{ nurse.email }})
-              </option>
-            </select>
+            <InputSelect
+              id="newNurse"
+              label="Select Nurse to Assign"
+              :model-value="nurseToAssignId"
+              @update:model-value="updateNurseToAssignId"
+              :text="'Select a nurse'"
+              :entities="availableNurses"
+              :item-key="'id'"
+              :item-value="'id'"
+              :option-value="nurseOptionText"
+              placeholder-value=""
+            />
           </div>
+
           <div class="form-actions assign-actions">
             <button
               type="button"
-              class="button button-primary"
+              class="btn btn-primary"
               @click="assignNurse"
               :disabled="!nurseToAssignId"
             >
@@ -72,15 +78,24 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" @click="closeModal">Cancel</button>
+          <button type="button" @click="closeModal" class="btn btn-secondary">
+            Cancel
+          </button>
         </div>
       </form>
     </div>
   </div>
+
+  <ConfirmModal
+    v-model="showConfirmModal"
+    :message="confirmMessage"
+    @confirmed="executeRemoveNurse"
+    @cancelled="cancelRemoveNurseOperation"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch } from 'vue';
 import type { DepartmentResponse } from '../../../types/schemas/department.schema';
 import { useAdminStore } from '../../../stores/admin.store';
 import type {
@@ -89,11 +104,13 @@ import type {
 } from '../../../types/schemas/assignments.schema';
 import type { UserResponse } from '../../../types/schemas/user.schema';
 import { UserRole } from '../../../types/enums/user-role.enum';
+import InputSelect from '../InputSelect.vue';
+import ConfirmModal from '../../common/ConfirmModal.vue';
 
 const props = defineProps<{
   isOpen: boolean;
   title: string;
-  item?: DepartmentResponse; // The department selected for managing nurses
+  item?: DepartmentResponse;
 }>();
 
 const emit = defineEmits(['close', 'submit']);
@@ -105,26 +122,32 @@ const assignedNurses = ref<NurseDepartmentResponse[]>([]);
 const availableNurses = ref<UserResponse[]>([]);
 const nurseToAssignId = ref<number | null>(null);
 
-const allDepartments = computed(() => adminStore.departments.content);
+const allDepartments = ref<DepartmentResponse[]>([]);
+
+const showConfirmModal = ref(false);
+const confirmMessage = ref('');
+const nurseToRemoveDetails = ref<{
+  departmentId: number;
+  nurseId: number;
+} | null>(null);
 
 const fetchInitialData = async () => {
   try {
     await adminStore.getAllDepartments();
+    allDepartments.value = adminStore.departments.content;
+
     if (props.item) {
       selectedDepartmentId.value = props.item.id;
       await fetchDepartmentNursesAndAvailableNurses();
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching initial data:', error);
   }
 };
 
 const fetchDepartmentNursesAndAvailableNurses = async () => {
-  if (!selectedDepartmentId.value) {
-    assignedNurses.value = [];
-    availableNurses.value = [];
-    return;
-  }
+  if (!selectedDepartmentId.value) return;
+
   try {
     await adminStore.getAllNursesByDepartment(selectedDepartmentId.value);
     assignedNurses.value = adminStore.nurseAssignments.content;
@@ -133,163 +156,211 @@ const fetchDepartmentNursesAndAvailableNurses = async () => {
     const allNurses = adminStore.users.content.filter(
       (user) => user.role === UserRole.NURSE,
     );
+
     const assignedNurseIds = new Set(
-      assignedNurses.value.map((assignment) => assignment.nurse.id),
+      assignedNurses.value.map((a) => a.nurse.id),
     );
+
     availableNurses.value = allNurses.filter(
       (nurse) => !assignedNurseIds.has(nurse.id),
     );
+
     nurseToAssignId.value = null;
-  } catch (error) {
-    console.error(
-      'Error fetching department nurses or available nurses:',
-      error,
-    );
+  } catch (error: any) {
+    console.error('Error fetching nurses:', error);
     assignedNurses.value = [];
     availableNurses.value = [];
   }
 };
 
-const assignNurse = async () => {
-  if (selectedDepartmentId.value && nurseToAssignId.value) {
-    const request: AssignNurseRequest = {
-      departmentId: selectedDepartmentId.value,
-      nurseId: nurseToAssignId.value,
-    };
-    try {
-      await adminStore.assignNurseToDepartment(request);
-      await fetchDepartmentNursesAndAvailableNurses();
-    } catch (error) {
-      console.error('Error assigning nurse:', error);
-    }
+const updateSelectedDepartment = (value: string | number | null) => {
+  selectedDepartmentId.value = value ? Number(value) : null;
+  if (selectedDepartmentId.value) {
+    fetchDepartmentNursesAndAvailableNurses();
+  } else {
+    assignedNurses.value = [];
+    availableNurses.value = [];
   }
 };
 
-const removeNurse = async (departmentId: number, nurseId: number) => {
-  if (
-    confirm('Are you sure you want to remove this nurse from the department?')
-  ) {
-    try {
-      await adminStore.removeNurseFromDepartment(departmentId, nurseId);
-      await fetchDepartmentNursesAndAvailableNurses();
-    } catch (error) {
-      console.error('Error removing nurse:', error);
-    }
+const updateNurseToAssignId = (value: string | number | null) => {
+  nurseToAssignId.value = value ? Number(value) : null;
+};
+
+const nurseOptionText = (nurse: UserResponse) => {
+  return `${nurse.firstname} ${nurse.lastname} (${nurse.email})`;
+};
+
+const assignNurse = async () => {
+  if (!selectedDepartmentId.value || !nurseToAssignId.value) return;
+
+  const request: AssignNurseRequest = {
+    departmentId: selectedDepartmentId.value,
+    nurseId: nurseToAssignId.value,
+  };
+
+  try {
+    await adminStore.assignNurseToDepartment(request);
+    await fetchDepartmentNursesAndAvailableNurses();
+  } catch (error: any) {
+    console.error('Error assigning nurse:', error);
   }
+};
+
+const handleRemoveNurseConfirmation = (
+  departmentId: number,
+  nurseId: number,
+  nurseFirstName: string,
+  nurseLastName: string,
+) => {
+  nurseToRemoveDetails.value = { departmentId, nurseId };
+  confirmMessage.value = `Are you sure you want to remove nurse "${nurseFirstName} ${nurseLastName}" from this department?`;
+  showConfirmModal.value = true;
+};
+
+const executeRemoveNurse = async () => {
+  if (!nurseToRemoveDetails.value) return;
+
+  const { departmentId, nurseId } = nurseToRemoveDetails.value;
+
+  try {
+    await adminStore.removeNurseFromDepartment(departmentId, nurseId);
+    await fetchDepartmentNursesAndAvailableNurses();
+  } catch (error: any) {
+    console.error('Error removing nurse:', error);
+  } finally {
+    nurseToRemoveDetails.value = null;
+  }
+};
+
+const cancelRemoveNurseOperation = () => {
+  nurseToRemoveDetails.value = null;
+  console.log('Nurse removal cancelled by user.');
 };
 
 watch(
   () => props.isOpen,
-  (newVal) => {
-    if (newVal) {
+  (isOpen) => {
+    if (isOpen) {
       fetchInitialData();
     } else {
-      // Reset state when modal closes
       selectedDepartmentId.value = null;
       assignedNurses.value = [];
       availableNurses.value = [];
       nurseToAssignId.value = null;
+      showConfirmModal.value = false;
+      nurseToRemoveDetails.value = null;
     }
   },
 );
 
-const handleSubmit = () => {
-  closeModal();
-};
-
-const closeModal = () => {
-  emit('close');
-};
-
-onMounted(() => {
-  if (props.isOpen) {
-    fetchInitialData();
-  }
-});
+const handleSubmit = () => closeModal();
+const closeModal = () => emit('close');
 </script>
 
 <style lang="scss" scoped>
-@use 'Modal.scss'; // This implicitly uses main.scss as well
-@use '../../../styles/main.scss' as *; // Explicitly import if needed for direct variable access
+@use 'Modal.scss';
+@use '../../../styles/main.scss' as *;
+
+.department-content {
+  margin-top: $spacer-4;
+  padding-top: $spacer-4;
+  border-top: 1px solid $gray-200;
+
+  h3 {
+    color: $text-primary;
+    margin-bottom: $spacer-3;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
 
 .nurse-list {
   list-style: none;
   padding: 0;
-  margin-top: $spacer * 3; // Using Sass variable directly
+  margin: $spacer-3 0;
+  background: $gray-100;
+  border-radius: $btn-border-radius;
+  border: 1px solid $gray-200;
+  padding: $spacer-2;
+  max-height: 200px;
+  overflow-y: auto;
 
   li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: $spacer * 0.5 0; // Using Sass variable
-    border-bottom: 1px solid $gray-200; // Using Sass variable
+    padding: $spacer-2 $spacer-3;
+    border-bottom: 1px solid $gray-200;
+    transition: $transition;
+
     &:last-child {
       border-bottom: none;
     }
-
-    .button-danger {
-      margin-left: $spacer * 3; // Using Sass variable
-    }
-  }
-}
-
-.assign-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: $spacer * 3; // Using Sass variable
-}
-
-.button {
-  padding: $btn-padding-y $btn-padding-x; // Use Sass variable directly
-  border-radius: $btn-border-radius; // Use Sass variable directly
-  font-size: $font-size-base; // Use Sass variable directly
-  cursor: pointer;
-  transition: $transition; // Use Sass variable directly
-
-  &.button-primary {
-    background-color: $primary; // Use Sass variable directly
-    color: $white; // Use Sass variable directly
-    border: 1px solid $primary; // Use Sass variable directly
-
-    &:hover {
-      background-color: $primary-hover; // Use Sass variable directly
-      border-color: $primary-hover; // Use Sass variable directly
-    }
-  }
-
-  &.button-secondary {
-    background-color: $white;
-    color: $gray-700;
-    border: 1px solid $gray-300;
 
     &:hover {
       background-color: $gray-100;
     }
   }
 
-  &.button-danger {
-    background-color: $error;
-    color: $white;
-    border: 1px solid $error;
+  .nurse-info {
+    flex-grow: 1;
+    color: $text-primary;
+  }
 
-    &:hover {
-      background-color: color.adjust(
-        $error,
-        $lightness: -10%
-      ); // Or define $error-dark
-      border-color: color.adjust($error, $lightness: -10%);
+  .btn-sm {
+    margin-left: $spacer-3;
+    padding: $spacer-1 $spacer-3;
+    font-size: 0.875rem;
+  }
+}
+
+.no-nurses {
+  color: $gray-600;
+  font-style: italic;
+  text-align: center;
+  padding: $spacer-3;
+  background: $gray-100;
+  border-radius: $btn-border-radius;
+}
+
+.assign-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacer-4;
+
+  .btn {
+    min-width: 120px;
+    padding: $spacer-2 $spacer-4;
+  }
+}
+
+.form-actions {
+  margin-top: $spacer-4;
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacer-3;
+
+  .btn {
+    min-width: 120px;
+    padding: $spacer-2 $spacer-4;
+  }
+}
+
+@include responsive(phone) {
+  .form-actions {
+    flex-direction: column;
+    gap: $spacer-2;
+
+    .btn {
+      width: 100%;
     }
   }
 
-  &.button-sm {
-    // You'd need to define these in your variables.scss if not already
-    padding: $btn-padding-y * 0.75 $btn-padding-x * 0.75; // Example smaller padding
-    font-size: $font-size-base * 0.875; // Example smaller font size
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  .assign-actions {
+    .btn {
+      width: 100%;
+    }
   }
 }
 </style>

@@ -17,6 +17,7 @@ export const useSupervisorDepartmentService = {
     const response = await api.get<DepartmentResponse[]>(
       '/supervisor/departments',
     );
+
     return response.data;
   },
 
@@ -24,6 +25,7 @@ export const useSupervisorDepartmentService = {
     const response = await api.get<DepartmentResponse>(
       `/supervisor/departments/${departmentId}`,
     );
+
     return response.data;
   },
 
@@ -32,6 +34,7 @@ export const useSupervisorDepartmentService = {
     const response = await api.get<UserResponse[]>(
       '/supervisor/departments/nurses/all',
     );
+
     return response.data;
   },
 
@@ -41,6 +44,7 @@ export const useSupervisorDepartmentService = {
     const response = await api.get<NurseDepartmentResponse[]>(
       `/supervisor/departments/${departmentId}/nurses`,
     );
+
     return response.data;
   },
 
@@ -52,6 +56,7 @@ export const useSupervisorDepartmentService = {
       `/supervisor/departments/${departmentId}/nurses`,
       data,
     );
+
     return response.data;
   },
 
@@ -62,7 +67,6 @@ export const useSupervisorDepartmentService = {
     await api.delete<void>(
       `/supervisor/departments/${departmentId}/nurses/${nurseId}`,
     );
-    // No data to return for a delete operation
   },
 
   //==== SHIFTS ====
@@ -70,6 +74,7 @@ export const useSupervisorDepartmentService = {
     const response = await api.get<ShiftResponse[]>(
       `/supervisor/departments/${departmentId}/shifts`,
     );
+
     return response.data;
   },
 
@@ -81,6 +86,7 @@ export const useSupervisorDepartmentService = {
       `/supervisor/departments/${departmentId}/shifts`,
       data,
     );
+
     return response.data;
   },
 
@@ -93,6 +99,7 @@ export const useSupervisorDepartmentService = {
       `/supervisor/departments/${departmentId}/shifts/${shiftId}`,
       data,
     );
+
     return response.data;
   },
 
@@ -100,6 +107,5 @@ export const useSupervisorDepartmentService = {
     await api.delete(
       `/supervisor/departments/${departmentId}/shifts/${shiftId}`,
     );
-    // No data to return for a delete operation
   },
 };
