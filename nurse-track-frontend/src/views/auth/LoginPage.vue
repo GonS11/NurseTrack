@@ -64,12 +64,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../services';
 import { AuthSchemas } from '../../types/schemas/auth.schema';
 import { ZodError } from 'zod';
 import Input from '../../components/ui/Input.vue';
 import { useFormErrors } from '../../utils/formValidation';
 import { useNotifications } from '../../composables/useNotifications';
+import { useAuthStore } from '../../stores/auth.store';
 
 const auth = useAuthStore();
 const router = useRouter();

@@ -32,12 +32,7 @@ export const useNotificationStore = defineStore('notification', {
           sortBy,
         );
       } catch (error: any) {
-        console.error('Error', {
-          userId,
-          page,
-          size,
-          sortBy,
-        });
+        console.error('Error loading notifications for user', userId, error);
         throw error;
       }
     },
@@ -48,11 +43,9 @@ export const useNotificationStore = defineStore('notification', {
           userId,
           notificationId,
         );
-
         const notificationIndex = this.notifications.content.findIndex(
-          (notification) => notification.id === notificationId,
+          (n) => n.id === notificationId,
         );
-
         if (notificationIndex !== -1) {
           this.notifications.content[notificationIndex] = notification;
         } else {
@@ -60,9 +53,10 @@ export const useNotificationStore = defineStore('notification', {
         }
       } catch (error: any) {
         console.error(
-          `Error fetching notification with ID ${notificationId} for user ID ${userId}:`,
+          `Error fetching notification with ID ${notificationId}:`,
           error,
         );
+        throw error;
       }
     },
 
@@ -75,46 +69,70 @@ export const useNotificationStore = defineStore('notification', {
           userId,
           request,
         );
-
-        this.notifications.content.push(newNotification);
+        this.notifications.content.unshift(newNotification);
       } catch (error: any) {
         console.error(
           `Error creating notification for user ID ${userId}:`,
           error,
         );
+        throw error;
       }
     },
 
     async markAsRead(userId: number, notificationId: number) {
       try {
         await useNotificationService.markAsRead(userId, notificationId);
-        const notificationIndex = this.notifications.content.findIndex(
-          (notification) => notification.id === notificationId,
+        const notification = this.notifications.content.find(
+          (n) => n.id === notificationId,
         );
-
-        if (notificationIndex !== -1) {
-          this.notifications.content[notificationIndex].isRead = true;
+        if (notification) {
+          notification.isRead = true;
         }
       } catch (error: any) {
         console.error(
-          `Error marking notification with ID ${notificationId} as read for user ID ${userId}:`,
+          `Error marking notification with ID ${notificationId} as read:`,
           error,
         );
+        throw error;
       }
     },
 
     async deleteNotification(userId: number, notificationId: number) {
       try {
         await useNotificationService.deleteNotification(userId, notificationId);
-
         this.notifications.content = this.notifications.content.filter(
-          (notification) => notification.id !== notificationId,
+          (n) => n.id !== notificationId,
         );
       } catch (error: any) {
         console.error(
-          `Error deleting notification with ID ${notificationId} for user ID ${userId}:`,
+          `Error deleting notification with ID ${notificationId}:`,
           error,
         );
+        throw error;
+      }
+    },
+
+    async markAllAsRead(userId: number) {
+      try {
+        const unreadIds = this.notifications.content
+          .filter((n) => !n.isRead)
+          .map((n) => n.id);
+
+        if (unreadIds.length === 0) {
+          return;
+        }
+        for (const id of unreadIds) {
+          await useNotificationService.markAsRead(userId, id);
+          const notification = this.notifications.content.find(
+            (n) => n.id === id,
+          );
+          if (notification) {
+            notification.isRead = true;
+          }
+        }
+      } catch (error: any) {
+        console.error('Error marking all notifications as read:', error);
+        throw error;
       }
     },
   },

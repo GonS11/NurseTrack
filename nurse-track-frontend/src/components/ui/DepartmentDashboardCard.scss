@@ -52,22 +52,18 @@
       &.btn-schedule {
         background-color: $secondary;
         color: $white;
+
         &:hover {
-          background-color: darken(
-            $secondary,
-            10%
-          ); // Using Sass's built-in darken or a specific shade if defined in main.scss
+          background-color: #5a6066;
         }
       }
 
       &.btn-requests {
         background-color: $info-border;
         color: $white;
+
         &:hover {
-          background-color: darken(
-            $info-border,
-            10%
-          ); // Using Sass's built-in darken or a specific shade if defined in main.scss
+          background-color: #12798e;
         }
       }
     }

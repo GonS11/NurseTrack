@@ -3,9 +3,20 @@
 .app-shell {
   display: flex;
   position: relative;
-  background: $background;
   min-height: 100vh;
   flex-direction: column;
+
+  &.role-admin {
+    background: $background-admin;
+  }
+
+  &.role-supervisor {
+    background: $background-supervisor;
+  }
+
+  &.role-nurse {
+    background: $background-nurse;
+  }
 
   .overlay {
     display: none;

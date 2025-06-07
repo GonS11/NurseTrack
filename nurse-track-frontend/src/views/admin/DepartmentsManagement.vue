@@ -19,7 +19,7 @@
 import { computed, onMounted, ref } from 'vue';
 import ManagamentComponent from '../../components/common/ManagamentComponent.vue';
 import { type TableAction } from '../../components/ui/Table.vue';
-import { useAuthStore } from '../../services';
+import { useAuthStore } from '../../stores/auth.store';
 import { useAdminStore } from '../../stores/admin.store';
 import type {
   CreateDepartmentRequest,

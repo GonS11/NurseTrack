@@ -217,12 +217,14 @@ const onDepartmentSelectedForRequests = async (departmentId: number | null) => {
 const { selectedDepartmentId, isLoadingDepartments, errorDepartments } =
   useDepartmentSelection({
     onDepartmentSelected: onDepartmentSelectedForRequests,
-    showAlertMessage: notifications.showMessage,
+    // PASAMOS notifications.displayNotification AQUÍ
+    showAlertMessage: notifications.displayNotification,
   });
 
 const requestActions = useRequestActions(
   selectedDepartmentId,
-  notifications.showMessage,
+  // PASAMOS notifications.displayNotification AQUÍ
+  notifications.displayNotification,
   fetchVacationRequests,
   fetchShiftChangeRequests,
 );

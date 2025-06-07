@@ -3,7 +3,7 @@
 .login-page {
   @include flex-center(column);
   min-height: 100vh;
-  background-color: mix($primary, $black, 90%);
+  background-color: $primary;
   padding: $spacer-3;
 
   .container {

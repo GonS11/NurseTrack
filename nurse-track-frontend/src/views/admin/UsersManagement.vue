@@ -25,7 +25,7 @@ import type {
   UserResponse,
 } from '../../types/schemas/user.schema';
 import { type TableAction } from '../../components/ui/Table.vue';
-import { useAuthStore } from '../../services';
+import { useAuthStore } from '../../stores/auth.store';
 import { useAdminStore } from '../../stores/admin.store';
 import { useNotifications } from '../../composables/useNotifications';
 

@@ -46,5 +46,5 @@ function dismiss() {
 </script>
 
 <style lang="scss" scoped>
-@use 'AlertMessage.scss';
+@use 'GlobalNotification.scss';
 </style>

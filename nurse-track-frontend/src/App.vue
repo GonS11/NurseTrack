@@ -1,6 +1,4 @@
 <template>
-  <router-view />
-
   <GlobalNotification
     v-model="notifications.showNotification.value"
     :message="notifications.notificationMessage.value"
@@ -9,6 +7,8 @@
     :autoClose="notifications.notificationAutoClose.value"
     @dismiss="notifications.dismiss"
   />
+
+  <router-view />
 </template>
 
 <script setup lang="ts">

@@ -173,17 +173,19 @@
   grid-template-columns: repeat($cols, 1fr);
   gap: $spacer * $gap;
 
-  @include responsive(phone) {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
   @include responsive(tablet) {
     @if $tablet-cols {
       grid-template-columns: repeat($tablet-cols, 1fr);
-    } @else if $cols > 1 {
-      grid-template-columns: repeat(2, 1fr);
     } @else {
-      grid-template-columns: repeat($cols, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @include responsive(phone) {
+    @if $phone-cols {
+      grid-template-columns: repeat($phone-cols, 1fr);
+    } @else {
+      grid-template-columns: repeat(1, 1fr);
     }
   }
 }

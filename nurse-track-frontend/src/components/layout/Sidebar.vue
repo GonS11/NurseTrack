@@ -49,10 +49,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
-import { useAuthStore } from '../../services';
 import { UserRole } from '../../types/enums/user-role.enum';
 import { useNotificationStore } from '../../stores/notification.store';
 import { useNotifications } from '../../composables/useNotifications';
+import { useAuthStore } from '../../stores/auth.store';
 
 const props = defineProps<{
   isOpen: boolean;

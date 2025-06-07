@@ -1,11 +1,10 @@
 @use '../../styles/main.scss' as *;
 
 .notifications-container {
-  background: $gray-200;
+  background: $white;
   border-radius: $border-radius;
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 1.5rem;
+  margin: $spacer-4 auto;
+  padding: $spacer-4;
 }
 
 .notifications-header {
@@ -17,41 +16,40 @@
 
   h1 {
     @include flex-center(row);
-    gap: 1rem;
-    font-size: 1.5rem;
+    gap: $spacer-3;
+    font-size: $font-size-h4;
     color: $text-primary;
   }
 
   .badge {
     background: $primary;
     color: $white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.9rem;
+    padding: $spacer-1 $spacer-2;
+    border-radius: $border-radius;
+    font-size: $font-size-sm;
   }
 
   .mark-all-read {
-    background: rgba($primary, 0.1);
+    @include button-base;
+    background: $gray-300;
     color: $black;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    transition: background 0.2s ease;
-    border: none;
+    padding: $btn-padding-y $btn-padding-x;
+    border-radius: $btn-border-radius;
 
     &:hover:not(:disabled) {
-      background: rgba($primary, 0.2);
+      background: $gray-400;
     }
 
     &:disabled {
       opacity: 0.5;
-      cursor: not-allowed;
+      cursor: default;
     }
   }
 }
 
 .loading-spinner {
   @include flex-center;
-  padding: 3rem;
+  padding: $spacer-5;
 
   .spin {
     animation: spin 1s linear infinite;
@@ -62,7 +60,7 @@
 
 .empty-state {
   @include flex-center(column);
-  gap: 1rem;
+  gap: $spacer-3;
   padding: $spacer-5;
   text-align: center;
   color: $gray-600;
@@ -74,17 +72,17 @@
 }
 
 .notifications-list {
-  background: $white;
-  border-radius: 0.5rem;
+  background: $gray-100;
+  border-radius: $border-radius-sm;
   @include box-shadow(1);
 }
 
 .notification-item {
   @include flex-center(row);
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: $spacer-3;
+  padding: $spacer-4;
   border-bottom: 1px solid $gray-100;
-  transition: background 0.2s ease;
+  transition: $transition;
 
   &:last-child {
     border-bottom: none;
@@ -103,8 +101,8 @@
 .notification-icon {
   @include flex-center;
   background: rgba($primary, 0.1);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: $spacer-5;
+  height: $spacer-5;
   border-radius: 50%;
 
   .material-icons {
@@ -117,48 +115,48 @@
 
   h3 {
     color: $text-primary;
-    margin-bottom: 0.5rem;
+    margin-bottom: $spacer-1;
+    font-size: $font-size-md;
   }
 
   p {
     color: $gray-600;
-    margin-bottom: 0.25rem;
+    margin-bottom: $spacer-1;
+    font-size: $font-size-sm;
   }
 
   time {
-    font-size: 0.875rem;
+    font-size: $font-size-xs;
     color: $gray-500;
   }
 }
 
 .notification-actions {
   @include flex-center(row);
-  gap: 0.5rem;
+  gap: $spacer-2;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: $transition;
 
   .notification-item:hover & {
     opacity: 1;
   }
 
   button {
-    @include flex-center;
-    padding: 0.5rem;
+    @include button-action-icon;
     border-radius: 50%;
-    transition: background 0.2s ease;
-    border: none; // Añadido para consistencia
+    padding: $spacer-2;
 
     &.mark-read {
-      color: $black;
-
+      color: $gray-600;
       &:hover {
-        background: rgba($black, 0.1);
+        background: rgba($primary, 0.1);
+        color: $primary;
       }
     }
 
     &.delete {
+      @extend .danger;
       color: $error;
-
       &:hover {
         background: rgba($error, 0.1);
       }
@@ -168,28 +166,31 @@
 
 .pagination-controls {
   @include flex-center(row);
-  gap: 1rem;
+  gap: $spacer-3;
   margin-top: $spacer-4;
-  padding: 1rem;
-  background: $gray-500; // Aquí sí uso $gray-500 directamente
-  border-radius: 0.5rem;
+  padding: $spacer-3;
+  background: $gray-100;
+  border-radius: $border-radius-sm;
   @include box-shadow(1);
 
   button {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    background: rgba($primary, 0.1);
+    @include button-base;
+    background: $gray-400;
     color: $black;
-    border: none;
 
     &:disabled {
       opacity: 0.5;
-      cursor: not-allowed;
+      cursor: default;
     }
 
     &:hover:not(:disabled) {
-      background: rgba($primary, 0.2);
+      background: $gray-700;
     }
+  }
+
+  span {
+    font-size: $font-size-md;
+    color: $black;
   }
 }
 

@@ -12,6 +12,13 @@
     ref="managementComponentRef"
   >
   </ManagamentComponent>
+
+  <ConfirmModal
+    v-model="showConfirmModal"
+    :message="confirmMessage"
+    @confirmed="executeRemoveSupervisor"
+    @cancelled="cancelRemoveSupervisorOperation"
+  />
 </template>
 
 <script setup lang="ts">
@@ -25,6 +32,7 @@ import { type TableAction } from '../../components/ui/Table.vue';
 import { useAdminStore } from '../../stores/admin.store';
 import SupervisorAssignmentModal from '../../components/ui/modals/SupervisorAssignmentModal.vue';
 import { useNotifications } from '../../composables/useNotifications';
+import ConfirmModal from '../../components/common/ConfirmModal.vue';
 
 const adminStore = useAdminStore();
 
@@ -33,6 +41,14 @@ const managementComponentRef = ref<InstanceType<
 > | null>(null);
 
 const { showSuccess, showError } = useNotifications();
+
+const showConfirmModal = ref(false);
+const confirmMessage = ref('');
+const assignmentToRemoveDetails = ref<{
+  departmentId: number;
+  supervisorName: string;
+  departmentName: string;
+} | null>(null);
 
 const supervisorAssignments = computed(() => adminStore.supervisorAssignments);
 
@@ -63,28 +79,18 @@ const supervisorAssignmentActions = computed(
         label: 'Remove Assignment',
         icon: 'person_remove',
         class: 'danger',
-        handler: async (assignment: SupervisorDepartmentResponse) => {
-          try {
-            if (
-              confirm(
-                `Are you sure you want to remove supervisor ${assignment.supervisor.firstname} ${assignment.supervisor.lastname} from department ${assignment.department.name}?`,
-              )
-            ) {
-              await removeSupervisor(assignment.department.id);
-              await getAllSupervisorAssignments(
-                supervisorAssignments.value.number, // Refresca la tabla
-              );
-              showSuccess('Supervisor assignment removed successfully!');
-            }
-          } catch (error: any) {
-            showError(error);
-          }
+        handler: (assignment: SupervisorDepartmentResponse) => {
+          handleRemoveSupervisorConfirmation(
+            assignment.department.id,
+            assignment.supervisor.firstname,
+            assignment.supervisor.lastname,
+            assignment.department.name,
+          );
         },
       },
     ] as TableAction<SupervisorDepartmentResponse>[],
 );
 
-// Métodos de CRUD para pasarle al componente
 const getAllSupervisorAssignments = async (page: number) => {
   try {
     await adminStore.getAllSupervisorAssignments(page);
@@ -105,9 +111,48 @@ const assignSupervisor = async (formData: AssignSupervisorRequest) => {
 const removeSupervisor = async (departmentId: number) => {
   try {
     await adminStore.removeSupervisorFromDepartment(departmentId);
+    showSuccess('Supervisor assignment removed successfully!');
   } catch (error: any) {
-    showError(error);
+    showError('Failed to remove supervisor assignment: ' + error.message);
+    throw error;
   }
+};
+
+const handleRemoveSupervisorConfirmation = (
+  departmentId: number,
+  supervisorFirstName: string,
+  supervisorLastName: string,
+  departmentName: string,
+) => {
+  assignmentToRemoveDetails.value = {
+    departmentId,
+    supervisorName: `${supervisorFirstName} ${supervisorLastName}`,
+    departmentName,
+  };
+  confirmMessage.value = `Are you sure you want to remove supervisor "${assignmentToRemoveDetails.value.supervisorName}" from department "${assignmentToRemoveDetails.value.departmentName}"?`;
+  showConfirmModal.value = true;
+};
+
+const executeRemoveSupervisor = async () => {
+  if (!assignmentToRemoveDetails.value) return;
+
+  const { departmentId } = assignmentToRemoveDetails.value;
+
+  try {
+    await removeSupervisor(departmentId);
+    await getAllSupervisorAssignments(supervisorAssignments.value.number);
+  } catch (error: any) {
+    console.error('Error executing supervisor removal:', error);
+  } finally {
+    assignmentToRemoveDetails.value = null;
+    showConfirmModal.value = false;
+  }
+};
+
+const cancelRemoveSupervisorOperation = () => {
+  assignmentToRemoveDetails.value = null;
+  showConfirmModal.value = false;
+  console.log('Supervisor removal operation cancelled by user.');
 };
 
 onMounted(() => {

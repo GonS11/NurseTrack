@@ -1,84 +1,90 @@
-import { ref, watch } from 'vue';
-import type { Ref } from 'vue';
+import { ref } from 'vue';
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 
+const showNotification = ref(false);
+const notificationMessage = ref('');
+const notificationType = ref<NotificationType>('info');
+const notificationTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
+const notificationAutoClose = ref(true); // Controla si se cierra automáticamente
+
 export function useNotifications() {
-  const showNotification: Ref<boolean> = ref(false);
-  const notificationMessage: Ref<string> = ref('');
-  const notificationType: Ref<NotificationType> = ref('info');
-  const notificationAutoClose: Ref<boolean | number> = ref(3000);
-
-  let autoCloseTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  function showMessage(
+  /**
+   * Muestra una notificación global en la aplicación.
+   * @param message El mensaje a mostrar.
+   * @param type El tipo de notificación (info, success, warning, error).
+   * @param autoClose Duración en milisegundos si se cierra automáticamente, o boolean (true para 5s, false para no cerrar).
+   */
+  const displayNotification = (
     message: string,
-    type: NotificationType = 'info',
-    autoClose: boolean | number = 3000,
-  ) {
-    if (autoCloseTimeout) {
-      clearTimeout(autoCloseTimeout);
-      autoCloseTimeout = null;
+    type: NotificationType, // Aquí debe ser un tipo requerido según tus errores
+    autoClose: boolean | number | undefined = true, // Acepta boolean, number o undefined
+  ) => {
+    if (notificationTimeout.value) {
+      clearTimeout(notificationTimeout.value);
     }
 
     notificationMessage.value = message;
     notificationType.value = type;
-    notificationAutoClose.value = autoClose;
     showNotification.value = true;
 
-    if (typeof autoClose === 'number' && autoClose > 0) {
-      autoCloseTimeout = setTimeout(() => {
+    let actualAutoClose = true;
+    let duration = 5000; // Duración por defecto
+
+    if (typeof autoClose === 'boolean') {
+      actualAutoClose = autoClose;
+      duration = 5000; // Si es boolean, asumimos 5 segundos por defecto
+    } else if (typeof autoClose === 'number') {
+      actualAutoClose = true; // Si es un número, siempre se auto-cierra
+      duration = autoClose;
+    } else {
+      actualAutoClose = true; // Si es undefined, por defecto se auto-cierra en 5 segundos
+    }
+
+    notificationAutoClose.value = actualAutoClose;
+
+    if (actualAutoClose) {
+      notificationTimeout.value = setTimeout(() => {
         dismiss();
-      }, autoClose);
+      }, duration);
     }
-  }
+  };
 
-  function showSuccess(message: string, autoClose: boolean | number = 3000) {
-    showMessage(message, 'success', autoClose);
-  }
+  // Las funciones específicas ahora deben pasar el tipo obligatoriamente
+  const showInfo = (message: string, autoClose?: boolean | number) => {
+    displayNotification(message, 'info', autoClose);
+  };
 
-  function showInfo(message: string, autoClose: boolean | number = 3000) {
-    showMessage(message, 'info', autoClose);
-  }
+  const showSuccess = (message: string, autoClose?: boolean | number) => {
+    displayNotification(message, 'success', autoClose);
+  };
 
-  function showWarning(message: string, autoClose: boolean | number = 5000) {
-    showMessage(message, 'warning', autoClose);
-  }
+  const showWarning = (message: string, autoClose?: boolean | number) => {
+    displayNotification(message, 'warning', autoClose);
+  };
 
-  function showError(
-    error: string | Error,
-    autoClose: boolean | number = false,
-  ) {
-    const message = error instanceof Error ? error.message : error;
-    showMessage(message, 'error', autoClose);
-  }
+  const showError = (message: string, autoClose?: boolean | number) => {
+    displayNotification(message, 'error', autoClose);
+  };
 
-  function dismiss() {
-    if (autoCloseTimeout) {
-      clearTimeout(autoCloseTimeout);
-      autoCloseTimeout = null;
-    }
+  const dismiss = () => {
     showNotification.value = false;
     notificationMessage.value = '';
     notificationType.value = 'info';
-    notificationAutoClose.value = 3000;
-  }
-
-  watch(showNotification, (newValue) => {
-    if (!newValue && autoCloseTimeout) {
-      clearTimeout(autoCloseTimeout);
-      autoCloseTimeout = null;
+    if (notificationTimeout.value) {
+      clearTimeout(notificationTimeout.value);
+      notificationTimeout.value = null;
     }
-  });
+  };
 
   return {
     showNotification,
     notificationMessage,
     notificationType,
     notificationAutoClose,
-    showMessage,
-    showSuccess,
+    displayNotification,
     showInfo,
+    showSuccess,
     showWarning,
     showError,
     dismiss,

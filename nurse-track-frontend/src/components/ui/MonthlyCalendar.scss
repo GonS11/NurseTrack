@@ -69,8 +69,8 @@
         font-weight: 600;
         padding: $spacer-2;
         text-align: center;
-        border-bottom: 1px solid darken($primary, 10%); // Changed from color.adjust
-        border-right: 1px solid darken($primary, 10%); // Changed from color.adjust
+        border-bottom: 1px solid $primary-hover;
+        border-right: 1px solid $primary-hover;
         &:nth-child(7n) {
           border-right: none;
         }
@@ -91,7 +91,7 @@
         flex-direction: column;
         align-items: flex-start;
         position: relative;
-        cursor: pointer;
+        cursor: default;
         transition: $transition;
         overflow: hidden;
         border-right: 1px solid $gray-200;
@@ -105,13 +105,16 @@
           border-bottom: none;
         }
 
-        &:hover {
-          background-color: $gray-200;
+        &.is-clickable {
+          cursor: pointer;
+          &:hover {
+            background-color: $gray-200;
+          }
         }
 
         &.is-current-month {
           background-color: $white;
-          &:hover {
+          &.is-clickable:hover {
             background-color: $gray-100;
           }
         }
@@ -170,131 +173,47 @@
             }
 
             &.morning {
-              background-color: rgba(#ffd54f, 0.2);
-              border-left-color: #ffa000;
+              background-color: $shift-morning-bg;
+              border-left-color: $shift-morning-border;
               .shift-time,
               .shift-nurse {
-                color: #d68f00;
+                color: $shift-morning-text;
               }
             }
             &.afternoon {
-              background-color: rgba(#4fc3f7, 0.2);
-              border-left-color: #0288d1;
+              background-color: $shift-afternoon-bg;
+              border-left-color: $shift-afternoon-border;
               .shift-time,
               .shift-nurse {
-                color: #016b9e;
+                color: $shift-afternoon-text;
               }
             }
             &.night {
-              background-color: rgba(#9575cd, 0.2);
-              border-left-color: #673ab7;
+              background-color: $shift-night-bg;
+              border-left-color: $shift-night-border;
               .shift-time,
               .shift-nurse {
-                color: #4e2a87;
+                color: $shift-night-text;
               }
             }
             &.half-morning {
-              background-color: rgba(#aed581, 0.2);
-              border-left-color: #689f38;
+              background-color: $shift-half-morning-bg;
+              border-left-color: $shift-half-morning-border;
               .shift-time,
               .shift-nurse {
-                color: #4b7d27;
+                color: $shift-half-morning-text;
               }
             }
             &.half-night {
-              background-color: rgba(#f06292, 0.2);
-              border-left-color: #c2185b;
+              background-color: $shift-half-night-bg;
+              border-left-color: $shift-half-night-border;
               .shift-time,
               .shift-nurse {
-                color: #9c124a;
+                color: $shift-half-night-text;
               }
             }
           }
         }
-      }
-    }
-  }
-
-  .shift-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
-    @include flex-center;
-    z-index: 1000;
-    padding: $spacer-3;
-  }
-
-  .shift-modal-content {
-    background-color: $white;
-    padding: $spacer-5;
-    border-radius: $border-radius;
-    @include box-shadow(2);
-    width: 90%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    gap: $spacer-3;
-
-    h3 {
-      color: $primary;
-      margin-bottom: $spacer-3;
-      text-align: center;
-      font-size: $font-size-h3;
-    }
-
-    .form-group {
-      margin-bottom: $spacer-3;
-      label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: $spacer-1;
-        color: $text-primary;
-        font-size: $font-size-base;
-      }
-      input[type='date'],
-      input[type='time'],
-      select,
-      textarea {
-        width: 100%;
-        padding: $spacer-2;
-        border: 1px solid $gray-300;
-        border-radius: $border-radius;
-        font-size: $font-size-base;
-        color: $text-primary;
-        &:not(textarea):not([type='date']):not([type='time']) {
-          appearance: none;
-          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-          background-repeat: no-repeat;
-          background-position: right $spacer-2 center;
-          background-size: 1.25rem;
-        }
-
-        &:focus {
-          border-color: $primary;
-          outline: none;
-          box-shadow: 0 0 0 $input-focus-glow-width $input-focus-glow;
-        }
-      }
-      textarea {
-        resize: vertical;
-        min-height: 80px;
-      }
-    }
-
-    .modal-actions {
-      @include flex-center;
-      gap: $spacer-2;
-      margin-top: $spacer-4;
-      flex-wrap: wrap;
-
-      .button {
-        @include button-base;
-        flex: 1;
-        min-width: 120px;
-        text-align: center;
       }
     }
   }

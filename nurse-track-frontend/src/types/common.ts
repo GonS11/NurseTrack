@@ -1,4 +1,8 @@
-import type { ShiftResponse } from './schemas/shifts.schema';
+import type { NurseDepartmentResponse } from './schemas/assignments.schema';
+import type {
+  ShiftResponse,
+  ShiftTemplateResponse,
+} from './schemas/shifts.schema';
 
 export interface Page<T> {
   content: T[];
@@ -13,4 +17,13 @@ export interface CalendarDay {
   dayNumber: number;
   isCurrentMonth: boolean;
   shifts: ShiftResponse[];
+}
+
+export interface ShiftFormModalProps {
+  isOpen: boolean;
+  isEditMode: boolean;
+  initialShiftDate: string;
+  shiftToEdit?: ShiftResponse | null;
+  availableNurses: NurseDepartmentResponse[];
+  shiftTemplates: ShiftTemplateResponse[];
 }

@@ -2,7 +2,6 @@
 
 .admin-dashboard {
   padding: $spacer-4;
-  background: $background;
   min-height: 100vh;
 }
 
@@ -19,7 +18,7 @@
 
   .stats-cards {
     width: 100%;
-    @include grid-layout($cols: 4, $gap: 4, $tablet-cols: 2);
+    @include grid-layout($cols: 4, $gap: 4, $tablet-cols: 2, $phone-cols: 1);
   }
 }
 
@@ -39,7 +38,7 @@
 
   .insights-grid {
     grid-auto-rows: 1fr;
-    @include grid-layout($cols: 2, $gap: 3, $tablet-cols: 2);
+    @include grid-layout($cols: 2, $gap: 3, $tablet-cols: 2, $phone-cols: 1);
   }
 }
 

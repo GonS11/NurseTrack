@@ -126,7 +126,7 @@ const {
   currentDepartment,
 } = useDepartmentSelection({
   onDepartmentSelected: onDepartmentSelectedForStaff,
-  showAlertMessage: notifications.showMessage,
+  showAlertMessage: notifications.displayNotification,
 });
 
 const {
@@ -137,7 +137,7 @@ const {
   cancelRemoveNurse,
 } = useNurseConfirmation(
   selectedDepartmentId,
-  notifications.showMessage,
+  notifications.displayNotification,
   fetchDepartmentNurses,
 );
 

@@ -4,8 +4,8 @@ import {
   type RouteRecordRaw,
 } from 'vue-router';
 import AppShell from '../components/layout/AppShell.vue';
-import { useAuthStore } from '../services';
 import { UserRole } from '../types/enums/user-role.enum';
+import { useAuthStore } from '../stores/auth.store';
 
 const LoginPage = () => import('../views/auth/LoginPage.vue');
 
@@ -212,7 +212,7 @@ router.beforeEach((to, _from, next) => {
   const allowedRoles = to.meta.allowedRoles as UserRole[] | undefined;
 
   if (allowedRoles?.length && user?.roles) {
-    const userRoles = user.roles.map((r) => r.authority);
+    const userRoles = user.roles.map((role) => role.authority);
 
     if (!userRoles.some((role) => allowedRoles.includes(role))) {
       return next({ name: 'dashboard' });

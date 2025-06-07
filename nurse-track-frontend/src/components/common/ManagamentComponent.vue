@@ -108,6 +108,8 @@ const handleModalSubmitInternal = async (formData: any) => {
         console.warn('Update operation not supported for this component type.');
       }
     }
+
+    closeModal();
   } catch (error: any) {
     console.error('Error saving item in ManagementComponent: ', error);
     throw error;
