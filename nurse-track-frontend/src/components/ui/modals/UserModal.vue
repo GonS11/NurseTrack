@@ -1,8 +1,133 @@
+<template>
+  <div v-if="isOpen" class="modal-overlay">
+    <div class="modal">
+      <h2>{{ item ? 'Edit User' : 'New User' }}</h2>
+
+      <form @submit.prevent="submitForm">
+        <div class="form-fields">
+          <Input
+            id="firstname"
+            label="First Name"
+            type="text"
+            v-model="formData.firstname"
+            placeholder="Enter firstname"
+            :error="errors.firstname"
+            required
+          />
+
+          <Input
+            id="lastname"
+            label="Last Name"
+            type="text"
+            v-model="formData.lastname"
+            placeholder="Enter lastname"
+            :error="errors.lastname"
+            required
+          />
+
+          <template v-if="!item">
+            <Input
+              id="username"
+              label="Username"
+              type="text"
+              v-model="formData.username"
+              placeholder="Enter username"
+              :error="errors.username"
+              required
+            />
+
+            <Input
+              id="email"
+              label="Email"
+              type="email"
+              v-model="formData.email"
+              placeholder="Enter email"
+              :error="errors.email"
+              required
+            />
+
+            <Input
+              id="password"
+              label="Password"
+              type="password"
+              v-model="formData.password"
+              placeholder="Enter password"
+              :error="errors.password"
+              required
+            />
+          </template>
+
+          <InputSelect
+            id="role"
+            label="Role"
+            v-model="formData.role"
+            text="Select a role"
+            :entities="roleOptions"
+            item-key="id"
+            item-value="id"
+            option-value="name"
+            :error="errors.role"
+            :placeholder-value="null"
+            required
+          />
+
+          <Input
+            v-if="[UserRole.NURSE, UserRole.SUPERVISOR].includes(formData.role as UserRole)"
+            id="licenseNumber"
+            label="License Number"
+            type="text"
+            v-model="formData.licenseNumber"
+            placeholder="Enter license number"
+            :error="errors.licenseNumber"
+            required
+          />
+
+          <InputSelect
+            v-if="item"
+            id="isActive"
+            label="Status"
+            v-model="formData.isActive"
+            text="Select status"
+            :entities="[
+              { id: true, name: 'Active' },
+              { id: false, name: 'Inactive' },
+            ]"
+            item-key="id"
+            item-value="id"
+            option-value="name"
+            :error="errors.isActive"
+            :placeholder-value="null"
+            required
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" @click="close" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            {{ item ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { computed, watch } from 'vue';
-import { useFormModal } from '../../../composables/useFormModal';
-import { UserSchemas, type CreateUserRequest, type UpdateUserRequest, type UserResponse } from '../../../types/schemas/user.schema';
-import { UserRole, UserRoleData, type UserRoleConfig } from '../../../types/enums/user-role.enum';
+import { reactive, watch, computed } from 'vue';
+import {
+  UserSchemas,
+  type CreateUserRequest,
+  type UpdateUserRequest,
+  type UserResponse,
+} from '../../../types/schemas/user.schema';
+import {
+  UserRole,
+  UserRoleData,
+  type UserRoleConfig,
+} from '../../../types/enums/user-role.enum';
+import { useFormErrors } from '../../../utils/formValidation';
 import Input from '../Input.vue';
 import InputSelect from '../InputSelect.vue';
 
@@ -13,6 +138,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'submit']);
 
+// Define initialFormData para permitir 'null' en el rol si es una nueva creación
 const initialFormData: Omit<CreateUserRequest, 'id' | 'createdAt'> &
   Partial<UpdateUserRequest> = {
   firstname: '',
@@ -25,23 +151,38 @@ const initialFormData: Omit<CreateUserRequest, 'id' | 'createdAt'> &
   isActive: true,
 };
 
-const validate = (data: any) => {
-  const schema = props.item ? UserSchemas.update : UserSchemas.create;
-  const result = schema.safeParse(data);
-  if (result.success) return { success: true, data: result.data };
-  return { success: false, errors: result.error.flatten().fieldErrors };
-};
+const formData = reactive<typeof initialFormData>({ ...initialFormData });
 
-const { formData, errors, resetForm, submitForm } = useFormModal(initialFormData, validate);
-
-const roleOptions = computed(() => {
-  return Object.values(UserRole).map((role: UserRole) => {
-    const config: UserRoleConfig = UserRoleData[role];
-    return { id: role, name: config.displayName };
-  });
+const { errors, mapZodErrors, clearErrors } = useFormErrors({
+  firstname: null,
+  lastname: null,
+  username: null,
+  email: null,
+  password: null,
+  role: null,
+  licenseNumber: null,
+  isActive: null,
 });
 
-const roleOptionText = (entity: { id: UserRole; name: string }) => entity.name;
+const roleOptions = computed(() => {
+  const options = Object.values(UserRole).map((role: UserRole) => {
+    const config: UserRoleConfig = UserRoleData[role];
+    return {
+      id: role,
+      name: config.displayName,
+    };
+  });
+  return options;
+});
+
+const roleOptionText = (entity: { id: UserRole; name: string }) => {
+  return entity.name;
+};
+
+const resetForm = () => {
+  Object.assign(formData, initialFormData);
+  clearErrors();
+};
 
 watch(
   () => props.item,
@@ -61,108 +202,75 @@ watch(
       resetForm();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
   () => props.isOpen,
   (newVal) => {
-    if (!newVal) resetForm();
-  }
+    if (!newVal) {
+      resetForm();
+    }
+  },
 );
 
 watch(
   () => formData.role,
   (newRole) => {
+    // Asegurarse de que el casting sea seguro si newRole puede ser null
     if (![UserRole.NURSE, UserRole.SUPERVISOR].includes(newRole as UserRole)) {
       formData.licenseNumber = undefined;
-      if (errors.licenseNumber) errors.licenseNumber = null;
+      if (errors.licenseNumber) {
+        errors.licenseNumber = null;
+      }
     }
-  }
+  },
 );
 
-const onSubmit = () => submitForm(emit);
+const submitForm = () => {
+  clearErrors();
 
-const close = () => emit('close');
+  const cleanData: any = { ...formData };
+
+  // Convertir null a undefined para Zod si el campo no es opcional
+  if (cleanData.role === null) {
+    cleanData.role = undefined;
+  }
+
+  if (props.item) {
+    delete cleanData.username;
+    delete cleanData.email;
+
+    if (cleanData.password === '') {
+      delete cleanData.password;
+    }
+
+    if (typeof cleanData.isActive === 'string') {
+      cleanData.isActive = cleanData.isActive === 'true';
+    }
+  }
+
+  for (const key in cleanData) {
+    if (cleanData[key] === '') {
+      cleanData[key] = undefined;
+    }
+  }
+
+  const schema = props.item ? UserSchemas.update : UserSchemas.create;
+  const result = schema.safeParse(cleanData);
+
+  if (result.success) {
+    emit('submit', result.data);
+  } else {
+    mapZodErrors(result.error);
+    console.error('Validation errors:', result.error.flatten().fieldErrors);
+  }
+};
+
+const close = () => {
+  emit('close');
+};
 </script>
-
-<template>
-  <div v-if="isOpen" class="modal">
-    <form @submit.prevent="onSubmit">
-      <Input
-        id="firstname"
-        label="First Name"
-        v-model="formData.firstname"
-        :error="errors.firstname"
-        required
-      />
-      <Input
-        id="lastname"
-        label="Last Name"
-        v-model="formData.lastname"
-        :error="errors.lastname"
-        required
-      />
-      <Input
-        id="username"
-        label="Username"
-        v-model="formData.username"
-        :error="errors.username"
-        required
-      />
-      <Input
-        id="email"
-        label="Email"
-        v-model="formData.email"
-        :error="errors.email"
-        required
-      />
-      <Input
-        id="password"
-        label="Password"
-        type="password"
-        v-model="formData.password"
-        :error="errors.password"
-        required
-      />
-      <InputSelect
-        id="role"
-        label="Role"
-        v-model="formData.role"
-        :entities="roleOptions"
-        :option-value="roleOptionText"
-        :error="errors.role"
-        required
-        itemKey="id"
-        itemValue="id"
-      />
-      <Input
-        v-if="[UserRole.NURSE, UserRole.SUPERVISOR].includes(formData.role as UserRole)"
-        id="licenseNumber"
-        label="License Number"
-        v-model="formData.licenseNumber"
-        :error="errors.licenseNumber"
-        required
-      />
-      <InputSelect
-        v-if="item"
-        id="isActive"
-        label="Status"
-        v-model="formData.isActive"
-        :entities="[{ id: true, name: 'Active' }, { id: false, name: 'Inactive' }]"
-        :option-value="(e:any)=>e.name"
-        :error="errors.isActive"
-        required
-        itemKey="id"
-        itemValue="id"
-      />
-      <div class="form-actions">
-        <button type="button" @click="close" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-primary">{{ item ? 'Update' : 'Create' }}</button>
-      </div>
-    </form>
-  </div>
-</template>
 
 <style lang="scss" scoped>
 @use 'Modal.scss';
