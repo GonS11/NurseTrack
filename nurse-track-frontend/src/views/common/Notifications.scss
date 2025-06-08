@@ -2,6 +2,7 @@
 
 .notifications-container {
   background: $white;
+  max-width: $container-max-widths-xl;
   border-radius: $border-radius;
   margin: $spacer-4 auto;
   padding: $spacer-4;

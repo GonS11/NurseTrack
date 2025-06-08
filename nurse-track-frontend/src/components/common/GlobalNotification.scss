@@ -1,21 +1,17 @@
-// GlobalNotification.scss
 @use '../../styles/main.scss' as *;
 
 .alert-message {
   position: fixed;
-  top: $spacer-4; // Keeps it anchored from the top
+  top: $spacer-4; 
   left: 50%;
-  // Corrected transform for horizontal centering:
-  transform: translateX(
-    -50%
-  ); // This centers the element horizontally based on its own width
-
+  transform: translateX(-50%); 
   width: 40%;
-  z-index: 999999999;
+  max-width: $container-max-widths-sm;
+  z-index: 999;
   @include flex-center;
   justify-content: space-between;
   padding: $spacer-3 $spacer-4;
-  border-radius: $border-radius-sm;
+  border-radius: $border-radius;
   font-size: $font-size-md;
   font-weight: 500;
   box-shadow: $card-shadow-sm;
@@ -66,7 +62,6 @@
   }
 }
 
-/* Transition styles */
 .alert-fade-enter-active,
 .alert-fade-leave-active {
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -75,7 +70,5 @@
 .alert-fade-enter-from,
 .alert-fade-leave-to {
   opacity: 0;
-  // This transform now applies relative to the centered position defined above.
-  // It moves it 20px up for the start/end of the transition.
   transform: translateY(-20px) translateX(-50%);
 }
