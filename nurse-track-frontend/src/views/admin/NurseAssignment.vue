@@ -18,26 +18,24 @@
 import { computed, onMounted, ref } from 'vue';
 import ManagamentComponent from '../../components/common/ManagamentComponent.vue';
 import NurseAssignmentModal from '../../components/ui/modals/NurseAssignmentModal.vue';
+import { useAdminStore } from '../../stores/admin.store';
+import { useNotifications } from '../../composables/useNotifications';
 import type {
   AssignNurseRequest,
   NurseDepartmentResponse,
 } from '../../types/schemas/assignments.schema';
 import type { DepartmentResponse } from '../../types/schemas/department.schema';
 import { type TableAction } from '../../components/ui/Table.vue';
-import { useAdminStore } from '../../stores/admin.store';
-import { useNotifications } from '../../composables/useNotifications';
 
 const adminStore = useAdminStore();
+const { showSuccess, showError } = useNotifications();
 
 const managementComponentRef = ref<InstanceType<
   typeof ManagamentComponent
 > | null>(null);
 
-const { showSuccess, showError } = useNotifications();
-
 const departmentsWithNurses = computed(() => {
   const groupedNurses = new Map<number, NurseDepartmentResponse[]>();
-
   adminStore.nurseAssignments.content.forEach((assignment) => {
     if (!groupedNurses.has(assignment.department.id)) {
       groupedNurses.set(assignment.department.id, []);
@@ -48,7 +46,6 @@ const departmentsWithNurses = computed(() => {
   const result: (DepartmentResponse & {
     assignedNurses: NurseDepartmentResponse[];
   })[] = [];
-
   groupedNurses.forEach((nurses, _departmentId) => {
     const departmentInfo = nurses[0].department;
     result.push({
@@ -82,25 +79,20 @@ const nurseAssignmentHeaders = [
   },
 ];
 
-const nurseAssignmentActions = computed(
-  () =>
-    [
-      {
-        label: 'Manage Nurses',
-        icon: 'group',
-        class: 'info',
-        handler: (
-          department: DepartmentResponse & {
-            assignedNurses: NurseDepartmentResponse[];
-          },
-        ) => {
-          managementComponentRef.value?.openUpdateModal(department);
-        },
+const nurseAssignmentActions = ref([
+  {
+    label: 'Manage Nurses',
+    icon: 'group',
+    class: 'info',
+    handler: (
+      department: DepartmentResponse & {
+        assignedNurses: NurseDepartmentResponse[];
       },
-    ] as TableAction<
-      DepartmentResponse & { assignedNurses: NurseDepartmentResponse[] }
-    >[],
-);
+    ) => {
+      managementComponentRef.value?.openUpdateModal(department);
+    },
+  },
+] as TableAction<DepartmentResponse & { assignedNurses: NurseDepartmentResponse[] }>[]);
 
 const getAllDepartmentsWithNurseInfo = async (page: number) => {
   try {

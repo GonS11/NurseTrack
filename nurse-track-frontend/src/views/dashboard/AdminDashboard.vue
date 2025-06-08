@@ -116,6 +116,9 @@ import { useAdminStore } from '../../stores/admin.store';
 import { UserRole } from '../../types/enums/user-role.enum';
 import DashboardCard from '../../components/ui/DashboardCard.vue';
 import DashboardCardContent from '../../components/ui/DashboardCardContent.vue';
+import { useNotifications } from '../../composables/useNotifications';
+
+const notifications = useNotifications();
 
 const adminStore = useAdminStore();
 
@@ -171,7 +174,7 @@ onMounted(() => {
     adminStore.getAllNurseAssignments(),
     adminStore.getAllSupervisorAssignments(),
   ]).catch((error) => {
-    console.error('Error loading admin dashboard data:', error);
+    notificacions.showError('Error loading admin dashboard data:', error);
   });
 });
 </script>

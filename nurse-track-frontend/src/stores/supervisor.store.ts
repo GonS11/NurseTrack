@@ -107,20 +107,8 @@ export const useSupervisorStore = defineStore('supervisor', {
           departmentId,
           nurseId,
         );
-
-        this.nurseAssignments = this.nurseAssignments.filter(
-          (assign) =>
-            !(
-              assign?.nurse?.id === nurseId &&
-              assign?.department?.id === departmentId
-            ),
-        );
+        await this.getDepartmentNurses(departmentId);
       } catch (error: any) {
-        console.error(
-          `Error removing nurse with ID ${nurseId} from department ID ${departmentId}:`,
-          error,
-        );
-
         throw error;
       }
     },
@@ -143,18 +131,9 @@ export const useSupervisorStore = defineStore('supervisor', {
 
     async createShift(departmentId: number, request: CreateShiftRequest) {
       try {
-        const newShift = await useSupervisorDepartmentService.createShift(
-          departmentId,
-          request,
-        );
-
-        this.shifts.push(newShift);
+        await useSupervisorDepartmentService.createShift(departmentId, request);
+        await this.getDepartmentShifts(departmentId);
       } catch (error: any) {
-        console.error(
-          `Error creating shift for department ID ${departmentId}:`,
-          error,
-        );
-
         throw error;
       }
     },
@@ -190,14 +169,8 @@ export const useSupervisorStore = defineStore('supervisor', {
     async cancelShift(departmentId: number, shiftId: number) {
       try {
         await useSupervisorDepartmentService.cancelShift(departmentId, shiftId);
-
-        this.shifts = this.shifts.filter((shift) => shift.id !== shiftId);
+        await this.getDepartmentShifts(departmentId);
       } catch (error: any) {
-        console.error(
-          `Error canceling shift with ID ${shiftId} for department ID ${departmentId}:`,
-          error,
-        );
-
         throw error;
       }
     },

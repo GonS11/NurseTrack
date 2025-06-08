@@ -149,7 +149,7 @@ const showAction = (action: TableAction, item: any) => {
 };
 
 const handleAction = (action: TableAction, item: any) => {
-  emit('action', { action: action.label, item });
+  //emit('action', { action: action.label, item });
   action.handler(item); // The actual action handler
 };
 

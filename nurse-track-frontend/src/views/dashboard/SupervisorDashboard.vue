@@ -46,9 +46,9 @@ onMounted(async () => {
     await supervisorStore.getAllMyDepartments();
   } catch (error: any) {
     const errorMessage = error.message || 'Failed to load departments.';
+
     errorDepartments.value = errorMessage;
     notifications.showError(errorMessage);
-    console.error('Error fetching departments for dashboard:', error);
   } finally {
     isLoadingDepartments.value = false;
   }

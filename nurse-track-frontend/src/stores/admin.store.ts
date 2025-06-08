@@ -53,6 +53,11 @@ export const useAdminStore = defineStore('admin', {
       number: 0,
       size: 10,
     } as Page<SupervisorDepartmentResponse>,
+
+    // Arrays auxiliares para selects/dropdowns
+    unassignedDepartments: [] as DepartmentResponse[],
+    unassignedDepartmentsForNurses: [] as DepartmentResponse[],
+
     error: '' as string,
   }),
 
@@ -140,31 +145,31 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async getAllActiveDepartments() {
+    // Para dropdowns, NO sobrescribas departments.content
+    async getUnassignedDepartmentsForSupervisor() {
       try {
-        this.departments.content =
-          await useAdminDepartmentService.getAllActiveDepartments();
-
-        // Refresca paginacion
-        this.departments.number = 0;
-        this.departments.totalPages = 1;
-        this.departments.size = this.departments.content.length;
-        this.departments.totalElements = this.departments.content.length;
+        this.unassignedDepartments =
+          await useAdminAssignmentService.getUnassignedDepartmentsForSupervisor();
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
       }
     },
 
-    async getAllInactiveDepartments() {
+    async getAllActiveDepartments() {
       try {
-        this.departments.content =
-          await useAdminDepartmentService.getAllInactiveDepartments();
+        this.unassignedDepartments =
+          await useAdminDepartmentService.getAllActiveDepartments();
+      } catch (e: any) {
+        this.error = e.response?.data?.message || e.message;
+        throw e;
+      }
+    },
 
-        this.departments.number = 0;
-        this.departments.totalPages = 1;
-        this.departments.size = this.departments.content.length;
-        this.departments.totalElements = this.departments.content.length;
+    async getUnassignedDepartmentsForNurses() {
+      try {
+        this.unassignedDepartmentsForNurses =
+          await useAdminAssignmentService.getUnassignedDepartmentsForNurses();
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -191,15 +196,10 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
+    // DEPARTMENTS
     async createDepartment(department: CreateDepartmentRequest) {
       try {
-        const newDepartment = await useAdminDepartmentService.createDepartment(
-          department,
-        );
-
-        this.departments.content.push(newDepartment);
-
-        // Recargar todos los departementos para que aparezca el nuevo
+        await useAdminDepartmentService.createDepartment(department);
         await this.getAllDepartments(this.departments.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
@@ -212,54 +212,12 @@ export const useAdminStore = defineStore('admin', {
       department: UpdateDepartmentRequest,
     ) {
       try {
-        const updatedDepartment =
-          await useAdminDepartmentService.updateDepartment(
-            departmentId,
-            department,
-          );
-
-        const oldDepartmentIndex = this.departments.content.findIndex(
-          (department) => department.id === departmentId,
+        await useAdminDepartmentService.updateDepartment(
+          departmentId,
+          department,
         );
-
-        if (oldDepartmentIndex !== -1) {
-          this.departments.content[oldDepartmentIndex] = updatedDepartment;
-        }
 
         await this.getAllDepartments(this.departments.number);
-      } catch (e: any) {
-        this.error = e.response?.data?.message || e.message;
-        throw e;
-      }
-    },
-
-    async activeDepartment(departmentId: number) {
-      try {
-        // Al devolver un void no hay que asignarlo
-        await useAdminDepartmentService.activateDepartment(departmentId);
-
-        const department = this.departments.content.find(
-          (department) => department.id === departmentId,
-        );
-
-        if (department) {
-          department.isActive = true;
-        }
-      } catch (e: any) {
-        this.error = e.response?.data?.message || e.message;
-        throw e;
-      }
-    },
-
-    async desactivateDepartment(departmentId: number) {
-      try {
-        await useAdminDepartmentService.desactivateDepartment(departmentId);
-
-        const department = this.departments.content.find(
-          (department) => department.id === departmentId,
-        );
-
-        if (department) department.isActive = false;
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -269,11 +227,6 @@ export const useAdminStore = defineStore('admin', {
     async deleteDepartment(departmentId: number) {
       try {
         await useAdminDepartmentService.deleteDepartment(departmentId);
-        this.departments.content = this.departments.content.filter(
-          (department) => department.id !== departmentId,
-        );
-
-        // Recargarlos para mostrar cambios
         await this.getAllDepartments(this.departments.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
@@ -300,59 +253,10 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async getUnassignedDepartmentsForSupervisor() {
-      try {
-        this.departments.content =
-          await useAdminAssignmentService.getUnassignedDepartmentsForSupervisor();
-
-        this.departments.number = 0;
-        this.departments.totalPages = 1;
-        this.departments.size = this.departments.content.length;
-        this.departments.totalElements = this.departments.content.length;
-      } catch (e: any) {
-        this.error = e.response?.data?.message || e.message;
-        throw e;
-      }
-    },
-
-    async getSupervisorByDepartment(departmentId: number) {
-      try {
-        const supervisorAssignment =
-          await useAdminAssignmentService.getSupervisorByDepartment(
-            departmentId,
-          );
-
-        const existingIndex = this.supervisorAssignments.content.findIndex(
-          (assignment) => assignment.department.id === departmentId,
-        );
-
-        if (existingIndex !== -1) {
-          this.supervisorAssignments.content[existingIndex] =
-            supervisorAssignment;
-        } else {
-          this.supervisorAssignments.content.push(supervisorAssignment);
-        }
-      } catch (e: any) {
-        this.error = e.response?.data?.message || e.message;
-        throw e;
-      }
-    },
-
+    // SUPERVISOR ASSIGNMENTS
     async assignSupervisorToDepartment(request: AssignSupervisorRequest) {
       try {
-        const newAssignment =
-          await useAdminAssignmentService.assignSupervisorToDepartment(request);
-
-        const existingIndex = this.supervisorAssignments.content.findIndex(
-          (assignment) => assignment.department.id === request.departmentId,
-        );
-
-        if (existingIndex !== -1) {
-          this.supervisorAssignments.content[existingIndex] = newAssignment;
-        } else {
-          this.supervisorAssignments.content.push(newAssignment);
-        }
-
+        await useAdminAssignmentService.assignSupervisorToDepartment(request);
         await this.getAllSupervisorAssignments(
           this.supervisorAssignments.number,
         );
@@ -363,30 +267,14 @@ export const useAdminStore = defineStore('admin', {
     },
 
     async removeSupervisorFromDepartment(departmentId: number) {
-      console.log(
-        'Attempting to remove supervisor from department ID:',
-        departmentId,
-      );
       try {
         await useAdminAssignmentService.removeSupervisorFromDepartment(
           departmentId,
         );
-        console.log(
-          'Backend call for removeSupervisorFromDepartment succeeded.',
-        );
-
-        this.supervisorAssignments.content =
-          this.supervisorAssignments.content.filter(
-            (assignment) => assignment.department.id !== departmentId,
-          );
-        console.log('Client-side state updated.');
-
         await this.getAllSupervisorAssignments(
           this.supervisorAssignments.number,
         );
-        console.log('Table reloaded with current assignments.');
       } catch (e: any) {
-        console.error('Error during removeSupervisorFromDepartment:', e);
         this.error = e.response?.data?.message || e.message;
         throw e;
       }
@@ -401,19 +289,6 @@ export const useAdminStore = defineStore('admin', {
             size,
             sortBy,
           );
-      } catch (e: any) {
-        this.error = e.response?.data?.message || e.message;
-        throw e;
-      }
-    },
-
-    async getUnassignedDepartmentsForNurses() {
-      try {
-        const depts =
-          await useAdminAssignmentService.getUnassignedDepartmentsForNurses();
-
-        this.departments.content = depts;
-        this.departments.totalElements = depts.length;
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
         throw e;
@@ -438,7 +313,6 @@ export const useAdminStore = defineStore('admin', {
     async assignNurseToDepartment(request: AssignNurseRequest) {
       try {
         await useAdminAssignmentService.assignNurseToDepartment(request);
-
         await this.getAllNurseAssignments(this.nurseAssignments.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;
@@ -452,7 +326,6 @@ export const useAdminStore = defineStore('admin', {
           departmentId,
           nurseId,
         );
-
         await this.getAllNurseAssignments(this.nurseAssignments.number);
       } catch (e: any) {
         this.error = e.response?.data?.message || e.message;

@@ -24,23 +24,22 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import ManagamentComponent from '../../components/common/ManagamentComponent.vue';
+import SupervisorAssignmentModal from '../../components/ui/modals/SupervisorAssignmentModal.vue';
+import ConfirmModal from '../../components/common/ConfirmModal.vue';
+import { useAdminStore } from '../../stores/admin.store';
+import { useNotifications } from '../../composables/useNotifications';
 import type {
   AssignSupervisorRequest,
   SupervisorDepartmentResponse,
 } from '../../types/schemas/assignments.schema';
 import { type TableAction } from '../../components/ui/Table.vue';
-import { useAdminStore } from '../../stores/admin.store';
-import SupervisorAssignmentModal from '../../components/ui/modals/SupervisorAssignmentModal.vue';
-import { useNotifications } from '../../composables/useNotifications';
-import ConfirmModal from '../../components/common/ConfirmModal.vue';
 
 const adminStore = useAdminStore();
+const { showSuccess, showError, showInfo } = useNotifications();
 
 const managementComponentRef = ref<InstanceType<
   typeof ManagamentComponent
 > | null>(null);
-
-const { showSuccess, showError } = useNotifications();
 
 const showConfirmModal = ref(false);
 const confirmMessage = ref('');
@@ -51,6 +50,8 @@ const assignmentToRemoveDetails = ref<{
 } | null>(null);
 
 const supervisorAssignments = computed(() => adminStore.supervisorAssignments);
+
+const unassignedDepartments = computed(() => adminStore.unassignedDepartments);
 
 const supervisorAssignmentHeaders = [
   {
@@ -72,24 +73,21 @@ const supervisorAssignmentHeaders = [
   },
 ];
 
-const supervisorAssignmentActions = computed(
-  () =>
-    [
-      {
-        label: 'Remove Assignment',
-        icon: 'person_remove',
-        class: 'danger',
-        handler: (assignment: SupervisorDepartmentResponse) => {
-          handleRemoveSupervisorConfirmation(
-            assignment.department.id,
-            assignment.supervisor.firstname,
-            assignment.supervisor.lastname,
-            assignment.department.name,
-          );
-        },
-      },
-    ] as TableAction<SupervisorDepartmentResponse>[],
-);
+const supervisorAssignmentActions = ref([
+  {
+    label: 'Remove Assignment',
+    icon: 'person_remove',
+    class: 'danger',
+    handler: (assignment: SupervisorDepartmentResponse) => {
+      handleRemoveSupervisorConfirmation(
+        assignment.department.id,
+        assignment.supervisor.firstname,
+        assignment.supervisor.lastname,
+        assignment.department.name,
+      );
+    },
+  },
+] as TableAction<SupervisorDepartmentResponse>[]);
 
 const getAllSupervisorAssignments = async (page: number) => {
   try {
@@ -140,9 +138,10 @@ const executeRemoveSupervisor = async () => {
 
   try {
     await removeSupervisor(departmentId);
-    await getAllSupervisorAssignments(supervisorAssignments.value.number);
+    // NO recargues aquí, la store ya lo hace
+    showSuccess('Supervisor assignment removed successfully!');
   } catch (error: any) {
-    console.error('Error executing supervisor removal:', error);
+    showError('Error executing supervisor removal: ' + error.message);
   } finally {
     assignmentToRemoveDetails.value = null;
     showConfirmModal.value = false;
@@ -152,7 +151,7 @@ const executeRemoveSupervisor = async () => {
 const cancelRemoveSupervisorOperation = () => {
   assignmentToRemoveDetails.value = null;
   showConfirmModal.value = false;
-  console.log('Supervisor removal operation cancelled by user.');
+  showInfo('Supervisor removal operation cancelled by user.');
 };
 
 onMounted(() => {

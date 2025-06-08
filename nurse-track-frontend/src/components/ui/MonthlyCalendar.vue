@@ -75,18 +75,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-
 import type { ShiftResponse } from '../../types/schemas/shifts.schema';
-
 import type { CalendarDay } from '../../types/common';
-
 import type { ShiftType } from '../../types/enums/shift-types.enum';
 
 interface Props {
   shifts: ShiftResponse[];
-
   isLoading: boolean;
-
   isInteractive?: boolean;
 }
 
@@ -96,73 +91,67 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: 'date-selected', date: string): void;
-
   (e: 'shift-selected', shift: ShiftResponse): void;
 }>();
 
 const currentMonth = ref(new Date().getMonth());
-
 const currentYear = ref(new Date().getFullYear());
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Días de la semana para un calendario que empieza en Lunes
+const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const currentMonthName = computed(() => {
+  // Mantener 'en-US' para que el nombre del mes sea en inglés
   return new Date(currentYear.value, currentMonth.value).toLocaleString(
     'en-US',
-
     { month: 'long' },
   );
 });
 
 const calendarDays = computed<CalendarDay[]>(() => {
   const year = currentYear.value;
-
   const month = currentMonth.value;
-
   const firstOfMonth = new Date(year, month, 1);
-
   const lastOfMonth = new Date(year, month + 1, 0);
 
   const daysInMonth = lastOfMonth.getDate();
+  let startDayOfWeek = firstOfMonth.getDay(); // 0 (Domingo) - 6 (Sábado)
 
-  const startDayOfWeek = firstOfMonth.getDay();
+  // Ajustar para que el Lunes (1) sea el primer día (0 en nuestro array de 'weekDays')
+  // Si el primer día es Domingo (0), lo convierte a 6 para que aparezca al final
+  // Si es Lunes (1), lo convierte a 0, etc.
+  startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
 
   const daysArray: CalendarDay[] = [];
 
+  // Rellenar los días vacíos al principio del mes
   for (let i = 0; i < startDayOfWeek; i++) {
     daysArray.push({
       date: '',
-
       dayNumber: 0,
-
       isCurrentMonth: false,
-
       shifts: [],
     });
   }
 
+  // Rellenar los días del mes actual
   for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
     const dateObj = new Date(year, month, dayNum);
-
     const dateString = dateObj.toISOString().split('T')[0];
-
     const shiftsForDay = props.shifts.filter(
       (s) => s.shiftDate.split('T')[0] === dateString,
     );
 
     daysArray.push({
       date: dateString,
-
       dayNumber: dayNum,
-
       isCurrentMonth: true,
-
       shifts: shiftsForDay,
     });
   }
 
+  // Rellenar los días vacíos al final para completar la última semana
   const totalCells = daysArray.length;
-
   const remainder = totalCells % 7;
 
   if (remainder !== 0) {
@@ -171,11 +160,8 @@ const calendarDays = computed<CalendarDay[]>(() => {
     for (let i = 0; i < emptyToAdd; i++) {
       daysArray.push({
         date: '',
-
         dayNumber: 0,
-
         isCurrentMonth: false,
-
         shifts: [],
       });
     }
@@ -187,7 +173,6 @@ const calendarDays = computed<CalendarDay[]>(() => {
 const previousMonth = () => {
   if (currentMonth.value === 0) {
     currentMonth.value = 11;
-
     currentYear.value -= 1;
   } else {
     currentMonth.value -= 1;
@@ -197,7 +182,6 @@ const previousMonth = () => {
 const nextMonth = () => {
   if (currentMonth.value === 11) {
     currentMonth.value = 0;
-
     currentYear.value += 1;
   } else {
     currentMonth.value += 1;
@@ -209,9 +193,7 @@ const formatTime = (timeString: string) => {
 
   return date.toLocaleTimeString([], {
     hour: '2-digit',
-
     minute: '2-digit',
-
     hour12: false,
   });
 };
@@ -222,7 +204,6 @@ const formatShiftTime = (start: string, end: string) => {
 
 function getShiftTypeClass(shiftType: ShiftType): string {
   let cls = shiftType.toLowerCase();
-
   cls = cls.replace(/_/g, '-');
 
   return cls;

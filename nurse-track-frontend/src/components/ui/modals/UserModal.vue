@@ -130,7 +130,9 @@ import {
 import { useFormErrors } from '../../../utils/formValidation';
 import Input from '../Input.vue';
 import InputSelect from '../InputSelect.vue';
+import { useNotifications } from '../../../composables/useNotifications';
 
+const { showError } = useNotifications();
 const props = defineProps<{
   isOpen: boolean;
   item: UserResponse | null;
@@ -143,7 +145,7 @@ const initialFormData: Omit<CreateUserRequest, 'id' | 'createdAt'> &
   Partial<UpdateUserRequest> = {
   firstname: '',
   lastname: '',
-  role: null as any,
+  role: UserRole.NURSE,
   licenseNumber: undefined,
   username: '',
   email: '',
@@ -263,7 +265,7 @@ const submitForm = () => {
     emit('submit', result.data);
   } else {
     mapZodErrors(result.error);
-    console.error('Validation errors:', result.error.flatten().fieldErrors);
+    showError('Please correct the errors.');
   }
 };
 

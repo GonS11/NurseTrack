@@ -14,7 +14,7 @@
     <template #header-actions>
       <button class="btn-primary" @click="openCreateModal">
         <span class="material-icons">add</span>
-        <span class="text">{{ createButtonModal }}</span>
+        <span class="text">{{ createButtonLabel }}</span>
       </button>
     </template>
   </Table>
@@ -32,6 +32,9 @@
 import { ref, type PropType } from 'vue';
 import Table, { type TableAction } from '../ui/Table.vue';
 import type { Page } from '../../types/common';
+import { useNotifications } from '../../composables/useNotifications';
+
+const notifications = useNotifications();
 
 const props = defineProps({
   title: {
@@ -56,7 +59,7 @@ const props = defineProps({
     type: Object as PropType<any>,
     required: true,
   },
-  createButtonModal: {
+  createButtonLabel: {
     type: String,
     default: 'New Item',
   },
@@ -105,13 +108,18 @@ const handleModalSubmitInternal = async (formData: any) => {
         const id = selectedEntity.value[props.itemIdKey];
         await props.updateItem(id, formData);
       } else {
-        console.warn('Update operation not supported for this component type.');
+        notifications.showWarning(
+          'Update operation not supported for this component type.',
+        );
       }
     }
 
     closeModal();
   } catch (error: any) {
-    console.error('Error saving item in ManagementComponent: ', error);
+    notifications.showError(
+      'Error saving item in ManagementComponent: ',
+      error,
+    );
     throw error;
   }
 };

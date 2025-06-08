@@ -39,6 +39,7 @@
   cursor: pointer;
   border: none;
   font-size: $font-size-base;
+  margin-inline: 0.5rem;
 }
 
 @mixin button-primary {

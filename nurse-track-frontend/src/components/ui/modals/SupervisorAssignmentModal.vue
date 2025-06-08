@@ -57,6 +57,9 @@ import type { UserResponse } from '../../../types/schemas/user.schema';
 import { UserRole } from '../../../types/enums/user-role.enum';
 import InputSelect from '../InputSelect.vue';
 import { useFormErrors } from '../../../utils/formValidation';
+import { useNotifications } from '../../../composables/useNotifications';
+
+const { showError } = useNotifications();
 
 const props = defineProps<{
   isOpen: boolean;
@@ -100,7 +103,7 @@ const fetchDropdownData = async () => {
       (user) => user.role === UserRole.SUPERVISOR,
     );
   } catch (error: any) {
-    console.error('Error fetching dropdown data:', error);
+    showError('Error fetching dropdown data:', error);
   }
 };
 
@@ -154,6 +157,7 @@ const submitForm = async () => {
     closeModal();
   } else {
     mapZodErrors(result.error);
+    showError('Please correct the errors.');
   }
 };
 

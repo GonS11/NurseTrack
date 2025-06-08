@@ -106,7 +106,9 @@ import type { UserResponse } from '../../../types/schemas/user.schema';
 import { UserRole } from '../../../types/enums/user-role.enum';
 import InputSelect from '../InputSelect.vue';
 import ConfirmModal from '../../common/ConfirmModal.vue';
+import { useNotifications } from '../../../composables/useNotifications';
 
+const { showError, showInfo } = useNotifications();
 const props = defineProps<{
   isOpen: boolean;
   title: string;
@@ -141,7 +143,7 @@ const fetchInitialData = async () => {
       await fetchDepartmentNursesAndAvailableNurses();
     }
   } catch (error: any) {
-    console.error('Error fetching initial data:', error);
+    showError('Error fetching initial data:', error);
   }
 };
 
@@ -167,7 +169,7 @@ const fetchDepartmentNursesAndAvailableNurses = async () => {
 
     nurseToAssignId.value = null;
   } catch (error: any) {
-    console.error('Error fetching nurses:', error);
+    showError('Error fetching nurses:', error);
     assignedNurses.value = [];
     availableNurses.value = [];
   }
@@ -203,7 +205,7 @@ const assignNurse = async () => {
     await adminStore.assignNurseToDepartment(request);
     await fetchDepartmentNursesAndAvailableNurses();
   } catch (error: any) {
-    console.error('Error assigning nurse:', error);
+    showError('Error assigning nurse:', error);
   }
 };
 
@@ -227,7 +229,7 @@ const executeRemoveNurse = async () => {
     await adminStore.removeNurseFromDepartment(departmentId, nurseId);
     await fetchDepartmentNursesAndAvailableNurses();
   } catch (error: any) {
-    console.error('Error removing nurse:', error);
+    showError('Error removing nurse:', error);
   } finally {
     nurseToRemoveDetails.value = null;
   }
@@ -235,7 +237,7 @@ const executeRemoveNurse = async () => {
 
 const cancelRemoveNurseOperation = () => {
   nurseToRemoveDetails.value = null;
-  console.log('Nurse removal cancelled by user.');
+  showInfo('Nurse removal cancelled by user.');
 };
 
 watch(

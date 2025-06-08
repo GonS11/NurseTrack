@@ -6,7 +6,7 @@
       v-model:selected-department-id="selectedDepartmentId"
       :is-loading-departments="isLoadingDepartments"
       :error-departments="errorDepartments"
-      @error-alert="notifications.showError"
+      @error-alert="showError"
     />
 
     <hr />
@@ -19,8 +19,8 @@
       :selected-department-id="selectedDepartmentId"
       request-type="vacation"
       @fetch-requests="fetchVacationRequests"
-      @approve-request="requestActions.confirmApproveVacation"
-      @reject-request="requestActions.openRejectVacationModal"
+      @approve-request="confirmApproveVacation"
+      @reject-request="openRejectVacationModal"
     >
       <template #request-card-content="{ request }">
         <p>
@@ -52,8 +52,8 @@
       :selected-department-id="selectedDepartmentId"
       request-type="shiftChange"
       @fetch-requests="fetchShiftChangeRequests"
-      @approve-request="requestActions.confirmApproveShiftChange"
-      @reject-request="requestActions.openRejectShiftChangeModal"
+      @approve-request="confirmApproveShiftChange"
+      @reject-request="openRejectShiftChangeModal"
     >
       <template #request-card-content="{ request }">
         <p>
@@ -80,21 +80,21 @@
     </RequestSection>
 
     <RejectNotesModal
-      v-model:show="requestActions.showRejectModal.value"
-      v-model:notes="requestActions.rejectNotes.value"
+      v-model:show="showRejectModal"
+      v-model:notes="rejectNotes"
       @confirmed="
-        requestActions.currentRequestType.value === 'vacation'
-          ? requestActions.handleRejectVacation()
-          : requestActions.handleRejectShiftChange()
+        currentRequestType === 'vacation'
+          ? handleRejectVacation()
+          : handleRejectShiftChange()
       "
-      @cancelled="requestActions.closeRejectModal"
+      @cancelled="closeRejectModal"
     />
 
     <ConfirmModal
-      v-model="requestActions.showApproveConfirmModal.value"
-      :message="requestActions.approveConfirmMessage.value"
-      @confirmed="requestActions.executeApproveRequest"
-      @cancelled="requestActions.cancelApproveOperation"
+      v-model="showApproveConfirmModal"
+      :message="approveConfirmMessage"
+      @confirmed="executeApproveRequest"
+      @cancelled="cancelApproveOperation"
     />
   </div>
 </template>
@@ -112,7 +112,7 @@ import RequestSection from '../../components/requests/RequestSection.vue';
 import RejectNotesModal from '../../components/requests/RejectNotesModal.vue';
 
 const supervisorStore = useSupervisorStore();
-const notifications = useNotifications();
+const { showError, showWarning } = useNotifications(); // Desestructuramos para uso directo
 
 const isLoadingVacation = ref(false);
 const isLoadingShiftChange = ref(false);
@@ -120,12 +120,12 @@ const errorVacation = ref<string | null>(null);
 const errorShiftChange = ref<string | null>(null);
 
 async function fetchVacationRequests(
-  departmentId: number | null,
+  departmentId: number | null, // Se mantiene 'number | null' aquí para manejar el caso inicial del selector
   all: boolean = false,
 ) {
   if (departmentId === null) {
-    console.warn(
-      'Attempting to fetch vacation requests with a null department ID.',
+    showWarning(
+      'Intentando obtener solicitudes de vacaciones con un ID de departamento nulo.',
     );
     supervisorStore.vacationRequests = [];
     isLoadingVacation.value = false;
@@ -142,28 +142,20 @@ async function fetchVacationRequests(
       await supervisorStore.getPendingVacationRequests(departmentId);
     }
   } catch (error: any) {
-    notifications.showError(
-      `Failed to load vacation requests: ${error.message || 'Unknown error'}`,
-    );
-    errorVacation.value = `Failed to load vacation requests: ${
-      error.message || 'Unknown error'
-    }`;
-    console.error(
-      `Error fetching vacation requests for department ${departmentId}:`,
-      error,
-    );
+    showError(error.message);
+    errorVacation.value = error.message;
   } finally {
     isLoadingVacation.value = false;
   }
 }
 
 async function fetchShiftChangeRequests(
-  departmentId: number | null,
+  departmentId: number | null, // Se mantiene 'number | null' aquí
   all: boolean = false,
 ) {
   if (departmentId === null) {
-    console.warn(
-      'Attempting to fetch shift change requests with a null department ID.',
+    showWarning(
+      'Intentando obtener solicitudes de cambio de turno con un ID de departamento nulo.',
     );
     supervisorStore.shiftChangeRequests = [];
     isLoadingShiftChange.value = false;
@@ -180,54 +172,47 @@ async function fetchShiftChangeRequests(
       await supervisorStore.getPendingShiftChangeRequests(departmentId);
     }
   } catch (error: any) {
-    notifications.showError(
-      `Failed to load shift change requests: ${
-        error.message || 'Unknown error'
-      }`,
-    );
-    errorShiftChange.value = `Failed to load shift change requests: ${
-      error.message || 'Unknown error'
-    }`;
-    console.error(
-      `Error fetching shift change requests for department ${departmentId}:`,
-      error,
-    );
+    showError(error.message);
+    errorShiftChange.value = error.message;
   } finally {
     isLoadingShiftChange.value = false;
   }
 }
 
-const onDepartmentSelectedForRequests = async (departmentId: number | null) => {
-  if (departmentId !== null) {
-    errorVacation.value = null;
-    errorShiftChange.value = null;
+const onDepartmentSelectedForRequests = async (departmentId: number) => {
+  errorVacation.value = null;
+  errorShiftChange.value = null;
 
-    await fetchVacationRequests(departmentId);
-    await fetchShiftChangeRequests(departmentId);
-  } else {
-    supervisorStore.vacationRequests = [];
-    supervisorStore.shiftChangeRequests = [];
-    isLoadingVacation.value = false;
-    isLoadingShiftChange.value = false;
-    errorVacation.value = null;
-    errorShiftChange.value = null;
-  }
+  await fetchVacationRequests(departmentId); // Aquí pasamos un número
+  await fetchShiftChangeRequests(departmentId); // Aquí pasamos un número
 };
 
 const { selectedDepartmentId, isLoadingDepartments, errorDepartments } =
   useDepartmentSelection({
     onDepartmentSelected: onDepartmentSelectedForRequests,
-    // PASAMOS notifications.displayNotification AQUÍ
-    showAlertMessage: notifications.displayNotification,
   });
 
-const requestActions = useRequestActions(
+// Desestructuramos las propiedades y funciones directamente del composable
+const {
+  approveConfirmMessage,
+  showApproveConfirmModal,
+  confirmApproveVacation,
+  confirmApproveShiftChange,
+  executeApproveRequest,
+  cancelApproveOperation,
+  showRejectModal,
+  currentRequestType,
+  rejectNotes,
+  openRejectVacationModal,
+  handleRejectVacation,
+  openRejectShiftChangeModal,
+  handleRejectShiftChange,
+  closeRejectModal,
+} = useRequestActions(
   selectedDepartmentId,
-  // PASAMOS notifications.displayNotification AQUÍ
-  notifications.displayNotification,
   fetchVacationRequests,
   fetchShiftChangeRequests,
-);
+); // Pasamos selectedDepartmentId como Ref
 </script>
 
 <style scoped lang="scss">

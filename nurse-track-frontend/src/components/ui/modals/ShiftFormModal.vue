@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="modal-overlay" @click.self="closeModal">
     <div class="modal">
       <h2>
-        {{ isEditMode ? 'Edit Shift' : 'Create New Shift' }} on
+        {{ isEditMode ? 'Editar Turno' : 'Crear Nuevo Turno' }} el
         {{ formatDate(initialShiftDate) }}
       </h2>
 
@@ -10,10 +10,10 @@
         <div class="form-fields">
           <InputSelect
             id="nurse"
-            label="Nurse"
+            label="Enfermero/a"
             :model-value="form.nurseId"
             @update:model-value="form.nurseId = $event"
-            text="Select a nurse"
+            text="Selecciona un enfermero/a"
             :entities="availableNurses"
             item-key="id"
             item-value="nurse.id"
@@ -24,10 +24,10 @@
 
           <InputSelect
             id="shiftTemplate"
-            label="Shift Type"
+            label="Tipo de Turno"
             :model-value="form.shiftTemplateId"
             @update:model-value="form.shiftTemplateId = $event"
-            text="Select a shift type"
+            text="Selecciona un tipo de turno"
             :entities="shiftTemplates"
             item-key="id"
             item-value="id"
@@ -37,17 +37,17 @@
           />
 
           <div class="form-group">
-            <label for="notes">Notes:</label>
+            <label for="notes">Notas:</label>
             <textarea id="notes" v-model="form.notes"></textarea>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">
-            {{ isEditMode ? 'Update' : 'Create' }}
+            {{ isEditMode ? 'Actualizar' : 'Crear' }}
           </button>
           <button type="button" @click="closeModal" class="btn btn-secondary">
-            Close
+            Cerrar
           </button>
           <button
             v-if="isEditMode"
@@ -55,7 +55,7 @@
             @click="requestShiftCancellation"
             class="btn btn-danger"
           >
-            Cancel Shift
+            Cancelar Turno
           </button>
         </div>
       </form>
@@ -69,12 +69,16 @@ import { formatDate } from '../../../utils/helpers';
 import type {
   CreateShiftRequest,
   UpdateShiftRequest,
+  ShiftResponse,
 } from '../../../types/schemas/shifts.schema';
 import { ShiftStatus } from '../../../types/enums/shift-status.enum';
 import InputSelect from '../InputSelect.vue';
-import type { ShiftFormModalProps } from '../../../types/common'; // Asegúrate de que esta importación sea correcta
+import type { ShiftFormModalProps } from '../../../types/common';
+import { useNotifications } from '../../../composables/useNotifications';
 
-const props = defineProps<ShiftFormModalProps>();
+const { showError, showWarning } = useNotifications();
+
+const props = defineProps<ShiftFormModalProps & { departmentId?: number }>();
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void;
@@ -86,7 +90,7 @@ const emit = defineEmits<{
       shiftId?: number;
     },
   ): void;
-  (e: 'shift-cancel-requested', shiftId: number): void;
+  (e: 'shift-cancel-requested', shift: ShiftResponse): void;
 }>();
 
 const form = ref<Partial<CreateShiftRequest> & Partial<UpdateShiftRequest>>({
@@ -98,7 +102,7 @@ const form = ref<Partial<CreateShiftRequest> & Partial<UpdateShiftRequest>>({
   status: ShiftStatus.SCHEDULED,
 });
 
-const currentShiftId = ref<number | null>(null);
+const currentShift = ref<ShiftResponse | null>(null);
 
 watch(
   () => props.isOpen,
@@ -106,7 +110,7 @@ watch(
     if (newVal) {
       resetForm();
       if (props.isEditMode && props.shiftToEdit) {
-        currentShiftId.value = props.shiftToEdit.id;
+        currentShift.value = props.shiftToEdit;
         form.value = {
           nurseId: props.shiftToEdit.nurse.id,
           departmentId: props.shiftToEdit.department.id,
@@ -118,26 +122,27 @@ watch(
       } else {
         form.value.shiftDate = props.initialShiftDate;
         form.value.status = ShiftStatus.SCHEDULED;
+        form.value.departmentId = props.departmentId; // Usa la prop departmentId
       }
     }
   },
+  { immediate: true },
 );
 
 const resetForm = () => {
   form.value = {
     nurseId: undefined,
-    departmentId: undefined,
+    departmentId: props.departmentId,
     shiftTemplateId: undefined,
     shiftDate: '',
     notes: '',
     status: ShiftStatus.SCHEDULED,
   };
-  currentShiftId.value = null;
+  currentShift.value = null;
 };
 
 const closeModal = () => {
   emit('update:isOpen', false);
-  resetForm();
 };
 
 const saveShift = () => {
@@ -146,44 +151,54 @@ const saveShift = () => {
     form.value.shiftTemplateId === undefined ||
     !form.value.shiftDate
   ) {
-    console.error('Missing required fields for shift operation.');
+    showError('Faltan campos obligatorios para la operación del turno.');
     return;
   }
 
-  if (props.isEditMode && currentShiftId.value) {
+  if (props.isEditMode) {
+    if (!currentShift.value) {
+      showError('Error: No hay turno para editar.');
+      return;
+    }
     const updateRequest: UpdateShiftRequest = {
+      nurseId: form.value.nurseId!,
+      departmentId: currentShift.value.department.id,
+      shiftTemplateId: form.value.shiftTemplateId!,
+      shiftDate: form.value.shiftDate,
+      notes: form.value.notes,
+      status: form.value.status!,
+    };
+    emit('shift-saved', {
+      type: 'update',
+      data: updateRequest,
+      shiftId: currentShift.value.id,
+    });
+  } else {
+    if (!form.value.departmentId) {
+      showError(
+        'No se ha proporcionado un ID de departamento para crear el turno.',
+      );
+      return;
+    }
+    const createRequest: CreateShiftRequest = {
       nurseId: form.value.nurseId!,
       departmentId: form.value.departmentId!,
       shiftTemplateId: form.value.shiftTemplateId!,
       shiftDate: form.value.shiftDate,
       notes: form.value.notes,
       status: form.value.status!,
+      createdById: undefined!, // Lo añade la vista antes de guardar
     };
-
-    emit('shift-saved', {
-      type: 'update',
-      data: updateRequest,
-      shiftId: currentShiftId.value,
-    });
-  } else {
-    const createRequest: CreateShiftRequest = {
-      nurseId: form.value.nurseId!,
-      departmentId: undefined!,
-      shiftTemplateId: form.value.shiftTemplateId!,
-      shiftDate: form.value.shiftDate,
-      notes: form.value.notes,
-      status: form.value.status!,
-      createdById: undefined!,
-    };
-
     emit('shift-saved', { type: 'create', data: createRequest });
   }
   closeModal();
 };
 
 const requestShiftCancellation = () => {
-  if (currentShiftId.value) {
-    emit('shift-cancel-requested', currentShiftId.value);
+  if (currentShift.value) {
+    emit('shift-cancel-requested', currentShift.value);
+  } else {
+    showWarning('No se ha seleccionado un turno para cancelar.');
   }
 };
 

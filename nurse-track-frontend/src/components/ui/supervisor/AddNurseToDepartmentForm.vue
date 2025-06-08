@@ -31,6 +31,9 @@ import { ref, watch } from 'vue';
 import { useSupervisorStore } from '../../../stores/supervisor.store';
 import { useSupervisorDepartmentService } from '../../../services/supervisor/supervisorDepartment.service';
 import type { UserResponse } from '../../../types/schemas/user.schema';
+import { useNotifications } from '../../../composables/useNotifications';
+
+const notifications = useNotifications();
 
 const props = defineProps<{
   departmentId: number;
@@ -68,7 +71,7 @@ const fetchAvailableNurses = async () => {
     }
   } catch (error: any) {
     localError.value = error.message || 'Failed to fetch available nurses.';
-    console.error('Error fetching available nurses:', error);
+    notifications.showError('Error fetching available nurses:', error);
   }
 };
 

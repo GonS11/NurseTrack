@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue';
 import { useSupervisorStore } from '../stores/supervisor.store';
+import { useNotifications } from './useNotifications';
 import { RequestStatus } from '../types/enums/status.enum';
 import type {
   VacationRequestResponse,
@@ -11,64 +12,54 @@ import { formatDate } from '../utils/helpers';
 
 export function useRequestActions(
   selectedDepartmentId: Ref<number | null>,
-  showAlertMessage: (
-    message: string,
-    type: 'info' | 'success' | 'warning' | 'error',
-    autoClose?: boolean | number,
-  ) => void,
-  fetchVacationRequests: (
-    departmentId: number | null,
-    all?: boolean,
-  ) => Promise<void>,
+  // Las funciones de fetch ahora esperan un 'number' como se usa en tus vistas, no 'number | null'
+  fetchVacationRequests: (departmentId: number, all?: boolean) => Promise<void>,
   fetchShiftChangeRequests: (
-    departmentId: number | null,
+    departmentId: number,
     all?: boolean,
   ) => Promise<void>,
 ) {
   const supervisorStore = useSupervisorStore();
+  const { showSuccess, showError, showInfo } = useNotifications();
 
-  const showApproveConfirmModal: Ref<boolean> = ref(false);
-  const approveConfirmMessage: Ref<string> = ref('');
-  const requestToApprove: Ref<
+  const showApproveConfirmModal = ref(false);
+  const approveConfirmMessage = ref('');
+  const requestToApprove = ref<
     VacationRequestResponse | ShiftChangeResponse | null
-  > = ref(null);
-  const requestTypeToApprove: Ref<'vacation' | 'shiftChange' | null> =
-    ref(null);
+  >(null);
+  const requestTypeToApprove = ref<'vacation' | 'shiftChange' | null>(null);
 
-  const showRejectModal: Ref<boolean> = ref(false);
-  const currentRequestType: Ref<'vacation' | 'shiftChange' | null> = ref(null);
-  const currentRequestId: Ref<number | null> = ref(null);
-  const rejectNotes: Ref<string> = ref('');
+  const showRejectModal = ref(false);
+  const currentRequestType = ref<'vacation' | 'shiftChange' | null>(null);
+  const currentRequestId = ref<number | null>(null);
+  const rejectNotes = ref('');
 
   function confirmApproveVacation(request: VacationRequestResponse) {
     requestToApprove.value = request;
     requestTypeToApprove.value = 'vacation';
-    approveConfirmMessage.value = `Are you sure you want to approve this vacation request from ${
+    approveConfirmMessage.value = `¿Estás seguro de que quieres aprobar esta solicitud de vacaciones de ${
       request.requestingNurse.firstname
-    } ${request.requestingNurse.lastname} for the period from ${formatDate(
+    } ${request.requestingNurse.lastname} para el periodo del ${formatDate(
       request.startDate,
-    )} to ${formatDate(request.endDate)}?`;
+    )} al ${formatDate(request.endDate)}?`;
     showApproveConfirmModal.value = true;
   }
 
   function confirmApproveShiftChange(request: ShiftChangeResponse) {
     requestToApprove.value = request;
     requestTypeToApprove.value = 'shiftChange';
-    approveConfirmMessage.value = `Are you sure you want to approve this shift change request from ${request.requestingNurse.firstname} ${request.requestingNurse.lastname}?`;
+    approveConfirmMessage.value = `¿Estás seguro de que quieres aprobar esta solicitud de cambio de turno de ${request.requestingNurse.firstname} ${request.requestingNurse.lastname}?`;
     showApproveConfirmModal.value = true;
   }
 
   async function executeApproveRequest() {
-    if (
-      selectedDepartmentId.value === null ||
-      !requestToApprove.value ||
-      !requestTypeToApprove.value
-    ) {
-      console.error('Missing department ID or request data for approval.');
-      showAlertMessage(
-        'An internal error occurred. Please try again.',
-        'error',
-      );
+    // Asegurarse de que el departamento esté seleccionado antes de continuar
+    if (selectedDepartmentId.value === null) {
+      showError('Departamento no seleccionado.');
+      return;
+    }
+    if (!requestToApprove.value || !requestTypeToApprove.value) {
+      showError('Ocurrió un error interno. Por favor, inténtalo de nuevo.');
       return;
     }
 
@@ -76,37 +67,34 @@ export function useRequestActions(
       if (requestTypeToApprove.value === 'vacation') {
         const updatePayload: UpdateVacationRequest = {
           status: RequestStatus.APPROVED,
-          reviewedNotes: 'Approved by supervisor.',
+          reviewedNotes: 'Aprobado por el supervisor.',
         };
         await supervisorStore.approveVacationRequest(
           selectedDepartmentId.value,
           requestToApprove.value.id,
           updatePayload,
         );
-        await fetchVacationRequests(selectedDepartmentId.value, false);
-        showAlertMessage('Vacation request approved successfully!', 'success');
+        await fetchVacationRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
+        showSuccess('¡Solicitud de vacaciones aprobada exitosamente!');
       } else if (requestTypeToApprove.value === 'shiftChange') {
         const updatePayload: UpdateShiftChangeRequest = {
           status: RequestStatus.APPROVED,
-          reviewedNotes: 'Approved by supervisor.',
+          reviewedNotes: 'Aprobado por el supervisor.',
         };
         await supervisorStore.approveShiftChangeRequest(
           selectedDepartmentId.value,
           requestToApprove.value.id,
           updatePayload,
         );
-        await fetchShiftChangeRequests(selectedDepartmentId.value, false);
-        showAlertMessage(
-          'Shift change request approved successfully!',
-          'success',
-        );
+        await fetchShiftChangeRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
+        showSuccess('¡Solicitud de cambio de turno aprobada exitosamente!');
       }
     } catch (error: any) {
-      showAlertMessage(
-        `Error approving request: ${error.message || 'Unknown error'}`,
-        'error',
+      showError(
+        `Error al aprobar la solicitud: ${
+          error.message || 'Error desconocido'
+        }`,
       );
-      console.error('Error approving request:', error);
     } finally {
       requestToApprove.value = null;
       requestTypeToApprove.value = null;
@@ -118,7 +106,7 @@ export function useRequestActions(
     requestToApprove.value = null;
     requestTypeToApprove.value = null;
     showApproveConfirmModal.value = false;
-    showAlertMessage('Approval operation cancelled.', 'info');
+    showInfo('Operación de aprobación cancelada.');
   }
 
   function openRejectVacationModal(requestId: number) {
@@ -129,16 +117,23 @@ export function useRequestActions(
   }
 
   async function handleRejectVacation() {
-    if (!currentRequestId.value || rejectNotes.value.trim() === '') {
-      showAlertMessage('Please provide rejection notes.', 'warning');
+    if (rejectNotes.value.trim() === '') {
+      showError('Por favor, proporciona notas de rechazo.');
       return;
     }
+    // Asegurarse de que el departamento esté seleccionado y el ID de la solicitud exista
+    if (selectedDepartmentId.value === null) {
+      showError('Departamento no seleccionado.');
+      closeRejectModal();
+      return;
+    }
+    if (currentRequestId.value === null) {
+      showError('ID de solicitud de vacaciones no encontrado.');
+      closeRejectModal();
+      return;
+    }
+
     try {
-      if (selectedDepartmentId.value === null) {
-        showAlertMessage('No department selected.', 'error');
-        closeRejectModal();
-        return;
-      }
       const updatePayload: UpdateVacationRequest = {
         status: RequestStatus.REJECTED,
         reviewedNotes: rejectNotes.value.trim(),
@@ -148,15 +143,15 @@ export function useRequestActions(
         currentRequestId.value,
         updatePayload,
       );
-      await fetchVacationRequests(selectedDepartmentId.value, false);
-      showAlertMessage('Vacation request rejected successfully!', 'success');
+      await fetchVacationRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
+      showSuccess('¡Solicitud de vacaciones rechazada exitosamente!');
       closeRejectModal();
     } catch (error: any) {
-      showAlertMessage(
-        `Error rejecting vacation request: ${error.message || 'Unknown error'}`,
-        'error',
+      showError(
+        `Error al rechazar la solicitud de vacaciones: ${
+          error.message || 'Error desconocido'
+        }`,
       );
-      console.error('Error rejecting vacation request:', error);
     }
   }
 
@@ -168,16 +163,23 @@ export function useRequestActions(
   }
 
   async function handleRejectShiftChange() {
-    if (!currentRequestId.value || rejectNotes.value.trim() === '') {
-      showAlertMessage('Please provide rejection notes.', 'warning');
+    if (rejectNotes.value.trim() === '') {
+      showError('Por favor, proporciona notas de rechazo.');
       return;
     }
+    // Asegurarse de que el departamento esté seleccionado y el ID de la solicitud exista
+    if (selectedDepartmentId.value === null) {
+      showError('Departamento no seleccionado.');
+      closeRejectModal();
+      return;
+    }
+    if (currentRequestId.value === null) {
+      showError('ID de solicitud de cambio de turno no encontrado.');
+      closeRejectModal();
+      return;
+    }
+
     try {
-      if (selectedDepartmentId.value === null) {
-        showAlertMessage('No department selected.', 'error');
-        closeRejectModal();
-        return;
-      }
       const updatePayload: UpdateShiftChangeRequest = {
         status: RequestStatus.REJECTED,
         reviewedNotes: rejectNotes.value.trim(),
@@ -187,20 +189,15 @@ export function useRequestActions(
         currentRequestId.value,
         updatePayload,
       );
-      await fetchShiftChangeRequests(selectedDepartmentId.value, false);
-      showAlertMessage(
-        'Shift change request rejected successfully!',
-        'success',
-      );
+      await fetchShiftChangeRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
+      showSuccess('¡Solicitud de cambio de turno rechazada exitosamente!');
       closeRejectModal();
     } catch (error: any) {
-      showAlertMessage(
-        `Error rejecting shift change request: ${
-          error.message || 'Unknown error'
+      showError(
+        `Error al rechazar la solicitud de cambio de turno: ${
+          error.message || 'Error desconocido'
         }`,
-        'error',
       );
-      console.error('Error rejecting shift change request:', error);
     }
   }
 
@@ -212,17 +209,14 @@ export function useRequestActions(
   }
 
   return {
-    showApproveConfirmModal,
     approveConfirmMessage,
-    requestToApprove,
-    requestTypeToApprove,
+    showApproveConfirmModal,
     confirmApproveVacation,
     confirmApproveShiftChange,
     executeApproveRequest,
     cancelApproveOperation,
     showRejectModal,
     currentRequestType,
-    currentRequestId,
     rejectNotes,
     openRejectVacationModal,
     handleRejectVacation,

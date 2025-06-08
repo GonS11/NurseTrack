@@ -1,16 +1,13 @@
 import { ref, type Ref } from 'vue';
 import { useSupervisorStore } from '../stores/supervisor.store';
+import { useNotifications } from './useNotifications';
 
 export function useNurseConfirmation(
   selectedDepartmentId: Ref<number | null>,
-  showAlertMessage: (
-    message: string,
-    type: 'info' | 'success' | 'warning' | 'error',
-    autoClose?: boolean | number,
-  ) => void,
   fetchNurses: (departmentId: number) => Promise<void>,
 ) {
   const supervisorStore = useSupervisorStore();
+  const { showSuccess, showError, showInfo } = useNotifications();
 
   const showConfirmModal: Ref<boolean> = ref(false);
   const confirmMessage: Ref<string> = ref('');
@@ -25,7 +22,7 @@ export function useNurseConfirmation(
 
   const handleRemoveNurse = async () => {
     if (!nurseIdToRemove.value || !selectedDepartmentId.value) {
-      showAlertMessage('Could not remove nurse. Missing data.', 'error');
+      showError('Could not remove nurse. Missing data.');
       return;
     }
 
@@ -34,13 +31,10 @@ export function useNurseConfirmation(
         selectedDepartmentId.value,
         nurseIdToRemove.value,
       );
-      showAlertMessage('Nurse removed successfully!', 'success');
+      showSuccess('Nurse removed successfully!');
       await fetchNurses(selectedDepartmentId.value);
     } catch (error: any) {
-      showAlertMessage(
-        `Error removing nurse: ${error.message || 'Unknown error'}`,
-        'error',
-      );
+      showError(`Error removing nurse: ${error.message || 'Unknown error'}`);
       console.error('Error deleting nurse:', error);
     } finally {
       nurseIdToRemove.value = null;
@@ -51,7 +45,7 @@ export function useNurseConfirmation(
   const cancelRemoveNurse = () => {
     nurseIdToRemove.value = null;
     showConfirmModal.value = false;
-    showAlertMessage('Nurse removal operation cancelled.', 'info');
+    showInfo('Nurse removal operation cancelled.');
   };
 
   return {

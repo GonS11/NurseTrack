@@ -46,6 +46,9 @@ import {
 } from '../../../types/schemas/department.schema';
 import { useFormErrors } from '../../../utils/formValidation';
 import Input from '../Input.vue';
+import { useNotifications } from '../../../composables/useNotifications';
+
+const { showError } = useNotifications();
 
 const props = defineProps<{
   isOpen: boolean;
@@ -120,7 +123,7 @@ const submitForm = () => {
     emit('submit', result.data);
   } else {
     mapZodErrors(result.error);
-    console.error('Validation errors:', result.error.flatten().fieldErrors);
+    showError('Validation errors:', result.error.flatten().fieldErrors);
   }
 };
 

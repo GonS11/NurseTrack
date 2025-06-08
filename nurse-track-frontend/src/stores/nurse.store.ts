@@ -79,12 +79,10 @@ export const useNurseStore = defineStore('nurse', {
 
     async createVacationRequest(request: CreateVacationRequest) {
       try {
-        const newVacationRequest =
-          await useNurseRequestService.createVacationRequest(request);
-
-        this.vacationRequests.push(newVacationRequest);
+        await useNurseRequestService.createVacationRequest(request);
+        await this.getMyVacationRequests();
       } catch (error: any) {
-        console.error('Error creating vacation request:', error);
+        throw error;
       }
     },
 
@@ -128,11 +126,10 @@ export const useNurseStore = defineStore('nurse', {
 
     async createShiftChangeRequest(request: CreateShiftChangeRequest) {
       try {
-        const newShiftChangeRequest =
-          await useNurseRequestService.createShiftChangeRequest(request);
-        this.shiftChangeRequests.push(newShiftChangeRequest);
+        await useNurseRequestService.createShiftChangeRequest(request);
+        await this.getMyShiftChangeRequests();
       } catch (error: any) {
-        console.error('Error creating shift change request:', error);
+        throw error;
       }
     },
   },

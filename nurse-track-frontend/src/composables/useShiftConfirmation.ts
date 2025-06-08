@@ -1,56 +1,60 @@
 import { ref, type Ref } from 'vue';
 import { useSupervisorStore } from '../stores/supervisor.store';
+import { useNotifications } from './useNotifications';
+import type { ShiftResponse } from '../types/schemas/shifts.schema';
 
 export function useShiftConfirmation(
   selectedDepartmentId: Ref<number | null>,
-  showAlertMessage: (
-    message: string,
-    type: 'info' | 'success' | 'warning' | 'error',
-    autoClose?: boolean | number,
-  ) => void,
-  fetchShifts: (departmentId: number | null) => Promise<void>,
+  fetchShifts: (departmentId: number) => Promise<void>,
 ) {
   const supervisorStore = useSupervisorStore();
+  const { showSuccess, showError, showInfo } = useNotifications();
 
   const showConfirmModal: Ref<boolean> = ref(false);
   const confirmMessage: Ref<string> = ref('');
-  const shiftToCancelId: Ref<number | null> = ref(null);
+  const shiftToCancel: Ref<ShiftResponse | null> = ref(null);
 
-  const handleShiftCancelledConfirmation = (shiftId: number) => {
-    shiftToCancelId.value = shiftId;
-    confirmMessage.value = 'Are you sure you want to cancel this shift?';
+  const handleShiftCancelledConfirmation = (shift: ShiftResponse) => {
+    shiftToCancel.value = shift;
+    const shiftDate = shift.shiftDate.split('T')[0];
+    const nurseName = `${shift.nurse.firstname} ${shift.nurse.lastname}`;
+    confirmMessage.value = `¿Estás seguro de que quieres cancelar el turno del ${shiftDate} para ${nurseName}?`;
     showConfirmModal.value = true;
   };
 
-  const executeShiftCancellation = async () => {
-    if (!selectedDepartmentId.value || shiftToCancelId.value === null) {
-      showAlertMessage('Could not cancel shift. Missing data.', 'error');
+  async function executeShiftCancellation() {
+    if (!selectedDepartmentId.value) {
+      showError('No se ha seleccionado un departamento.');
+      cancelShiftCancellationOperation();
+      return;
+    }
+    if (!shiftToCancel.value) {
+      showError('No se ha especificado un turno para cancelar.');
+      cancelShiftCancellationOperation();
       return;
     }
 
     try {
       await supervisorStore.cancelShift(
         selectedDepartmentId.value,
-        shiftToCancelId.value,
+        shiftToCancel.value.id,
       );
-      showAlertMessage('Shift cancelled successfully!', 'success');
+      showSuccess('¡Turno cancelado exitosamente!');
       await fetchShifts(selectedDepartmentId.value);
     } catch (error: any) {
-      showAlertMessage(
-        `Error canceling shift: ${error.message || 'Unknown error'}`,
-        'error',
+      showError(
+        `Error al cancelar el turno: ${error.message || 'Error desconocido'}`,
       );
-      console.error('Error canceling shift:', error);
     } finally {
-      shiftToCancelId.value = null;
+      shiftToCancel.value = null;
       showConfirmModal.value = false;
     }
-  };
+  }
 
   const cancelShiftCancellationOperation = () => {
-    shiftToCancelId.value = null;
+    shiftToCancel.value = null;
     showConfirmModal.value = false;
-    showAlertMessage('Shift cancellation operation cancelled.', 'info');
+    showInfo('Operación de cancelación de turno cancelada.');
   };
 
   return {

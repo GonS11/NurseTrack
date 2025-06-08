@@ -39,7 +39,7 @@
           <div class="notification-content">
             <h3>{{ notification.title }}</h3>
             <p>{{ notification.message }}</p>
-            <time>{{ formatNotificationDate(notification.createdAt) }}</time>
+            <time>{{ formatDate(notification.createdAt) }}</time>
           </div>
 
           <div class="notification-actions">

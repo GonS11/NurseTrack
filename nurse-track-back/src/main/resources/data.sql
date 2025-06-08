@@ -35,27 +35,26 @@ INSERT INTO users (
 -- 2) Departamentos
 INSERT INTO departments (name, location, is_active)
 VALUES
-    ('Cardiology',       'Floor 1, East Wing',             TRUE),
-    ('Neurology',        'Floor 1, West Wing',             TRUE),
-    ('Emergency Room',   'Ground Floor, Main Entrance',    TRUE),
-    ('Oncology',         'Floor 3, South Building',        TRUE),
-    ('ICU',              'Floor 2, Critical Care Unit',    TRUE),
-    ('Maternity',        'Floor 5, North Tower',           TRUE),
+    ('Cardiology',       'Floor 1, East Wing',          TRUE),
+    ('Neurology',        'Floor 1, West Wing',          TRUE),
+    ('Emergency Room',   'Ground Floor, Main Entrance',   TRUE),
+    ('Oncology',         'Floor 3, South Building',       TRUE),
+    ('ICU',              'Floor 2, Critical Care Unit',   TRUE),
+    ('Maternity',        'Floor 5, North Tower',          TRUE),
     -- Inactive Departments
-    ('Pediatrics',       'Floor 2, North Block',           FALSE),
-    ('Surgery',          'Floor 4, Operating Theatres',    FALSE),
-    ('Physical Therapy','Ground Floor, Annex Building',    FALSE);
+    ('Pediatrics',       'Floor 2, North Block',          FALSE),
+    ('Surgery',          'Floor 4, Operating Theatres',   FALSE),
+    ('Physical Therapy','Ground Floor, Annex Building',   FALSE);
 
 
 -- 3) Plantillas de turno (SE ELIMINARON las que duplicaban el enum `type`)
 INSERT INTO shift_templates (name, start_time, end_time, type)
 VALUES
     ('Morning Shift',      '08:00:00', '15:00:00', 'MORNING'),
-    ('Afternoon Shift',    '15:00:00', '22:00:00', 'AFTERNOON'),
+    ('Afternoon Shift',      '15:00:00', '22:00:00', 'AFTERNOON'),
     ('Night Shift',        '22:00:00', '08:00:00', 'NIGHT'),
-    ('12h Day',            '08:00:00', '20:00:00', 'HALF_MORNING'), -- CORREGIDO: “Short Morning” eliminada
-    ('12h Night',          '20:00:00', '08:00:00', 'HALF_NIGHT');
-    -- (Se quitaron “Short Morning” y “Late Evening” para no duplicar el campo `type` con valores ya existentes)
+    ('12h Day',              '08:00:00', '20:00:00', 'HALF_MORNING'),
+    ('12h Night',            '20:00:00', '08:00:00', 'HALF_NIGHT');
 
 
 -- 4) supervisors_departments – Asignación de Supervisores a Departamentos
@@ -93,7 +92,7 @@ VALUES
 
 
 -- 5) nurses_departments – Asignación de Enfermeras a Departamentos
-INSERT INTO nurses_departments (nurse_id, department_id, assigned_at) -- <--- ADD assigned_at here
+INSERT INTO nurses_departments (nurse_id, department_id, assigned_at)
 VALUES
     -- Cardiology Nurses
     ((SELECT id FROM users WHERE username = 'nurse1'), (SELECT id FROM departments WHERE name = 'Cardiology'), NOW()),
@@ -278,7 +277,7 @@ INSERT INTO shifts (
     (
       (SELECT id FROM users WHERE username = 'nurse7'),
       (SELECT id FROM departments WHERE name = 'Neurology'),
-      (SELECT id FROM shift_templates WHERE name = 'Morning Shift'), -- CORREGIDO: antes era 'Short Morning'
+      (SELECT id FROM shift_templates WHERE name = 'Morning Shift'),
       DATE_ADD(CURDATE(), INTERVAL 8 DAY),
       'SCHEDULED',
       'Short shift in Neurology.',
@@ -327,7 +326,7 @@ INSERT INTO shifts (
     (
       (SELECT id FROM users WHERE username = 'nurse5'),
       (SELECT id FROM departments WHERE name = 'Oncology'),
-      (SELECT id FROM shift_templates WHERE name = 'Afternoon Shift'), -- CORREGIDO: antes era 'Late Evening'
+      (SELECT id FROM shift_templates WHERE name = 'Afternoon Shift'),
       DATE_ADD(CURDATE(), INTERVAL 2 DAY),
       'SCHEDULED',
       'Afternoon for oncology patients.',
@@ -386,7 +385,7 @@ INSERT INTO shift_change_requests (
       'PENDING',
       TRUE,
       NULL,
-      NULL
+      NULL -- 'reviewed_at' es NULL para PENDING
     ),
     -- 7.2 Approved Swap (Turno #3 de Nurse3 por Turno #1 de Nurse1)
     (
@@ -399,7 +398,7 @@ INSERT INTO shift_change_requests (
       'APPROVED',
       FALSE,
       (SELECT id FROM users WHERE username = 'super1'),
-      DATE_SUB(NOW(), INTERVAL 2 DAY)
+      NOW() -- Aquí sí se necesita NOW() porque está APROBADO
     ),
     -- 7.3 Rejected Request (Nurse5 ofrece Neurology(13), Nurse6 quiere Afternoon)
     (
@@ -419,7 +418,7 @@ INSERT INTO shift_change_requests (
       'REJECTED',
       FALSE,
       (SELECT id FROM users WHERE username = 'super_ana'),
-      DATE_SUB(NOW(), INTERVAL 1 DAY)
+      NOW() -- Aquí sí se necesita NOW() porque está RECHAZADO
     ),
     -- 7.4 Pending Interchange (Nurse7 ofrece ER(17), Recipient Nurse8 con 12h Night)
     (
@@ -439,7 +438,7 @@ INSERT INTO shift_change_requests (
       'PENDING',
       TRUE,
       NULL,
-      NULL
+      NULL -- 'reviewed_at' es NULL para PENDING
     ),
     -- 7.5 Pending Interchange (Nurse9 ofrece Oncology(20) por Oncology(21))
     (
@@ -452,7 +451,7 @@ INSERT INTO shift_change_requests (
       'PENDING',
       TRUE,
       NULL,
-      NULL
+      NULL -- 'reviewed_at' es NULL para PENDING
     );
 
 
@@ -471,7 +470,7 @@ INSERT INTO vacation_requests (
       NULL,
       'PENDING',
       NULL,
-      NULL
+      NULL -- 'reviewed_at' es NULL para PENDING
     ),
     -- 8.2 Approved Request (Nurse5, dentro de 60 días)
     (
@@ -482,7 +481,7 @@ INSERT INTO vacation_requests (
       'Approved, confirmed coverage in Neurology.',
       'APPROVED',
       (SELECT id FROM users WHERE username = 'super_ana'),
-      DATE_SUB(NOW(), INTERVAL 10 DAY)
+      NOW() -- Aquí sí se necesita NOW()
     ),
     -- 8.3 Rejected Request (Nurse2, la próxima semana)
     (
@@ -493,7 +492,7 @@ INSERT INTO vacation_requests (
       'Rejected: Too many staff off this week, cannot approve.',
       'REJECTED',
       (SELECT id FROM users WHERE username = 'super1'),
-      DATE_SUB(NOW(), INTERVAL 2 DAY)
+      NOW() -- Aquí sí se necesita NOW()
     ),
     -- 8.4 Past Approved Request (Nurse8, ER)
     (
@@ -504,7 +503,7 @@ INSERT INTO vacation_requests (
       'Approved quickly.',
       'APPROVED',
       (SELECT id FROM users WHERE username = 'super1'),
-      DATE_SUB(NOW(), INTERVAL 14 DAY)
+      NOW() -- Aquí sí se necesita NOW()
     ),
     -- 8.5 Another Pending Request (Nurse6, Maternity)
     (
@@ -515,13 +514,13 @@ INSERT INTO vacation_requests (
       NULL,
       'PENDING',
       NULL,
-      NULL
+      NULL -- 'reviewed_at' es NULL para PENDING
     );
 
 
 -- 9) Notifications
 INSERT INTO notifications (
-    user_id, type, title, message, is_read
+    user_id, type, title, message, is_read, created_at
 ) VALUES
     -- Recordatorios Generales
     (
@@ -529,21 +528,24 @@ INSERT INTO notifications (
       'GENERAL',
       'Shift Reminder',
       'Your Morning Shift in Cardiology is today at 08:00.',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse5'),
       'GENERAL',
       'Holiday Alert',
       'Don''t forget your upcoming vacation starts in 60 days!',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse3'),
       'GENERAL',
       'ICU Shift Reminder',
       'Your Night Shift in ICU is today at 22:00. Be prepared.',
-      FALSE
+      FALSE,
+      NOW()
     ),
 
     -- Notificaciones de Cambio de Turno
@@ -552,35 +554,40 @@ INSERT INTO notifications (
       'SHIFT_CHANGE',
       'New Shift Change Request (Cardiology)',
       'Nurse Smith (nurse1) has requested a shift swap for today.',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse2'),
       'SHIFT_CHANGE',
       'Shift Swap Offer Received',
       'Nurse Smith (nurse1) wants to swap shifts with you for today.',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse3'),
       'SHIFT_CHANGE',
       'Your Shift Swap was Approved',
       'Your shift swap request has been approved by Supervisor Boss.',
-      TRUE
+      TRUE,
+      DATE_SUB(NOW(), INTERVAL 1 HOUR)
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse5'),
       'SHIFT_CHANGE',
       'Your Shift Change Request was Rejected',
       'Your request to change your Neurology shift was rejected.',
-      FALSE
+      FALSE,
+      DATE_SUB(NOW(), INTERVAL 2 HOUR)
     ),
     (
       (SELECT id FROM users WHERE username = 'super_david'),
       'SHIFT_CHANGE',
       'New Shift Change Request (Oncology)',
       'Nurse Taylor (nurse9) has requested a shift swap.',
-      FALSE
+      FALSE,
+      NOW()
     ),
 
     -- Notificaciones de Vacaciones
@@ -589,21 +596,24 @@ INSERT INTO notifications (
       'VACATION_REQUEST',
       'New Vacation Request (Maternity)',
       'Nurse Miller (nurse6) has submitted a vacation request.',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse2'),
       'VACATION_REQUEST',
       'Your Vacation Request was Rejected',
       'Your vacation request for next week was rejected due to staffing.',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'nurse5'),
       'VACATION_REQUEST',
       'Vacation Approved',
       'Your vacation request for next month has been approved.',
-      TRUE
+      TRUE,
+      NOW()
     ),
 
     -- Notificaciones de Sistema
@@ -612,19 +622,22 @@ INSERT INTO notifications (
       'SYSTEM',
       'System Update Scheduled',
       'Important system maintenance on Sunday, June 10th at 02:00 AM.',
-      FALSE
+      FALSE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'super1'),
       'SYSTEM',
       'Security Alert',
       'Unusual login activity detected on your account. Please review.',
-      TRUE
+      TRUE,
+      NOW()
     ),
     (
       (SELECT id FROM users WHERE username = 'admin1'),
       'SYSTEM',
       'New Department Added',
       'A new department, "Maternity," has been added to the system.',
-      TRUE
+      TRUE,
+      NOW()
     );

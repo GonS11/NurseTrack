@@ -1,20 +1,17 @@
 import { ref, computed, onMounted, watch, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSupervisorStore } from '../stores/supervisor.store';
+import { useNotifications } from './useNotifications';
 import type { DepartmentResponse } from '../types/schemas/department.schema';
 
 interface UseDepartmentSelectionOptions {
   onDepartmentSelected: (departmentId: number) => Promise<void>;
-  showAlertMessage: (
-    message: string,
-    type: 'info' | 'success' | 'warning' | 'error',
-    autoClose?: boolean | number,
-  ) => void;
 }
 
 export function useDepartmentSelection(options: UseDepartmentSelectionOptions) {
   const supervisorStore = useSupervisorStore();
   const route = useRoute();
+  const { showError } = useNotifications();
 
   const isLoadingDepartments = ref(false);
   const errorDepartments = ref<string | null>(null);
@@ -38,18 +35,21 @@ export function useDepartmentSelection(options: UseDepartmentSelectionOptions) {
       const routeDepartmentId = route.query.departmentId;
 
       if (routeDepartmentId) {
-        selectedDepartmentId.value = Number(routeDepartmentId);
+        const idFromRoute = Number(routeDepartmentId);
+        if (
+          !isNaN(idFromRoute) &&
+          supervisorStore.departments.some((d) => d.id === idFromRoute)
+        ) {
+          selectedDepartmentId.value = idFromRoute;
+        } else if (supervisorStore.departments.length > 0) {
+          selectedDepartmentId.value = supervisorStore.departments[0].id;
+        }
       } else if (supervisorStore.departments.length > 0) {
         selectedDepartmentId.value = supervisorStore.departments[0].id;
       }
     } catch (error: any) {
-      options.showAlertMessage(
-        error.message || 'Error loading departments.',
-        'error',
-        false,
-      );
+      showError(error.message || 'Error loading departments.', false);
       errorDepartments.value = error.message || 'Error loading departments.';
-      console.error('Error in useDepartmentSelection (onMounted):', error);
     } finally {
       isLoadingDepartments.value = false;
     }
@@ -59,6 +59,7 @@ export function useDepartmentSelection(options: UseDepartmentSelectionOptions) {
     selectedDepartmentId,
     async (newDepartmentId) => {
       if (newDepartmentId !== null) {
+        // Asegúrate de que selectedDepartmentId.value siempre sea un número antes de pasarlo.
         await options.onDepartmentSelected(newDepartmentId);
       }
     },
