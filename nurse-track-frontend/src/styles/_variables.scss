@@ -3,6 +3,7 @@ $primary-hover: #1e5e69;
 $secondary: #6c757d;
 $success: #4caf50;
 $error: #e53935;
+$error-hover: #c02c28;
 $background: #6ca1a8d5;
 $background-admin: #cfcfcf;
 $background-supervisor: #91b6ac;
@@ -97,22 +98,22 @@ $input-padding-x: $spacer-3;
 $input-padding-y: $spacer-2;
 
 // Shift type colors
-$shift-morning-bg: rgba(255, 213, 79, 0.2); // #ffd54f with 20% opacity
+$shift-morning-bg: rgba(255, 213, 79, 0.2);
 $shift-morning-border: #ffa000;
 $shift-morning-text: #d68f00;
 
-$shift-afternoon-bg: rgba(79, 195, 247, 0.2); // #4fc3f7 with 20% opacity
+$shift-afternoon-bg: rgba(79, 195, 247, 0.2);
 $shift-afternoon-border: #0288d1;
 $shift-afternoon-text: #016b9e;
 
-$shift-night-bg: rgba(149, 117, 205, 0.2); // #9575cd with 20% opacity
+$shift-night-bg: rgba(149, 117, 205, 0.2);
 $shift-night-border: #673ab7;
 $shift-night-text: #4e2a87;
 
-$shift-half-morning-bg: rgba(174, 213, 129, 0.2); // #aed581 with 20% opacity
+$shift-half-morning-bg: rgba(174, 213, 129, 0.2);
 $shift-half-morning-border: #689f38;
 $shift-half-morning-text: #4b7d27;
 
-$shift-half-night-bg: rgba(240, 98, 146, 0.2); // #f06292 with 20% opacity
+$shift-half-night-bg: rgba(240, 98, 146, 0.2);
 $shift-half-night-border: #c2185b;
 $shift-half-night-text: #9c124a;

@@ -11,9 +11,7 @@ import api from '../api/axios';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    // Initialize token from localStorage if it exists
     token: localStorage.getItem('authToken') || null,
-    // user will be hydrated by the 'initializeAuth' action
     user: null as DecodedToken | null,
   }),
 
@@ -89,19 +87,19 @@ export const useAuthStore = defineStore('auth', {
     async getCurrentUser() {
       if (!this.token) {
         this.logout();
-        throw new Error('No hay token de autenticación');
+        throw new Error('There is no authentication token');
       }
       try {
         const userData = jwtDecode<DecodedToken>(this.token);
         const currentTime = Date.now() / 1000;
         if (userData.exp < currentTime) {
-          console.warn('JWT token is expired in getCurrentUser. Logging out.');
+          console.log('JWT token is expired in getCurrentUser. Logging out.');
           this.logout();
-          throw new Error('Token expirado');
+          throw new Error('Token expired');
         }
         this.user = userData;
       } catch (e) {
-        console.error('Token inválido o expirado:', e);
+        console.error('Invalid or expired token:', e);
         this.logout();
         throw e;
       }

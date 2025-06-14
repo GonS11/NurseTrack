@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="modal-overlay" @click.self="closeModal">
     <div class="modal">
       <h2>
-        {{ isEditMode ? 'Editar Turno' : 'Crear Nuevo Turno' }} el
+        {{ isEditMode ? 'Edit Shift' : 'Create New Shift' }} on
         {{ formatDate(initialShiftDate) }}
       </h2>
 
@@ -10,10 +10,10 @@
         <div class="form-fields">
           <InputSelect
             id="nurse"
-            label="Enfermero/a"
+            label="Nurse"
             :model-value="form.nurseId"
             @update:model-value="form.nurseId = $event"
-            text="Selecciona un enfermero/a"
+            text="Select a nurse"
             :entities="availableNurses"
             item-key="id"
             item-value="nurse.id"
@@ -24,10 +24,10 @@
 
           <InputSelect
             id="shiftTemplate"
-            label="Tipo de Turno"
+            label="Shift Type"
             :model-value="form.shiftTemplateId"
             @update:model-value="form.shiftTemplateId = $event"
-            text="Selecciona un tipo de turno"
+            text="Select a shift type"
             :entities="shiftTemplates"
             item-key="id"
             item-value="id"
@@ -37,17 +37,17 @@
           />
 
           <div class="form-group">
-            <label for="notes">Notas:</label>
+            <label for="notes">Notes:</label>
             <textarea id="notes" v-model="form.notes"></textarea>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">
-            {{ isEditMode ? 'Actualizar' : 'Crear' }}
+            {{ isEditMode ? 'Update' : 'Create' }}
           </button>
           <button type="button" @click="closeModal" class="btn btn-secondary">
-            Cerrar
+            Close
           </button>
           <button
             v-if="isEditMode"
@@ -55,7 +55,7 @@
             @click="requestShiftCancellation"
             class="btn btn-danger"
           >
-            Cancelar Turno
+            Cancel Shift
           </button>
         </div>
       </form>
@@ -122,7 +122,7 @@ watch(
       } else {
         form.value.shiftDate = props.initialShiftDate;
         form.value.status = ShiftStatus.SCHEDULED;
-        form.value.departmentId = props.departmentId; // Usa la prop departmentId
+        form.value.departmentId = props.departmentId;
       }
     }
   },
@@ -151,13 +151,13 @@ const saveShift = () => {
     form.value.shiftTemplateId === undefined ||
     !form.value.shiftDate
   ) {
-    showError('Faltan campos obligatorios para la operación del turno.');
+    showError('Missing required fields for shift operation.');
     return;
   }
 
   if (props.isEditMode) {
     if (!currentShift.value) {
-      showError('Error: No hay turno para editar.');
+      showError('Error: No shift to edit.');
       return;
     }
     const updateRequest: UpdateShiftRequest = {
@@ -175,9 +175,7 @@ const saveShift = () => {
     });
   } else {
     if (!form.value.departmentId) {
-      showError(
-        'No se ha proporcionado un ID de departamento para crear el turno.',
-      );
+      showError('No department ID provided to create the shift.');
       return;
     }
     const createRequest: CreateShiftRequest = {
@@ -187,7 +185,7 @@ const saveShift = () => {
       shiftDate: form.value.shiftDate,
       notes: form.value.notes,
       status: form.value.status!,
-      createdById: undefined!, // Lo añade la vista antes de guardar
+      createdById: undefined!,
     };
     emit('shift-saved', { type: 'create', data: createRequest });
   }
@@ -198,7 +196,7 @@ const requestShiftCancellation = () => {
   if (currentShift.value) {
     emit('shift-cancel-requested', currentShift.value);
   } else {
-    showWarning('No se ha seleccionado un turno para cancelar.');
+    showWarning('No shift selected for cancellation.');
   }
 };
 

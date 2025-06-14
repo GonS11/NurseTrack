@@ -174,7 +174,7 @@ onMounted(() => {
     adminStore.getAllNurseAssignments(),
     adminStore.getAllSupervisorAssignments(),
   ]).catch((error) => {
-    notificacions.showError('Error loading admin dashboard data:', error);
+    notifications.showError('Error loading admin dashboard data:', error);
   });
 });
 </script>

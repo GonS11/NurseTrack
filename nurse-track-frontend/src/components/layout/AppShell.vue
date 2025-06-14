@@ -3,7 +3,7 @@
     class="app-shell"
     :class="[
       { 'sidebar-open': isSidebarOpen, 'is-mobile': isMobile },
-      userRoleClass, // Esta es la clase dinámica que generaremos
+      userRoleClass,
     ]"
   >
     <Sidebar

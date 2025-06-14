@@ -6,19 +6,13 @@ const showNotification = ref(false);
 const notificationMessage = ref('');
 const notificationType = ref<NotificationType>('info');
 const notificationTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
-const notificationAutoClose = ref(true); // Controla si se cierra automáticamente
+const notificationAutoClose = ref(true);
 
 export function useNotifications() {
-  /**
-   * Muestra una notificación global en la aplicación.
-   * @param message El mensaje a mostrar.
-   * @param type El tipo de notificación (info, success, warning, error).
-   * @param autoClose Duración en milisegundos si se cierra automáticamente, o boolean (true para 5s, false para no cerrar).
-   */
   const displayNotification = (
     message: string,
-    type: NotificationType, // Aquí debe ser un tipo requerido según tus errores
-    autoClose: boolean | number | undefined = true, // Acepta boolean, number o undefined
+    type: NotificationType,
+    autoClose: boolean | number | undefined = true,
   ) => {
     if (notificationTimeout.value) {
       clearTimeout(notificationTimeout.value);
@@ -29,16 +23,16 @@ export function useNotifications() {
     showNotification.value = true;
 
     let actualAutoClose = true;
-    let duration = 5000; // Duración por defecto
+    let duration = 5000;
 
     if (typeof autoClose === 'boolean') {
       actualAutoClose = autoClose;
-      duration = 5000; // Si es boolean, asumimos 5 segundos por defecto
+      duration = 5000;
     } else if (typeof autoClose === 'number') {
-      actualAutoClose = true; // Si es un número, siempre se auto-cierra
+      actualAutoClose = true;
       duration = autoClose;
     } else {
-      actualAutoClose = true; // Si es undefined, por defecto se auto-cierra en 5 segundos
+      actualAutoClose = true;
     }
 
     notificationAutoClose.value = actualAutoClose;
@@ -50,7 +44,6 @@ export function useNotifications() {
     }
   };
 
-  // Las funciones específicas ahora deben pasar el tipo obligatoriamente
   const showInfo = (message: string, autoClose?: boolean | number) => {
     displayNotification(message, 'info', autoClose);
   };

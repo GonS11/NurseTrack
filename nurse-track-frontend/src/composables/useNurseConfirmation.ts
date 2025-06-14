@@ -8,7 +8,6 @@ export function useNurseConfirmation(
 ) {
   const supervisorStore = useSupervisorStore();
   const { showSuccess, showError, showInfo } = useNotifications();
-
   const showConfirmModal: Ref<boolean> = ref(false);
   const confirmMessage: Ref<string> = ref('');
   const nurseIdToRemove: Ref<number | null> = ref(null);
@@ -23,6 +22,7 @@ export function useNurseConfirmation(
   const handleRemoveNurse = async () => {
     if (!nurseIdToRemove.value || !selectedDepartmentId.value) {
       showError('Could not remove nurse. Missing data.');
+
       return;
     }
 
@@ -31,10 +31,12 @@ export function useNurseConfirmation(
         selectedDepartmentId.value,
         nurseIdToRemove.value,
       );
+
       showSuccess('Nurse removed successfully!');
       await fetchNurses(selectedDepartmentId.value);
     } catch (error: any) {
       showError(`Error removing nurse: ${error.message || 'Unknown error'}`);
+
       console.error('Error deleting nurse:', error);
     } finally {
       nurseIdToRemove.value = null;

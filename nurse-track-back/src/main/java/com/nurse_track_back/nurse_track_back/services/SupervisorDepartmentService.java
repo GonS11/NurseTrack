@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -59,11 +58,10 @@ public class SupervisorDepartmentService {
     }
 
     public SupervisorDepartmentResponse assignSupervisor(AssignSupervisorRequest request) {
-        SupervisorDepartment assignment =
-                supervisorDepartmentMapper.toEntity(request, userRepository, departmentRepository);
+        SupervisorDepartment assignment = supervisorDepartmentMapper.toEntity(request, userRepository,
+                departmentRepository);
         return supervisorDepartmentMapper.toDTO(
-                supervisorDepartmentRepository.save(assignment)
-        );
+                supervisorDepartmentRepository.save(assignment));
     }
 
     public void removeSupervisor(Long departmentId) {
@@ -75,10 +73,11 @@ public class SupervisorDepartmentService {
     }
 
     public void validateSupervisorAccess(Long supervisorId, Long departmentId) {
-        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisor_IdAndDepartment_Id(supervisorId, departmentId);
+        boolean hasAccess = supervisorDepartmentRepository.existsBySupervisor_IdAndDepartment_Id(supervisorId,
+                departmentId);
         if (!hasAccess) {
             throw SecurityException.create("validateSupervisorAccess",
-                                           "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
+                    "Supervisor with ID " + supervisorId + " does not have access to department ID: " + departmentId);
         }
     }
 }

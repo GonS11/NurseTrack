@@ -97,7 +97,7 @@ type Header = {
   key: string;
   label: string;
   format?: (item: any) => string;
-  alignCenter?: boolean; // Nueva prop para centrar el texto de la celda
+  alignCenter?: boolean;
 };
 
 export interface TableAction<Item = any> {
@@ -149,8 +149,7 @@ const showAction = (action: TableAction, item: any) => {
 };
 
 const handleAction = (action: TableAction, item: any) => {
-  //emit('action', { action: action.label, item });
-  action.handler(item); // The actual action handler
+  action.handler(item);
 };
 
 const changePage = (delta: number) => {

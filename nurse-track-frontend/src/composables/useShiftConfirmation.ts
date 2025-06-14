@@ -18,18 +18,18 @@ export function useShiftConfirmation(
     shiftToCancel.value = shift;
     const shiftDate = shift.shiftDate.split('T')[0];
     const nurseName = `${shift.nurse.firstname} ${shift.nurse.lastname}`;
-    confirmMessage.value = `¿Estás seguro de que quieres cancelar el turno del ${shiftDate} para ${nurseName}?`;
+    confirmMessage.value = `Are you sure you want to cancel the ${shiftDate} to ${nurseName}?`;
     showConfirmModal.value = true;
   };
 
   async function executeShiftCancellation() {
     if (!selectedDepartmentId.value) {
-      showError('No se ha seleccionado un departamento.');
+      showError('A department has not been selected.');
       cancelShiftCancellationOperation();
       return;
     }
     if (!shiftToCancel.value) {
-      showError('No se ha especificado un turno para cancelar.');
+      showError('No shift has been specified for cancellation.');
       cancelShiftCancellationOperation();
       return;
     }
@@ -39,11 +39,14 @@ export function useShiftConfirmation(
         selectedDepartmentId.value,
         shiftToCancel.value.id,
       );
-      showSuccess('¡Turno cancelado exitosamente!');
+      showSuccess('Shift successfully cancelled!');
       await fetchShifts(selectedDepartmentId.value);
     } catch (error: any) {
+      const backendMsg = error?.response?.data?.message;
       showError(
-        `Error al cancelar el turno: ${error.message || 'Error desconocido'}`,
+        `Error when canceling the shift: ${
+          backendMsg || error.message || 'Unknown error'
+        }`,
       );
     } finally {
       shiftToCancel.value = null;
@@ -54,7 +57,7 @@ export function useShiftConfirmation(
   const cancelShiftCancellationOperation = () => {
     shiftToCancel.value = null;
     showConfirmModal.value = false;
-    showInfo('Operación de cancelación de turno cancelada.');
+    showInfo('Shift cancellation operation cancelled.');
   };
 
   return {

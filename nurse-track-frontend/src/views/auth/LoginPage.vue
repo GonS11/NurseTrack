@@ -120,10 +120,14 @@ const handleSubmit = async () => {
   try {
     await auth.login(username.value, password.value);
     await router.push({ name: 'dashboard' });
+
     notifications.showSuccess('Login successful! Welcome.');
   } catch (err: any) {
+    const backendMsg = err?.response?.data?.message;
     notifications.showError(
-      err.message || 'Login failed. Please check your credentials.',
+      backendMsg ||
+        err.message ||
+        'Login failed. Please check your credentials.',
     );
   } finally {
     isLoading.value = false;

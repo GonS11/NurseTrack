@@ -111,13 +111,6 @@ const getNotificationIcon = (type: string) => {
   }
 };
 
-const formatNotificationDate = (dateString: string) => {
-  return formatDate(dateString);
-};
-
-// --- Interaction Functions ---
-
-// Fetches notifications
 const getNotifications = async () => {
   loading.value = true;
 

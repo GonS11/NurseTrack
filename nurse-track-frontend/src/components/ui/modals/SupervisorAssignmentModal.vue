@@ -90,7 +90,6 @@ const fetchDropdownData = async () => {
     await adminStore.getUnassignedDepartmentsForSupervisor();
     await adminStore.getAllUsers();
 
-    // Manejo seguro de datos (arreglo vs estructura paginada)
     unassignedDepartments.value = Array.isArray(adminStore.departments)
       ? adminStore.departments
       : adminStore.departments?.content || [];
@@ -103,7 +102,8 @@ const fetchDropdownData = async () => {
       (user) => user.role === UserRole.SUPERVISOR,
     );
   } catch (error: any) {
-    showError('Error fetching dropdown data:', error);
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error inesperado');
   }
 };
 

@@ -51,7 +51,7 @@ const assignmentToRemoveDetails = ref<{
 
 const supervisorAssignments = computed(() => adminStore.supervisorAssignments);
 
-const unassignedDepartments = computed(() => adminStore.unassignedDepartments);
+//const unassignedDepartments = computed(() => adminStore.unassignedDepartments);
 
 const supervisorAssignmentHeaders = [
   {

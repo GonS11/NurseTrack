@@ -54,7 +54,6 @@ export const useAdminStore = defineStore('admin', {
       size: 10,
     } as Page<SupervisorDepartmentResponse>,
 
-    // Arrays auxiliares para selects/dropdowns
     unassignedDepartments: [] as DepartmentResponse[],
     unassignedDepartmentsForNurses: [] as DepartmentResponse[],
 

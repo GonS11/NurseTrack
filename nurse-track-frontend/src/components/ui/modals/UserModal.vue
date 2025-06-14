@@ -177,10 +177,6 @@ const roleOptions = computed(() => {
   return options;
 });
 
-const roleOptionText = (entity: { id: UserRole; name: string }) => {
-  return entity.name;
-};
-
 const resetForm = () => {
   Object.assign(formData, initialFormData);
   clearErrors();

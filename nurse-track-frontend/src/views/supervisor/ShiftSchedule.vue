@@ -4,6 +4,7 @@
 
     <DepartmentSelector
       v-model:selected-department-id="selectedDepartmentId"
+      :departments="departments"
       :is-loading-departments="isLoadingDepartments"
       :error-departments="errorDepartments"
       @error-alert="showError"
@@ -25,7 +26,14 @@
       </div>
 
       <p v-else-if="isLoadingDepartments">Cargando departamentos...</p>
-      <p v-else-if="errorShifts">{{ errorShifts }}</p>
+      <p v-else-if="errorDepartments">{{ errorDepartments }}</p>
+      <p
+        v-else-if="
+          departments.length === 0 && !isLoadingDepartments && !errorDepartments
+        "
+      >
+        Por favor, selecciona un departamento para ver su horario de turnos.
+      </p>
       <p v-else>
         Por favor, selecciona un departamento para ver su horario de turnos.
       </p>
@@ -52,9 +60,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useSupervisorStore } from '../../stores/supervisor.store';
 import { useShiftTemplatesStore } from '../../stores/shiftTemplate.store';
+import { useAuthStore } from '../../stores/auth.store';
 import MonthlyCalendar from '../../components/ui/MonthlyCalendar.vue';
 import ConfirmModal from '../../components/common/ConfirmModal.vue';
 import DepartmentSelector from '../../components/requests/DepartmentSelector.vue';
@@ -70,6 +79,7 @@ import type {
 
 const supervisorStore = useSupervisorStore();
 const shiftTemplatesStore = useShiftTemplatesStore();
+const authStore = useAuthStore();
 const { showError, showWarning, showSuccess } = useNotifications();
 
 const isLoadingShifts = ref(false);
@@ -82,6 +92,8 @@ const shiftToEdit = ref<ShiftResponse | null>(null);
 
 const todayString = new Date().toISOString().split('T')[0];
 
+const authenticatedUserId = ref<number | null>(null);
+
 async function fetchDepartmentShifts(departmentId: number | null) {
   if (!departmentId) return;
 
@@ -93,7 +105,8 @@ async function fetchDepartmentShifts(departmentId: number | null) {
     await supervisorStore.getDepartmentNurses(departmentId);
     await shiftTemplatesStore.getShiftTemplates();
   } catch (error: any) {
-    showError(error.message);
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error loading data');
     errorShifts.value = error.message;
   } finally {
     isLoadingShifts.value = false;
@@ -102,7 +115,6 @@ async function fetchDepartmentShifts(departmentId: number | null) {
 
 const onDepartmentSelectedForShifts = async (departmentId: number) => {
   errorShifts.value = null;
-
   await fetchDepartmentShifts(departmentId);
 };
 
@@ -111,8 +123,20 @@ const {
   isLoadingDepartments,
   errorDepartments,
   currentDepartment,
+  departments,
 } = useDepartmentSelection({
+  store: supervisorStore,
+  fetchDepartmentsAction: supervisorStore.getAllMyDepartments,
   onDepartmentSelected: onDepartmentSelectedForShifts,
+  userId: authenticatedUserId,
+});
+
+onMounted(() => {
+  if (authStore.user?.id) {
+    authenticatedUserId.value = authStore.user.id;
+  } else {
+    showError('User not authenticated. Cannot load schedule.');
+  }
 });
 
 const {
@@ -125,7 +149,7 @@ const {
 
 const handleDateSelectedForShift = (date: string) => {
   if (date < todayString) {
-    showWarning('No puedes crear un turno en el pasado.');
+    showWarning('You can not create a shift in the past.');
     return;
   }
 
@@ -139,7 +163,7 @@ const handleShiftSelectedToEdit = (shift: ShiftResponse) => {
   const shiftDateOnly = shift.shiftDate.split('T')[0];
 
   if (shiftDateOnly < todayString) {
-    showWarning('No puedes editar un turno pasado.');
+    showWarning('You cannot edit a past turn.');
     return;
   }
 
@@ -157,34 +181,34 @@ type ShiftSavedPayload = {
 
 const handleShiftSaved = async (payload: ShiftSavedPayload) => {
   if (!selectedDepartmentId.value) {
-    showWarning('Selecciona un departamento para guardar el turno.');
+    showWarning('Select a department to save the shift.');
     return;
   }
 
-  if (payload.type === 'create') {
-    payload.data.departmentId = selectedDepartmentId.value;
-
-    await supervisorStore.createShift(
-      selectedDepartmentId.value,
-      payload.data as CreateShiftRequest,
-    );
-
-    showSuccess('¡Turno creado correctamente!');
-  } else if (payload.type === 'update' && payload.shiftId) {
-    payload.data.departmentId = selectedDepartmentId.value;
-
-    await supervisorStore.updateShift(
-      selectedDepartmentId.value,
-      payload.shiftId,
-      payload.data as UpdateShiftRequest,
-    );
-
-    showSuccess('¡Turno actualizado correctamente!');
+  try {
+    if (payload.type === 'create') {
+      payload.data.departmentId = selectedDepartmentId.value;
+      await supervisorStore.createShift(
+        selectedDepartmentId.value,
+        payload.data as CreateShiftRequest,
+      );
+      showSuccess('Shift successfully created!');
+    } else if (payload.type === 'update' && payload.shiftId) {
+      payload.data.departmentId = selectedDepartmentId.value;
+      await supervisorStore.updateShift(
+        selectedDepartmentId.value,
+        payload.shiftId,
+        payload.data as UpdateShiftRequest,
+      );
+      showSuccess('Shift successfully updated!');
+    }
+    await fetchDepartmentShifts(selectedDepartmentId.value);
+  } catch (error: any) {
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error saving shift.');
+  } finally {
+    isShiftModalOpen.value = false;
   }
-
-  await fetchDepartmentShifts(selectedDepartmentId.value);
-
-  isShiftModalOpen.value = false;
 };
 </script>
 

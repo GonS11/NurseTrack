@@ -19,8 +19,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ShiftService
-{
+public class ShiftService {
     private final ShiftRepository shiftRepository;
     private final ShiftMapper shiftMapper;
     private final ShiftBusinessValidator businessValidator;
@@ -31,52 +30,47 @@ public class ShiftService
     private final ShiftTemplateRepository shiftTemplateRepository;
 
     @Transactional(readOnly = true)
-    public List<ShiftResponse> getAllShiftsByDepartmentId(Long departmentId)
-    {
-        return shiftMapper.toDTOList(shiftRepository.findAllByDepartmentId(departmentId));
+    public List<ShiftResponse> getAllShiftsByDepartmentId(Long departmentId) {
+        List<Shift> shifts = shiftRepository.findAllByDepartmentId(departmentId);
+        if (shifts == null) {
+            return List.of();
+        }
+        return shiftMapper.toDTOList(shifts);
     }
 
     @Transactional(readOnly = true)
-    public List<ShiftResponse> getAllShiftByUserId(Long nurseId)
-    {
+    public List<ShiftResponse> getAllShiftByUserId(Long nurseId) {
         return shiftMapper.toDTOList(shiftRepository.findAllByNurseId(nurseId));
     }
 
     @Transactional(readOnly = true)
-    public List<ShiftResponse> getAllShiftByUserIdAndDate(Long nurseId, LocalDate startDate, LocalDate endDate)
-    {
+    public List<ShiftResponse> getAllShiftByUserIdAndDate(Long nurseId, LocalDate startDate, LocalDate endDate) {
         return shiftMapper.toDTOList(shiftRepository.findAllByNurseIdAndShiftDateBetween(nurseId, startDate, endDate));
     }
 
     @Transactional(readOnly = true)
-    public List<ShiftResponse> getShiftsByNurseAndDepartment(Long nurseId, Long departmentId)
-    {
+    public List<ShiftResponse> getShiftsByNurseAndDepartment(Long nurseId, Long departmentId) {
         nurseDepartmentService.validateNurseAccess(nurseId, departmentId);
         return shiftMapper.toDTOList(shiftRepository.findAllByNurseIdAndDepartmentId(nurseId, departmentId));
 
     }
 
     @Transactional(readOnly = true)
-    public ShiftResponse getShiftById(Long shiftId, Long departmentId)
-    {
+    public ShiftResponse getShiftById(Long shiftId, Long departmentId) {
         Shift shift = shiftRepository.findByIdAndDepartmentId(shiftId, departmentId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Shift", shiftId));
 
         return shiftMapper.toDTO(shift);
     }
 
-
-    public ShiftResponse createShift(CreateShiftRequest request)
-    {
+    public ShiftResponse createShift(CreateShiftRequest request) {
         Shift shift = shiftMapper.toEntity(request, userRepository, departmentRepository, shiftTemplateRepository);
 
         Shift savedShift = shiftRepository.save(shift);
         return shiftMapper.toDTO(savedShift);
     }
 
-
-    public ShiftResponse updateShift(Long shiftId, UpdateShiftRequest request, Long supervisorId)
-    {
+    public ShiftResponse updateShift(Long shiftId, UpdateShiftRequest request, Long supervisorId) {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> ResourceNotFoundException.create("Shift", shiftId));
 
@@ -88,14 +82,11 @@ public class ShiftService
         return shiftMapper.toDTO(updatedShift);
     }
 
-    public void deleteShift(Long shiftId)
-    {
-        if (!shiftRepository.existsById(shiftId))
-        {
+    public void deleteShift(Long shiftId) {
+        if (!shiftRepository.existsById(shiftId)) {
             throw ResourceNotFoundException.create("Shift", shiftId);
         }
         shiftRepository.deleteById(shiftId);
     }
-
 
 }

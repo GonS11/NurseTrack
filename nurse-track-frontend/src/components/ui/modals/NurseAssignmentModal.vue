@@ -169,7 +169,8 @@ const fetchDepartmentNursesAndAvailableNurses = async () => {
 
     nurseToAssignId.value = null;
   } catch (error: any) {
-    showError('Error fetching nurses:', error);
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error inesperado');
     assignedNurses.value = [];
     availableNurses.value = [];
   }
@@ -205,7 +206,8 @@ const assignNurse = async () => {
     await adminStore.assignNurseToDepartment(request);
     await fetchDepartmentNursesAndAvailableNurses();
   } catch (error: any) {
-    showError('Error assigning nurse:', error);
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error inesperado');
   }
 };
 
@@ -229,7 +231,8 @@ const executeRemoveNurse = async () => {
     await adminStore.removeNurseFromDepartment(departmentId, nurseId);
     await fetchDepartmentNursesAndAvailableNurses();
   } catch (error: any) {
-    showError('Error removing nurse:', error);
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error inesperado');
   } finally {
     nurseToRemoveDetails.value = null;
   }

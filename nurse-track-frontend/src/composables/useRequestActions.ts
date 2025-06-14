@@ -12,7 +12,6 @@ import { formatDate } from '../utils/helpers';
 
 export function useRequestActions(
   selectedDepartmentId: Ref<number | null>,
-  // Las funciones de fetch ahora esperan un 'number' como se usa en tus vistas, no 'number | null'
   fetchVacationRequests: (departmentId: number, all?: boolean) => Promise<void>,
   fetchShiftChangeRequests: (
     departmentId: number,
@@ -37,29 +36,28 @@ export function useRequestActions(
   function confirmApproveVacation(request: VacationRequestResponse) {
     requestToApprove.value = request;
     requestTypeToApprove.value = 'vacation';
-    approveConfirmMessage.value = `¿Estás seguro de que quieres aprobar esta solicitud de vacaciones de ${
+    approveConfirmMessage.value = `Are you sure you want to approve this vacation request from ${
       request.requestingNurse.firstname
-    } ${request.requestingNurse.lastname} para el periodo del ${formatDate(
+    } ${request.requestingNurse.lastname} for the period of ${formatDate(
       request.startDate,
-    )} al ${formatDate(request.endDate)}?`;
+    )} to ${formatDate(request.endDate)}?`;
     showApproveConfirmModal.value = true;
   }
 
   function confirmApproveShiftChange(request: ShiftChangeResponse) {
     requestToApprove.value = request;
     requestTypeToApprove.value = 'shiftChange';
-    approveConfirmMessage.value = `¿Estás seguro de que quieres aprobar esta solicitud de cambio de turno de ${request.requestingNurse.firstname} ${request.requestingNurse.lastname}?`;
+    approveConfirmMessage.value = `Are you sure you want to approve this shift change request from ${request.requestingNurse.firstname} ${request.requestingNurse.lastname}?`;
     showApproveConfirmModal.value = true;
   }
 
   async function executeApproveRequest() {
-    // Asegurarse de que el departamento esté seleccionado antes de continuar
     if (selectedDepartmentId.value === null) {
-      showError('Departamento no seleccionado.');
+      showError('Department not selected.');
       return;
     }
     if (!requestToApprove.value || !requestTypeToApprove.value) {
-      showError('Ocurrió un error interno. Por favor, inténtalo de nuevo.');
+      showError('An internal error occurred. Please try again.');
       return;
     }
 
@@ -67,32 +65,33 @@ export function useRequestActions(
       if (requestTypeToApprove.value === 'vacation') {
         const updatePayload: UpdateVacationRequest = {
           status: RequestStatus.APPROVED,
-          reviewedNotes: 'Aprobado por el supervisor.',
+          reviewedNotes: 'Approved by the supervisor.',
         };
         await supervisorStore.approveVacationRequest(
           selectedDepartmentId.value,
           requestToApprove.value.id,
           updatePayload,
         );
-        await fetchVacationRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
-        showSuccess('¡Solicitud de vacaciones aprobada exitosamente!');
+        await fetchVacationRequests(selectedDepartmentId.value, false);
+        showSuccess('Vacation request successfully approved!');
       } else if (requestTypeToApprove.value === 'shiftChange') {
         const updatePayload: UpdateShiftChangeRequest = {
           status: RequestStatus.APPROVED,
-          reviewedNotes: 'Aprobado por el supervisor.',
+          reviewedNotes: 'Approved by the supervisor.',
         };
         await supervisorStore.approveShiftChangeRequest(
           selectedDepartmentId.value,
           requestToApprove.value.id,
           updatePayload,
         );
-        await fetchShiftChangeRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
-        showSuccess('¡Solicitud de cambio de turno aprobada exitosamente!');
+        await fetchShiftChangeRequests(selectedDepartmentId.value, false);
+        showSuccess('Shift change request successfully approved!');
       }
     } catch (error: any) {
+      const backendMsg = error?.response?.data?.message;
       showError(
-        `Error al aprobar la solicitud: ${
-          error.message || 'Error desconocido'
+        `Error in approving the application: ${
+          backendMsg || error.message || 'Unknown error'
         }`,
       );
     } finally {
@@ -106,7 +105,7 @@ export function useRequestActions(
     requestToApprove.value = null;
     requestTypeToApprove.value = null;
     showApproveConfirmModal.value = false;
-    showInfo('Operación de aprobación cancelada.');
+    showInfo('Approval operation cancelled.');
   }
 
   function openRejectVacationModal(requestId: number) {
@@ -118,17 +117,18 @@ export function useRequestActions(
 
   async function handleRejectVacation() {
     if (rejectNotes.value.trim() === '') {
-      showError('Por favor, proporciona notas de rechazo.');
+      showError('Please provide rejection notes.');
       return;
     }
-    // Asegurarse de que el departamento esté seleccionado y el ID de la solicitud exista
+
     if (selectedDepartmentId.value === null) {
-      showError('Departamento no seleccionado.');
+      showError('Department not selected.');
       closeRejectModal();
       return;
     }
+
     if (currentRequestId.value === null) {
-      showError('ID de solicitud de vacaciones no encontrado.');
+      showError('Vacation request ID not found.');
       closeRejectModal();
       return;
     }
@@ -138,19 +138,20 @@ export function useRequestActions(
         status: RequestStatus.REJECTED,
         reviewedNotes: rejectNotes.value.trim(),
       };
+
       await supervisorStore.rejectVacationRequest(
         selectedDepartmentId.value,
         currentRequestId.value,
         updatePayload,
       );
-      await fetchVacationRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
-      showSuccess('¡Solicitud de vacaciones rechazada exitosamente!');
+
+      await fetchVacationRequests(selectedDepartmentId.value, false);
+
+      showSuccess('Vacation request successfully rejected!');
       closeRejectModal();
     } catch (error: any) {
       showError(
-        `Error al rechazar la solicitud de vacaciones: ${
-          error.message || 'Error desconocido'
-        }`,
+        `Error rejecting vacation request: ${error.message || 'Unknown error'}`,
       );
     }
   }
@@ -164,17 +165,17 @@ export function useRequestActions(
 
   async function handleRejectShiftChange() {
     if (rejectNotes.value.trim() === '') {
-      showError('Por favor, proporciona notas de rechazo.');
+      showError('Please provide rejection notes.');
       return;
     }
-    // Asegurarse de que el departamento esté seleccionado y el ID de la solicitud exista
+
     if (selectedDepartmentId.value === null) {
-      showError('Departamento no seleccionado.');
+      showError('Department not selected.');
       closeRejectModal();
       return;
     }
     if (currentRequestId.value === null) {
-      showError('ID de solicitud de cambio de turno no encontrado.');
+      showError('Shift change request ID not found.');
       closeRejectModal();
       return;
     }
@@ -189,13 +190,13 @@ export function useRequestActions(
         currentRequestId.value,
         updatePayload,
       );
-      await fetchShiftChangeRequests(selectedDepartmentId.value, false); // Pasa el ID directamente
-      showSuccess('¡Solicitud de cambio de turno rechazada exitosamente!');
+      await fetchShiftChangeRequests(selectedDepartmentId.value, false);
+      showSuccess('Shift change request successfully rejected!');
       closeRejectModal();
     } catch (error: any) {
       showError(
-        `Error al rechazar la solicitud de cambio de turno: ${
-          error.message || 'Error desconocido'
+        `Error rejecting shift change request: ${
+          error.message || 'Unknown error'
         }`,
       );
     }

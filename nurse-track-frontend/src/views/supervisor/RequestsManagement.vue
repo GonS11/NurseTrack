@@ -4,6 +4,7 @@
 
     <DepartmentSelector
       v-model:selected-department-id="selectedDepartmentId"
+      :departments="departments"
       :is-loading-departments="isLoadingDepartments"
       :error-departments="errorDepartments"
       @error-alert="showError"
@@ -102,17 +103,20 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useSupervisorStore } from '../../stores/supervisor.store';
-import { useRequestActions } from '../../composables/useRequestActions';
 import { useDepartmentSelection } from '../../composables/useDepartmentSelection';
-import { useNotifications } from '../../composables/useNotifications';
+import { useAuthStore } from '../../stores/auth.store';
+import { useRequestActions } from '../../composables/useRequestActions';
 import { formatDate } from '../../utils/helpers';
 import ConfirmModal from '../../components/common/ConfirmModal.vue';
 import DepartmentSelector from '../../components/requests/DepartmentSelector.vue';
 import RequestSection from '../../components/requests/RequestSection.vue';
 import RejectNotesModal from '../../components/requests/RejectNotesModal.vue';
+import { useNotifications } from '../../composables/useNotifications';
 
 const supervisorStore = useSupervisorStore();
-const { showError, showWarning } = useNotifications(); // Desestructuramos para uso directo
+const { showError, showWarning } = useNotifications();
+const authStore = useAuthStore();
+const authenticatedUserId = ref<number | null>(authStore.user?.id ?? null);
 
 const isLoadingVacation = ref(false);
 const isLoadingShiftChange = ref(false);
@@ -120,13 +124,11 @@ const errorVacation = ref<string | null>(null);
 const errorShiftChange = ref<string | null>(null);
 
 async function fetchVacationRequests(
-  departmentId: number | null, // Se mantiene 'number | null' aquí para manejar el caso inicial del selector
+  departmentId: number | null,
   all: boolean = false,
 ) {
   if (departmentId === null) {
-    showWarning(
-      'Intentando obtener solicitudes de vacaciones con un ID de departamento nulo.',
-    );
+    showWarning('Trying to get vacation requests with a null department ID.');
     supervisorStore.vacationRequests = [];
     isLoadingVacation.value = false;
     return;
@@ -142,20 +144,20 @@ async function fetchVacationRequests(
       await supervisorStore.getPendingVacationRequests(departmentId);
     }
   } catch (error: any) {
-    showError(error.message);
-    errorVacation.value = error.message;
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error loading data');
   } finally {
     isLoadingVacation.value = false;
   }
 }
 
 async function fetchShiftChangeRequests(
-  departmentId: number | null, // Se mantiene 'number | null' aquí
+  departmentId: number | null,
   all: boolean = false,
 ) {
   if (departmentId === null) {
     showWarning(
-      'Intentando obtener solicitudes de cambio de turno con un ID de departamento nulo.',
+      'Trying to get shift change requests with a null department ID.',
     );
     supervisorStore.shiftChangeRequests = [];
     isLoadingShiftChange.value = false;
@@ -172,7 +174,8 @@ async function fetchShiftChangeRequests(
       await supervisorStore.getPendingShiftChangeRequests(departmentId);
     }
   } catch (error: any) {
-    showError(error.message);
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error loading data');
     errorShiftChange.value = error.message;
   } finally {
     isLoadingShiftChange.value = false;
@@ -183,16 +186,22 @@ const onDepartmentSelectedForRequests = async (departmentId: number) => {
   errorVacation.value = null;
   errorShiftChange.value = null;
 
-  await fetchVacationRequests(departmentId); // Aquí pasamos un número
-  await fetchShiftChangeRequests(departmentId); // Aquí pasamos un número
+  await fetchVacationRequests(departmentId);
+  await fetchShiftChangeRequests(departmentId);
 };
 
-const { selectedDepartmentId, isLoadingDepartments, errorDepartments } =
-  useDepartmentSelection({
-    onDepartmentSelected: onDepartmentSelectedForRequests,
-  });
+const {
+  selectedDepartmentId,
+  isLoadingDepartments,
+  errorDepartments,
+  departments,
+} = useDepartmentSelection({
+  store: supervisorStore,
+  fetchDepartmentsAction: supervisorStore.getAllMyDepartments,
+  onDepartmentSelected: onDepartmentSelectedForRequests,
+  userId: authenticatedUserId,
+});
 
-// Desestructuramos las propiedades y funciones directamente del composable
 const {
   approveConfirmMessage,
   showApproveConfirmModal,
@@ -212,7 +221,7 @@ const {
   selectedDepartmentId,
   fetchVacationRequests,
   fetchShiftChangeRequests,
-); // Pasamos selectedDepartmentId como Ref
+);
 </script>
 
 <style scoped lang="scss">

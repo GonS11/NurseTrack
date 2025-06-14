@@ -4,6 +4,7 @@
 
     <DepartmentSelector
       v-model:selected-department-id="selectedDepartmentId"
+      :departments="departments"
       :is-loading-departments="isLoadingDepartments"
       :error-departments="errorDepartments"
       @error-alert="showError"
@@ -76,11 +77,14 @@ import AddNurseToDepartmentForm from '../../components/ui/supervisor/AddNurseToD
 import ConfirmModal from '../../components/common/ConfirmModal.vue';
 import DepartmentSelector from '../../components/requests/DepartmentSelector.vue';
 import { useNotifications } from '../../composables/useNotifications';
-import { useNurseConfirmation } from '../../composables/useNurseConfirmation'; // Asegúrate de que este composable exista
+import { useNurseConfirmation } from '../../composables/useNurseConfirmation';
 import { useDepartmentSelection } from '../../composables/useDepartmentSelection';
+import { useAuthStore } from '../../stores/auth.store';
 
 const supervisorStore = useSupervisorStore();
-const { showError, showWarning, showSuccess } = useNotifications(); // Desestructuramos para uso directo
+const { showError, showWarning, showSuccess } = useNotifications();
+const authStore = useAuthStore();
+const authenticatedUserId = ref<number | null>(authStore.user?.id ?? null);
 
 const isLoadingNurses = ref(false);
 const errorDepartmentDetails = ref<string | null>(null);
@@ -91,8 +95,8 @@ async function fetchDepartmentNurses(departmentId: number) {
   try {
     await supervisorStore.getDepartmentNurses(departmentId);
   } catch (error: any) {
-    showError(error.message);
-    errorDepartmentDetails.value = error.message;
+    const backendMsg = error?.response?.data?.message;
+    showError(backendMsg || error.message || 'Error loading data');
   } finally {
     isLoadingNurses.value = false;
   }
@@ -108,29 +112,28 @@ const {
   isLoadingDepartments,
   errorDepartments,
   currentDepartment,
+  departments,
 } = useDepartmentSelection({
+  store: supervisorStore,
+  fetchDepartmentsAction: supervisorStore.getAllMyDepartments,
   onDepartmentSelected: onDepartmentSelectedForStaff,
+  userId: authenticatedUserId,
 });
 
-// Desestructuramos las propiedades y funciones directamente del composable
 const {
   showConfirmModal,
   confirmMessage,
   handleRemoveNurseConfirmation,
   handleRemoveNurse,
   cancelRemoveNurse,
-} = useNurseConfirmation(selectedDepartmentId, fetchDepartmentNurses); // Pasamos selectedDepartmentId como Ref
-// Si useNurseConfirmation espera `notifications` como un argumento, deberías pasarlo:
-// } = useNurseConfirmation(selectedDepartmentId, notifications, fetchDepartmentNurses);
+} = useNurseConfirmation(selectedDepartmentId, fetchDepartmentNurses);
 
 const handleNurseAdded = async () => {
   if (selectedDepartmentId.value) {
-    showSuccess('¡Enfermera añadida exitosamente!');
+    showSuccess('Nurse added successfully!');
     await fetchDepartmentNurses(selectedDepartmentId.value);
   } else {
-    showWarning(
-      'No se pudo añadir la enfermera. Departamento no seleccionado.',
-    );
+    showWarning('Nurse could not be added. Department not selected.');
   }
 };
 </script>

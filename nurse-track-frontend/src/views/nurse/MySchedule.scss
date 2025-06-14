@@ -1,0 +1,10 @@
+@use '../../styles/main.scss' as *;
+
+.requests-container {
+  @include flex-center(row);
+  justify-content: space-evenly;
+
+  &--section {
+    @include flex-center(column);
+  }
+}

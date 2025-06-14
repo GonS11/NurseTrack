@@ -30,15 +30,11 @@ const emit = defineEmits<{
   (e: 'cancelled'): void;
 }>();
 
-// Cuando confirma
 function onConfirm() {
-  // Primero avisamos al padre que hubo "confirm"
   emit('confirmed');
-  // Luego cerramos el modal (emitimos update:modelValue = false)
   emit('update:modelValue', false);
 }
 
-// Cuando cancela (o clic en overlay)
 function onCancel() {
   emit('cancelled');
   emit('update:modelValue', false);

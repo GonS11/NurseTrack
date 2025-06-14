@@ -29,7 +29,6 @@ const RequestsManagement = () =>
 
 // Nurse
 const NurseDashboard = () => import('../views/dashboard/NurseDashboard.vue');
-const MyDepartments = () => import('../views/nurse/MyDepartments.vue');
 const MySchedule = () => import('../views/nurse/MySchedule.vue');
 const RequestShiftSwap = () => import('../views/nurse/RequestShiftSwap.vue');
 const RequestVacation = () => import('../views/nurse/RequestVacation.vue');
@@ -163,11 +162,6 @@ const routes: RouteRecordRaw[] = [
         path: 'nurse',
         meta: { allowedRoles: [UserRole.NURSE] },
         children: [
-          {
-            path: 'departments',
-            name: 'nurse-departments',
-            component: MyDepartments,
-          },
           { path: 'schedule', name: 'nurse-schedule', component: MySchedule },
           {
             path: 'shift-swap',

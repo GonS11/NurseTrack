@@ -79,12 +79,7 @@ const handleLogout = async () => {
 };
 
 const closeSidebarOnMobile = () => {
-  // Note: AppShell.vue's `isLateralSidebarOnMobile` is currently `false`.
-  // If you want the sidebar to close on route click on mobile, you'd need
-  // to change `isLateralSidebarOnMobile` to `true` in AppShell.vue
-  // and then this condition `props.isMobile` would be sufficient.
   if (props.isMobile && false) {
-    // This `&& false` makes the condition always false. Remove `&& false` if `isLateralSidebarOnMobile` ever becomes true.
     emit('toggle');
   }
 };
@@ -134,7 +129,6 @@ const allowedRoutes = computed(() => {
     base.splice(
       1,
       0,
-      { name: 'nurse-departments', icon: 'business', text: 'My Departments' },
       { name: 'nurse-schedule', icon: 'calendar_month', text: 'My Schedule' },
       { name: 'nurse-shift-swap', icon: 'swap_horiz', text: 'Shift Request' },
       {

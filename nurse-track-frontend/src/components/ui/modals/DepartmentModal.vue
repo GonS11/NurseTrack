@@ -123,7 +123,10 @@ const submitForm = () => {
     emit('submit', result.data);
   } else {
     mapZodErrors(result.error);
-    showError('Validation errors:', result.error.flatten().fieldErrors);
+    showError(
+      'Validation errors: ' +
+        JSON.stringify(result.error.flatten().fieldErrors),
+    );
   }
 };
 

@@ -107,7 +107,6 @@ const userActions = ref<TableAction<UserResponse>[]>([
       } catch (error: any) {
         showError(error);
       }
-      // NO recargues aquí, la store debe hacerlo si es necesario
     },
     condition: () => authStore.isAdmin,
   },

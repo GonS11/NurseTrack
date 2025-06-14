@@ -116,11 +116,8 @@ const handleModalSubmitInternal = async (formData: any) => {
 
     closeModal();
   } catch (error: any) {
-    notifications.showError(
-      'Error saving item in ManagementComponent: ',
-      error,
-    );
-    throw error;
+    const backendMsg = error?.response?.data?.message;
+    notifications.showError(backendMsg || error.message || 'Unexpected error');
   }
 };
 

@@ -31,4 +31,13 @@ export const useNurseShiftService = {
 
     return response.data;
   },
+
+  async getAllShiftsInDepartment(
+    departmentId: number,
+  ): Promise<ShiftResponse[]> {
+    const response = await api.get<ShiftResponse[]>(
+      `/departments/${departmentId}/shifts/all`,
+    );
+    return response.data;
+  },
 };
