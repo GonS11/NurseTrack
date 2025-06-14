@@ -96,11 +96,13 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 - Java Development Kit (JDK) v21
 - Docker & Docker Compose
 
+---
+
 ### **Docker Installation (Linux):**
 
 If you're running on Linux, follow these steps to install Docker Engine and Docker Compose. For Windows or macOS, please use Docker Desktop.
 
-1.  **Install Docker Engine:**
+1.  **Install Docker Engine and Compose:**
 
     ```bash
     # Update your package index
@@ -110,16 +112,16 @@ If you're running on Linux, follow these steps to install Docker Engine and Dock
     # Create a directory for Docker's GPG key
     sudo install -m 0755 -d /etc/apt/keyrings
     # Download and add Docker's official GPG key
-    sudo curl -fsSL [https://download.docker.com/linux/ubuntu/gpg](https://download.docker.com/linux/ubuntu/gpg) -o /etc/apt/keyrings/docker.asc
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
     # Add the Docker repository to Apt sources
     echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
       $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
       sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     # Update the package index again with the Docker repository
     sudo apt-get update
-    # Install Docker Engine, containerd, and Docker Compose
+    # Install Docker Engine and Docker Compose plugin
     sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     ```
 
@@ -140,26 +142,42 @@ If you're running on Linux, follow these steps to install Docker Engine and Dock
 
     If the installation is successful, you'll see a message confirming Docker is working.
 
+---
+
 ### **Steps to Run:**
 
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/GonS11/NurseTrack.git](https://github.com/GonS11/NurseTrack.git)
+    git clone https://github.com/GonS11/NurseTrack.git
     cd NurseTrack
     ```
 
 2.  **Start Backend and Database Services (using Docker Compose):**
 
-    ```bash
-    docker-compose up -d
-    ```
+    - **On Linux:**  
+      Use the new Docker Compose command (without hyphen):
+
+      ```bash
+      docker compose up -d
+      ```
+
+    - **On Windows/macOS (Docker Desktop):**  
+      You can use either:
+
+      ```bash
+      docker compose up -d
+      ```
+      or
+      ```bash
+      docker-compose up -d
+      ```
 
     - To stop the services:
 
-    ```bash
-    docker-compose down
-    ```
+      ```bash
+      docker compose down
+      ```
 
 3.  **Verify Backend Readiness:**
     It's crucial to wait for the backend service to be fully operational before starting the frontend. You can monitor its health by accessing the Spring Boot Actuator endpoint.
