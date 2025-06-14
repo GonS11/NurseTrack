@@ -74,18 +74,20 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 ---
 
 ## Screenshots
+
 ### Login Page
+
 ![Login Page](https://github.com/user-attachments/assets/4edd3299-8022-45e7-ab77-0600dfae269e)
 
 ### Admin Dashboard
-![Admin Dashboard](https://github.com/user-attachments/assets/f319da0b-830a-4d1f-a5cb-07ab43a1a76f)
 
+![Admin Dashboard](https://github.com/user-attachments/assets/f319da0b-830a-4d1f-a5cb-07ab43a1a76f)
 
 ---
 
 ## 🌟 **How to Run the Project**
 
-> ⚠️ **Important:** The backend and database are containerized using Docker. Make sure you have **Docker** installed (Docker Desktop for Windows/macOS, or Docker Engine on Linux).  
+> ⚠️ **Important:** The backend and database are containerized using Docker. Make sure you have **Docker** installed (Docker Desktop for Windows/macOS, or Docker Engine on Linux).
 > The frontend is **not dockerized** and must be run separately using `npm run dev`.
 
 ### **Prerequisites:**
@@ -94,12 +96,56 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 - Java Development Kit (JDK) v21
 - Docker & Docker Compose
 
-### **Steps to Run:**
+### **Docker Installation (Linux):**
 
-1. **Clone the repository:**
+If you're running on Linux, follow these steps to install Docker Engine and Docker Compose. For Windows or macOS, please use Docker Desktop.
+
+1.  **Install Docker Engine:**
 
     ```bash
-    git clone https://github.com/GonS11/NurseTrack.git
+    # Update your package index
+    sudo apt-get update
+    # Install Docker's dependencies
+    sudo apt-get install ca-certificates curl
+    # Create a directory for Docker's GPG key
+    sudo install -m 0755 -d /etc/apt/keyrings
+    # Download and add Docker's official GPG key
+    sudo curl -fsSL [https://download.docker.com/linux/ubuntu/gpg](https://download.docker.com/linux/ubuntu/gpg) -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    # Add the Docker repository to Apt sources
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # Update the package index again with the Docker repository
+    sudo apt-get update
+    # Install Docker Engine, containerd, and Docker Compose
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    ```
+
+2.  **Manage Docker as a non-root user (optional but recommended):**
+    To run Docker commands without `sudo`, add your user to the `docker` group.
+
+    ```bash
+    sudo usermod -aG docker $USER
+    # Log out and log back in for the changes to take effect, or run:
+    newgrp docker
+    ```
+
+3.  **Verify Docker installation:**
+
+    ```bash
+    docker run hello-world
+    ```
+
+    If the installation is successful, you'll see a message confirming Docker is working.
+
+### **Steps to Run:**
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone [https://github.com/GonS11/NurseTrack.git](https://github.com/GonS11/NurseTrack.git)
     cd NurseTrack
     ```
 
@@ -123,6 +169,7 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
     # Or just open this URL in your browser:
     http://localhost:8080/actuator/health
     ```
+
     The backend is ready when the response displays: `"status": "UP"`.
 
 4.  **Run the frontend (not dockerized):**
@@ -149,5 +196,5 @@ NurseTrack leverages a modern, robust, and scalable technology stack to ensure e
 7.  **Access the Application:**
     Once both backend and frontend services are running, you can access NurseTrack through your web browser.
 
-    -   **Frontend (User Interface):** [http://localhost:5173](http://localhost:5173)
-    -   **Backend (API Base URL):** [http://localhost:8080](http://localhost:8080)
+    - **Frontend (User Interface):** [http://localhost:5173](http://localhost:5173)
+    - **Backend (API Base URL):** [http://localhost:8080](http://localhost:8080)
